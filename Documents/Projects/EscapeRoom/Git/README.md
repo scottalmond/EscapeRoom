@@ -11,11 +11,7 @@ Developer Functionality Check
 
 The following is a series of basic tests to ensure proper installation of the support tools needed to develop the code.
 
-License
 
-Code: Creative Commons, Attribution Only
-Artwork: Creative Commons, Attribution Only
-https://creativecommons.org/licenses/by/3.0/us/legalcode
 
 About
 
