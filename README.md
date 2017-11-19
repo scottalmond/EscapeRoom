@@ -1,15 +1,15 @@
 <b>Overview</b>
 
 This project contains four interactive puzzles which form a portion of an escape room.
-<a href="https://en.wikipedia.org/wiki/Escape_room">Wikipedia: Escape Room</a>
+[Wikipedia: Escape Room](https://en.wikipedia.org/wiki/Escape_room)
 TODO: video of deployed build
 
 <b>Details</b>
 
-<u>Room</u>
+_Room_
 The escape room is themed after a Star Trek command bridge and is designed to build team work among a team of 4-6 employees.  Teams are given one hour to re-establish power to the ship, stock a cargo pod, then navigate the pod to stranded crew members.
 
-<u>Puzzle 1: Morse Code</u>
+_Puzzle 1: Morse Code_
 The auxilary monitor displays a password prompt.  The player can provide two inputs: a dot and a dash by pressing labelled concave buttons.  The password is acquired by solving puzzles elsewhere in the room.  Entering the correct password unlocks the screen to provide information needed to access other puzzles in the room.
 
 <u>Puzzle 2: Light Puzzle Splash Screen</u>
@@ -29,12 +29,12 @@ A cutscene is played showing the cargo pod exiting from the space ship, follwed 
 The following resources were used in this project.
 
 <u>Hardware</u>
-* Qty: 2, <a href="https://www.raspberrypi.org/products/raspberry-pi-3-model-b/">Raspberry Pi 3</a>, each drives one monitor
-	* Qty: 2, <a href="https://www.newegg.com/Product/Product.aspx?Item=9SIA12K0N93630">SanDisk 32GB microSD microSDHC Card Mobile Ultra Class 10 with USB Card Reader</a>, holds operating system and project files
-	* Qty: 1, <a href=""><a/>
-	* Qty: 1, <a href=""><a/>
-* Qty: 1, <a href="https://www.sparkfun.com/products/9136">Arcade Joystick</a>, 4-axis bang-bang control with fire button
-* Qty: 4, <a href="https://www.sparkfun.com/products/9337">Button</a>, bang-bang control
+- Qty: 2, <a href="https://www.raspberrypi.org/products/raspberry-pi-3-model-b/">Raspberry Pi 3</a>, each drives one monitor
+	- Qty: 2, <a href="https://www.newegg.com/Product/Product.aspx?Item=9SIA12K0N93630">SanDisk 32GB microSD microSDHC Card Mobile Ultra Class 10 with USB Card Reader</a>, holds operating system and project files
+	- Qty: 1, <a href=""><a/>
+	- Qty: 1, <a href=""><a/>
+- Qty: 1, <a href="https://www.sparkfun.com/products/9136">Arcade Joystick</a>, 4-axis bang-bang control with fire button
+- Qty: 4, <a href="https://www.sparkfun.com/products/9337">Button</a>, bang-bang control
 
 <u>Software</u>
 OS: Noobs v2.4.4
