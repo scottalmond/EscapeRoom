@@ -1,6 +1,6 @@
 # Overview
 
-This project contains four interactive puzzles which form a portion of an [Wikipedia: Escape Room](https://en.wikipedia.org/wiki/Escape_room).  Puzzles are written in Python3 and run on two Raspberry Pi 3's.
+This project contains four interactive puzzles which form a portion of an [Escape Room](https://en.wikipedia.org/wiki/Escape_room).  Puzzles are written in Python3 and run on two Raspberry Pi 3's.
 
 TODO: video of deployed build
 
@@ -12,12 +12,12 @@ The escape room is themed after a Star Trek command bridge and is designed to bu
 TODO: Wideangle image of room
 
 ## Puzzle 1: Morse Code
-The auxilary monitor displays a password prompt.  The player can provide two inputs: a dot and a dash by pressing labelled concave buttons.  The correct password is acquired by solving puzzles elsewhere in the room.  Entering the correct password unlocks the screen to provide information needed to access other puzzles in the room.
+The auxilary monitor displays a password prompt.  The player can provide two inputs: a dot and a dash by pressing the corresponding labelled concave buttons.  The correct password is acquired by solving puzzles elsewhere in the room.  Entering the correct password unlocks the screen to provide information needed to access other puzzles in the room.
 
 TODO: 20-30 demo video
 
 ## Puzzle 2: Light Puzzle
-The main monitor displays a 1-hour countdown timer and the status of the power in the command bridge.  Power status is represented by four disabled power icons.  Four colored LED strips connect the main monitor to puzzles in other areas of the room.  When a light puzzle is solved, the corresponding LED strip transistions from blinking erratically to smoothly pulsing, and the icon on the screen updates to show power is enabled.  Once all four light puzzles are solved, a cutscene video is played, and then Puzzle 3 begins.
+The main monitor displays a one-hour countdown timer and the status of the power in the command bridge.  Power status is represented by four disabled power icons.  Four colored LED strips visually connect the main monitor to other puzzles in the room.  When a light puzzle is solved, the corresponding LED strip transistions from blinking erratically to smoothly pulsing, and the icon on the screen updates to show power is enabled.  Once all four light puzzles are solved, a cutscene video is played, and then the next puzzle begins.
 
 TODO: 20-30 demo video
 
@@ -29,7 +29,11 @@ The first sprite is controlled via the joystick.  The second sprite is controlle
 TODO: 20-30 second demo video
 
 ## Puzzle 4: Hyperspace Game
-A cutscene is played showing the cargo pod exiting from the space ship, followed by entering a hyperspace tunnel.  The gameplay pulls inspiration from a boss battle in [Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s).  The cargo pod must evade obstacles 
+A cutscene is played showing the cargo pod exiting from the space ship, followed by entering a hyperspace tunnel.  The gameplay pulls inspiration from a boss battle in [Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s).  The hyperspace tunnel consists of a long series of rings.  The hyperlane is primarily straight with occassional branches leading to shorter or longer paths to the finish.  The auxilary monitor displays a map of the full maze that only one player can see.  Players must avoid hitting asteroids while travelling through the rings either by navigating the cargo pod around them or blowing them up with a laser.
+
+
+
+
 
 TODO: 20-30 second demo video
 
@@ -40,10 +44,8 @@ TODO: 20-30 second demo video
 
 # Dependencies
 
-The following resources were used in this project.
-
 ## Hardware
-- Qty: 2, [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/), each drives one monitor
+- Qty: 2, [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/), each one drives a monitor
 	- Qty: 2, [SanDisk 32GB microSDHC Card Mobile Ultra Class 10](https://www.newegg.com/Product/Product.aspx?Item=9SIA12K0N93630), holds operating system and project files
 	- Qty: 1, [MicroUSB 5V 2.5A power supply](https://www.newegg.com/Product/Product.aspx?Item=9SIA7PR5WA8871), used to power the Raspberry Pi connected to the auxilary monitor
 	- Qty: 1, [MC33866 Motor Driver Shield](http://www.robotshop.com/en/mc33886-raspberry-pi-motor-driver-board-raspberry-pi.html), used to supply enough current to drive several strips of LEDs
@@ -66,23 +68,35 @@ The following resources were used in this project.
 ## Software
 - Raspberry Pi Operating System
 	- [Noobs v2.4.4](https://www.raspberrypi.org/downloads/noobs/)
+		- Burn operating system to the microSD card then insert into Raspberry Pi
 	- Command: _sudo apt-get update_
+		- Connect to the internet then enter command into a terminal shell
 	- Command: _sudo apt-get upgrade_
 - Git
 	- Command: _sudo apt-get install git_
+		- To allow download of the code repository
 	- Command: _cd /home/pi/Documents/_
+		- Parent folder where the project files will be stored
 	- Command: _git config user.email "USERNAME@EMAIL.COM"_
+		- Set the Git parameters for the current user and folder
 	- Command: _git config user.name "USERNAME"_
 	- Command: _git config credential.helper 'cache --timeout=900'_
 		- 900 is the default number of seconds before a session times out and the Git username/password must be reentered to push code changes
 	- Command: _git clone https://github.com/scottalmond/EscapeRoom.git_
+		- Creates a new folder
+- Wiring Library
+	- Command: _sudo pip3 install wiringpi_
+		- Used to read from and write to discrete inputs like buttons, joystick and LEDs
 - Numpy
 	- Command: 
 - PyGame
 	- Command: _sudo apt-get install python-pygame_
-- Pi3D
-	- Command:_sudo apt-get upgrade_
-	- TODO: Change graphis allocation
+		- Used for 2D graphics
+- [Pi3D](https://github.com/tipam/pi3d) ([FAQ](https://pi3d.github.io/html/FAQ.html))
+	- Command:_sudo pip3 install pi3d_
+		- Used for 3D graphics
+	- Command: _sudo raspi-config_
+		- To allow greater utilization of the GPU, a larger memory allocation is needed, refer to the [ReadMe](http://pi3d.github.io/html/ReadMe.html#setup-on-the-raspberry-pi) to set the allocation to 256 MB
 - Sound
 
 
