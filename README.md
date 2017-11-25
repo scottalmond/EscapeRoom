@@ -12,7 +12,7 @@ The escape room is themed after a Star Trek command bridge and is designed to bu
 TODO: Wideangle image of room
 
 ## Introduction
-When the lights in the room are turned on, the primary Raspberry Pi detects a change in light levels and begins a 60-minute timer.  An introduction video clip is played to welcome players to the escape room and outline the objectives.  Following the end of the introduction video, the primary monitor transitions to the Light Puzzle and the Auxilary Monitor transitions to the Morse Code puzzle.
+When the lights in the room are turned on, the primary Raspberry Pi detects a change in light levels and begins a 60-minute timer.  An introduction video clip is played to welcome players to the escape room and outline the objectives.  Following the end of the introduction video, the primary monitor transitions to the Light Puzzle and the auxilary monitor transitions to the Morse Code puzzle.
 
 ## Puzzle 1: Morse Code
 The auxilary monitor displays a password prompt.  The player can provide two inputs: a dot and a dash by pressing the corresponding labelled concave buttons.  The correct password is acquired by solving puzzles elsewhere in the room.  Entering the correct password unlocks the screen to provide information needed to access other puzzles in the room.
