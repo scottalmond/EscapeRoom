@@ -29,7 +29,7 @@ The first sprite is controlled via the joystick.  The second sprite is controlle
 TODO: 20-30 second demo video
 
 ## Puzzle 4: Hyperspace Game
-A cutscene is played showing the cargo pod exiting from the space ship, followed by entering a hyperspace tunnel.  The gameplay pulls inspiration from a boss battle in [Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s).  The hyperspace tunnel consists of a long series of rings.  The hyperlane is primarily straight with occassional branches leading to shorter or longer paths to the finish.  The auxilary monitor displays a map of the full maze that only one player can see.  Players must avoid hitting asteroids while travelling through the rings either by navigating the cargo pod around them or blowing them up with a laser.
+A cutscene is played showing the cargo pod exiting from the space ship, followed by entering a hyperspace tunnel.  The gameplay pulls inspiration from a boss battle in [Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s).  The hyperspace tunnel consists of a long series of rings.  The hyperlane is primarily straight with occassional branches leading to shorter or longer paths to the finish point.  The auxilary monitor displays a map of the full maze that only one player can see.  Players must avoid hitting asteroids while travelling through the rings either by navigating the cargo pod around them or blowing them up with a laser.
 
 
 
