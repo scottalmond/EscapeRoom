@@ -24,7 +24,7 @@ class Main(threading.Thread):
 	"""
 	Create Environment and Book
 	"""
-	def __init(self,environment_type=1,book_type=1):
+	def __init(self,environment_type=Environment.,book_type=Book.TYPE_DEBUG):
 		self.my_environment=Environment(environment_type)
 		self.my_environment.init()
 		self.my_book=Book(self.my_environment,book_type)
