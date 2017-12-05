@@ -73,15 +73,15 @@ TODO: 20-30 second demo video
 	- [Noobs v2.4.5](https://www.raspberrypi.org/downloads/noobs/)
 		- Burn operating system to the microSD card then insert into Raspberry Pi and apply power
 		- On first boot, check only Raspbian from the menu (press space) then proceed with the intall (press i)
+	- Change Monitor Resolution
+		- Start >> Preferences >> Raspberry Pi Configuration >> System >> Resolution >> Set Resolution ... >> DMT mode 82 1920x1080 16:9
+	- Command: sudo reboot
+		- Enable new monitor settings to take effect
 	- Configure Keyboard
 		- Start >> Preferences >> Mouse and Keyboard Settings >> Keyboard >> Keyboard Layout... >> United States >> English (US)
 	- Command: _sudo apt-get update_
 		- Connect to the internet then enter command into a terminal shell
 	- Command: _sudo apt-get upgrade_
-	- Change Monitor Resolution
-		- Start >> Preferences >> Raspberry Pi Configuration >> System >> Resolution >> Set Resolution ... >> DMT mode 82 1920x1080 16:9
-	- Command: sudo reboot
-		- Enable new monitor settings to take effect
 - Git
 	- Command: _cd /home/pi/Documents/_
 		- Parent folder where the project files will be stored
