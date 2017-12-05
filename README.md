@@ -73,16 +73,16 @@ TODO: 20-30 second demo video
 	- [Noobs v2.4.5](https://www.raspberrypi.org/downloads/noobs/)
 		- Burn operating system to the microSD card then insert into Raspberry Pi and apply power
 		- On first boot, check only Raspbian from the menu (press space) then proceed with the intall (press i)
+	- Configure Keyboard
+		- Start >> Preferences >> Mouse and Keyboard Settings >> Keyboard >> Keyboard Layout... >> United States >> English (US)
 	- Command: _sudo apt-get update_
 		- Connect to the internet then enter command into a terminal shell
 	- Command: _sudo apt-get upgrade_
 	- Change Monitor Resolution
 		- Start >> Preferences >> Raspberry Pi Configuration >> System >> Resolution >> Set Resolution ... >> DMT mode 82 1920x1080 16:9
-	- Configure Keyboard
-		- Start >> Preferences >> Mouse and Keyboard Settings >> Keyboard >> Keyboard Layout... >> United States >> English (US)
+	- Command: sudo reboot
+		- Enable new monitor settings to take effect
 - Git
-	- Command: _sudo apt-get install git_
-		- To allow download of the code repository ALREADY DONE
 	- Command: _cd /home/pi/Documents/_
 		- Parent folder where the project files will be stored
 	- Command: _git init_
@@ -103,21 +103,22 @@ TODO: 20-30 second demo video
 		- Set I2C to Enabled
 		- Set Serial to Enabled
 		- Set Remote GPIO to Enabled
-- Numpy
-	- Command: _sudo apt-get install python3-numpy_
-		- Used for basic operations like arrays TODO fully define usage ALREADY DONE
-- PyGame
-	- Command: _sudo apt-get install python-pygame_
-		- Used for 2D graphics ALREADY DONE
 - [Pi3D](https://github.com/tipam/pi3d) ([FAQ](https://pi3d.github.io/html/FAQ.html))
 	- Command: _sudo pip3 install pi3d_
 		- Used for 3D graphics
 	- Command: _sudo raspi-config_
-		- To allow greater utilization of the GPU, a larger memory allocation is needed, refer to the [ReadMe](http://pi3d.github.io/html/ReadMe.html#setup-on-the-raspberry-pi) to set the allocation to 256 MB
 		- 7 Advanced Operations >> A3 Memory Split >> 256
+		- To allow greater utilization of the GPU, a larger memory allocation is needed [source](http://pi3d.github.io/html/ReadMe.html#setup-on-the-raspberry-pi)
 - Sound
 	- Command: _amixer cset numid=3 1_
-		Change the audio to come out over the headphone jack [source](https://www.raspberrypi.org/documentation/configuration/audio-config.md)
+		- Change the audio to come out over the headphone jack [source](https://www.raspberrypi.org/documentation/configuration/audio-config.md)
+- Reboot
+	- Command: _sudo reboot_
+		- Clean all installs and settings changes
+- Functional Test
+	- Command: _cd /home/pi/Documents/EscapeRoom/_
+	- Command: TODO
+		- Run a functional test of all library dependencies
 
 # Connection Diagram
 
