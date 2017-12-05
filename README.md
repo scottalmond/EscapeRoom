@@ -11,6 +11,9 @@ The escape room is themed after a Star Trek command bridge and is designed to bu
 
 TODO: Wideangle image of room
 
+## Introduction
+When the lights in the room are turned on, the primary Raspberry Pi detects a change in light levels and begins a 60-minute timer.  An introduction video clip is played to welcome players to the escape room and outline the objectives.  Following the end of the introduction video, the primary monitor transitions to the Light Puzzle and the auxilary monitor transitions to the Morse Code puzzle.
+
 ## Puzzle 1: Morse Code
 The auxilary monitor displays a password prompt.  The player can provide two inputs: a dot and a dash by pressing the corresponding labelled concave buttons.  The correct password is acquired by solving puzzles elsewhere in the room.  Entering the correct password unlocks the screen to provide information needed to access other puzzles in the room.
 
@@ -29,16 +32,15 @@ The first sprite is controlled via the joystick.  The second sprite is controlle
 TODO: 20-30 second demo video
 
 ## Puzzle 4: Hyperspace Game
-A cutscene is played showing the cargo pod exiting from the space ship, followed by entering a hyperspace tunnel.  The gameplay pulls inspiration from a boss battle in [Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s).  The hyperspace tunnel consists of a long series of rings.  The hyperlane is primarily straight with occassional branches leading to shorter or longer paths to the finish.  The auxilary monitor displays a map of the full maze that only one player can see.  Players must avoid hitting asteroids while travelling through the rings either by navigating the cargo pod around them or blowing them up with a laser.
-
-
-
-
+A cutscene is played showing the cargo pod exiting from the space ship, followed by entering a hyperspace tunnel.  The gameplay pulls inspiration from a boss battle in [Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s).  The hyperspace tunnel consists of a long series of rings.  The hyperlane is primarily straight with occassional branches leading to shorter or longer paths to the finish point.  The auxilary monitor displays a map of the full maze that only one player can see.  Players must avoid hitting asteroids while travelling through the rings either by navigating the cargo pod around them or blowing them up with a laser.
 
 TODO: 20-30 second demo video
 
 ## Credits
 Upon completion of the hyperspace puzzle, a credit sequence is played.  Half the screen is used to list the puzzle contributors one-puzzle-at-a-time.  The other half shows images of the pod exiting hyperspace, landing on the planet, and the crew collecting supplies from the pod.  Finally a full-screen corporate logo is displayed.
+
+## Conclusion
+Upon completion of the hyperspace puzzle, a credit sequence is played.  Half the screen is used to list the puzzle contributors one-puzzle-at-a-time.  The other half shows still frames of the pod exiting hyperspace, landing on the planet, and the crew collecting supplies from the pod.  Finally a full-screen corporate logo is displayed.
 
 TODO: 20-30 second demo video
 
