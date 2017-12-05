@@ -37,7 +37,7 @@ A cutscene is played showing the cargo pod exiting from the space ship, followed
 
 TODO: 20-30 second demo video
 
-## Conclusion
+## Credits
 Upon completion of the hyperspace puzzle, a credit sequence is played.  Half the screen is used to list the puzzle contributors one-puzzle-at-a-time.  The other half shows images of the pod exiting hyperspace, landing on the planet, and the crew collecting supplies from the pod.  Finally a full-screen corporate logo is displayed.
 
 TODO: 20-30 second demo video
@@ -87,18 +87,24 @@ TODO: 20-30 second demo video
 - Wiring Library
 	- Command: _sudo pip3 install wiringpi_
 		- Used to read from and write to discrete inputs like buttons, joystick and LEDs
+	- Start >> Preferences >> Raspberry Pi Configuration >> Interfaces
+		- Set SPI to Enabled
+		- Set I2C to Enabled
+		- Set Serial to Enabled
+		- Set Remote GPIO to Enabled
 - Numpy
 	- Command: 
 - PyGame
 	- Command: _sudo apt-get install python-pygame_
 		- Used for 2D graphics
 - [Pi3D](https://github.com/tipam/pi3d) ([FAQ](https://pi3d.github.io/html/FAQ.html))
-	- Command:_sudo pip3 install pi3d_
+	- Command: _sudo pip3 install pi3d_
 		- Used for 3D graphics
 	- Command: _sudo raspi-config_
 		- To allow greater utilization of the GPU, a larger memory allocation is needed, refer to the [ReadMe](http://pi3d.github.io/html/ReadMe.html#setup-on-the-raspberry-pi) to set the allocation to 256 MB
 - Sound
-
+	- Command: _amixer cset numid=3 1_
+		Change the audio to come out over the headphone jack [source](https://www.raspberrypi.org/documentation/configuration/audio-config.md)
 
 # Connection Diagram
 
