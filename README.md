@@ -7,7 +7,7 @@ TODO: video of deployed build
 # Details
 
 ## Room
-The escape room is themed after a Star Trek command bridge and is designed to build team work among a group of 4-6 employees.  Teams are given one hour to re-establish power to the ship, stock a cargo pod, then navigate the pod to stranded crew members.
+The escape room is themed after a Star Trek command bridge and is designed to build team work among a group of 5 employees.  Teams are given one hour to re-establish power to the ship, stock a cargo pod, then navigate the pod to stranded crew members.
 
 TODO: Wideangle image of room
 
