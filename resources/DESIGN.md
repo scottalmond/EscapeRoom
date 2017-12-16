@@ -44,6 +44,8 @@ This document details the top level objectives, implementation, and interface de
 
 - Requirement: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed on the wall
 
+- Requirement: The wall computer shall be configured to run at TODO resolution
+
 ## Morse Code
 
 - Requirement: Once the light puzzle is solved, the wall computer shall send a trigger signal to the console computer.  In response to this command, the console computer shall proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game
@@ -52,6 +54,8 @@ This document details the top level objectives, implementation, and interface de
 - Requirement: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the console 
 
 - Requirement: Two buttons shall be installed in the console adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the console computer so that the state of the buttons can be acquired.
+
+- Requirement: The console computer shall be configured to run at TODO resolution
 
 ## Snake Game
 
