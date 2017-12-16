@@ -27,7 +27,7 @@ This document details the top level objectives, implementation, and interface de
 
 ## Light Puzzle
 
-- Implementation: Mock up: ![Light Puzzle Mock Up](https://imgur.com/LKqFlft)
+- Implementation: Mock up: ![Light Puzzle Mock Up](https://i.imgur.com/LKqFlft.jpg)
 
 - Requirement: The wall monitor shall display the remaining time to solve the room during the light puzzle
 
