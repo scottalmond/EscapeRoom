@@ -17,13 +17,14 @@ This document details the top level objectives, implementation, and interface de
 			- Implementation: Allow the proctor to adjust volume levels prior to room playthrough
 			- Implementation: The volume for music will be independent from the volume for sound effects
 		- Derived Requirement: No other puzzles shall emit sound during the finale
-	- Implementation: Sound effects shall be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds
 
 - Requirement: The goal of the finale shall be to encourage team work among the players
 	- Implementation: The Snake game will be most easily beaten if the players coordinate so only one onscreen character completes the objective at a time (to minimize the risk of players running into one another) rather than all proceeding independnetly at the same time
 	- Implementation: The Hyperspace game controls act as an Ouija board where multiple players need to coordinate their actions to achieve the desired outcome.  Additionally, players will be presented with asymmetric controls and information: a limited number of players will be able to see the map to determine how best to reach the end goal; some obstacles like asteroid rubble must be avoided (one set of controls), while other obstacles like large asteroids cannot be avoided and must be destroyed with the laser (joystick in another station)
 
 - Requirement: The cameras, proctor computer, wall computer, and console computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
+
+- Requirement: Custom eletrical connections such as with the joystick and buttons will use heat shrink to strain relief the connections and reduce the risk of inadvertant eletrical contact
 
 ## Light Puzzle
 
@@ -45,7 +46,7 @@ This document details the top level objectives, implementation, and interface de
 
 ## Morse Code
 
-- Requirement: Once the light puzzle is solved, the wall computer will send a trigger signal to the console computer.  In response to this command, the console computer shall proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game
+- Requirement: Once the light puzzle is solved, the wall computer shall send a trigger signal to the console computer.  In response to this command, the console computer shall proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game
 	- Implementation: The book state machine running in the console computer will cease updating the morse code puzzle and rendering graphics in response to the relevant Ethernet command from the wall or proctor computers
 
 - Requirement: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the console 
@@ -58,7 +59,9 @@ This document details the top level objectives, implementation, and interface de
 ![Snake Game Mock Up](https://i.imgur.com/bh3N98u.jpg)
 
 - Implementation: The music for this section will be inspired by the following reference songs:
-	-
+	- [Epic Mountain - Quantum Computers](https://www.youtube.com/watch?v=hUsoHSa4QXI)
+	- [Software Inc - Trailer](https://youtu.be/6M2jonWFHwQ?t=6s)
+	- [Traktion - Mission ASCII](https://www.youtube.com/watch?v=mTbdaC3JsMc&feature=youtu.be&t=22s)
 
 - Requirement: The wall monitor shall display the remaining time to solve the room during the Snake game
 
@@ -85,34 +88,38 @@ This document details the top level objectives, implementation, and interface de
 ![Hyperspace Map Mock Up](https://i.imgur.com/IudjHqh.jpg)
 
 - Implementation: The music for this section will be inspired by the following reference songs:
-	- 
+	- [Zabutom - Final Blast](https://www.youtube.com/watch?v=uwlijEs81mI)
+	- [Them's Fightin' Herds - Title Theme](https://www.youtube.com/watch?v=hHCtGhXCKYI)
+	- [Riggsmeister - To The Future](https://youtu.be/JtFy3IusYY8?t=26s)
+
+- Implementation: Sound effects will be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds
 
 - Requirement: The wall monitor shall display the remaining time to solve the room during the Hyperspace game
 
 - Requirement: The Hyperspace Game shall be designed to be completed within 10 minutes, but allow for shorter or longer play times depending on player skill level
 
-- Requirement: Only one or two players can clearly see the map in the console
+- Requirement: No more than two players shall clearly see the map in the console
 
 - Requirement: Upon start of the Hyperspace game, the wall monitor shall emit a trigger signal to the console computer to transition to the map display
 
-- Implementation: The player charcter is a single cargo pod with thrusers and a laser.
+- Implementation: The player character is a single cargo pod with thrusers and a laser.
 ![Cargo Pod](https://i.imgur.com/5g2vbFS.png)
 
 - Implementation: The playing field consists of a branching hyperspace path filled with asteroid obstacles.  The map depicts the full Hyperspace maze.  The Hyperspace path is indicated via linear series of rings and occasional forks where players need to navigate to either the left or right side of the screen to select a branch
 ![Hyperspace Ring](https://i.imgur.com/96dxxqV.png)
 ![Hyperspace Fork](https://i.imgur.com/cCaWGny.png)
 
-- Implementation: The asteroids consist of three size: small, medium, and large.  The medium asteroid can either be shot with the laser or avoided by moving the pod out of a collision course.  The large asteroid has no room to maneuver around and must be shot with the laser.  The small asteroid (a debris cloud) cannot be shot with the laser and must be avoided.
+- Implementation: The asteroids consist of three sizes: small, medium, and large.  The medium asteroid can either be shot with the laser or avoided by moving the pod out of a collision course.  The large asteroid has no room to maneuver around and must be shot with the laser.  The small asteroid (a debris cloud) cannot be shot with the laser and must be avoided.
 ![Medium Asteroid](https://i.imgur.com/qjFWaUX.png)
 
-- Implementation: The four buttons in the console and four stomp pads act an Ouija board for controlling the position of the pod.  If only the only user input was the right button in the console, the pod would move at one-third speed to the right.  If the only user input were the right stomp pad, the pod would again move at one-thrid speed to the right.  When both the right pad and right button are activated syncronously, the pod moves at full speed to the right.
-The joystick in the captain's chair controls the laser cross hairs.  When the fire button is pressed, a laser fires.  If the laser hits a medium or large asteroid
+- Implementation: The four buttons in the console and four stomp pads act an Ouija board for controlling the position of the pod.  If only the only user input was the right button in the console, the pod would move at one-third speed to the right.  If the only user input were the right stomp pad, the pod would again move at one-thrid speed to the right.  When both the right pad and right button are activated syncronously, the pod moves at full speed to the right.  The logic for the remaining three cardinal directions act in the same combinational manner.
+The joystick in the captain's chair controls the laser cross hairs.  When the fire button is pressed, a laser fires.  If the laser hits a medium or large asteroid the asteroid will be destroyed.  Targeting a small astroid debris field with the laser does nothing.
 
-- Implementation: Hitting an asteroid triggers a player death.  The pod is reverted back to the start point and briefly flashes to indicate a new life.
+- Implementation: Hitting an asteroid triggers a player death.  The pod is reverted back to the start of the hyperspace map and briefly flashes to indicate a new life.
 
 ## Proctor
 
-- Requirement: The proctor shall emit signal(s) over Ethernet to pull the wall and console computers out of sleep mode and begin the 60 minute coutdown timer
+- Requirement: The proctor shall emit signal(s) over Ethernet to prompt the wall and console computers out of sleep mode and begin the 60 minute countdown timer
 
 - Requirement: The proctor shall have the capability to change the remaining time to complete the room
 
@@ -132,19 +139,20 @@ The joystick in the captain's chair controls the laser cross hairs.  When the fi
 - Implementation: The credits sequence will be implemented as a slide show.  Following a successful room completion in under 60 minutes, half the screen will display credits for the puzzle builders, artists and support staff.  The other half of the screen will display original static artworks of pod exiting hyperspace, entering a planet's atmosphere, descending under parachute, landing on the surface, and astronauts removing supplies from the pod.  If the room is not completed in under 60 minutes, the artowkr will be replaced with detailed pictures of the puzzles to highlight the assembly and design work.
 
 - Implementation: The music for this section will be inspired by the following reference songs:
-	- 
+	- [Incredible Machine 3 - Unplugged](https://www.youtube.com/watch?v=WToAEdHbH7A)
+	- [Firewatch - Camp Approach](https://www.youtube.com/watch?v=US-Eqtr3x08)
 
 - Requirement: When the puzzle is successfully completed in under 60 minutes, the total time taken to solve the game shall be displayed on screen during the credits sequence
 
 - Requirement: The wall computer shall automatically play a pre-scripted credits sequence for no longer than 60 seconds following the completion of the Hyperspace puzzle
-https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png
+
 - Implementation: Following the credits sequence, a brief cut scene showing the corporate logo will play.
 
 - Implementation: If the room was successfully completed in under 60 minutes, a humerous blooper cut scene will play after the corporate logo as a reward to the players for successfully completing the room.
 
 - Implementation: Following either the blooper reel in a successful room compeletion, or the corporate logo in a failed room playthrough, the wall monitor shall proceed to the sleep state
 
-# Implementation
+# Detailed Implementation
 
 ## Computers
 
@@ -154,35 +162,42 @@ https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png
 
 ## Connection Diagram
 
-
+![Connection Diagram](https://i.imgur.com/KcypXCK.png)
 
 ## Wall Computer
 
 - Implementation: Wall book chapters
-	- Standby: The monitor shall display a black screen and emit no sound
+	- Idle Standby: The monitor shall display a black screen and emit no sound
 	- Opening cut scene: In response to a proctor command, the wall computer will begin playing a cut scene
-	- Light puzzle: 
+	- Light puzzle: Display light puzzle component status change in response to discrete inputs.  Update countdown timer
 	- Instructions cut scene: 
 	- Snake:
 	- Hyperspace:
 	- Credits:
-	- Corporate logo cut scene:
-	- Blooper video: When the room is successfully completed in under 60 minutes, a bonus video will play after the credits, otherwise the 
+	- Corporate logo cut scene: The corporate logo animation will play for a few seconds
+	- Blooper video: When the room is successfully completed in under 60 minutes, a bonus video will play after the credits, otherwise this chapter is skipped
 - Implementation: Pinout
 
 ![Raspberry Pi 3 Pinout](https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png)
+
+TODO
 
 ### Console Computer
 
 - Implementation: Console book chapters
-	- Standby: The monitor shall display a black screen
+	- Idle Standby: The monitor shall display a black screen
+	- Light Puzzle Standby: The monitor shall display a black screen
 	- Morse Code: The puzzle will accept user input and display information when the proper code is entered
-	- Standby: The monitor shall display a black screen
+	- Snake Game Standby: The monitor shall display a black screen
 	- Map: The monitor shall display the hyperspace map and the location of the cargo pod
-	- Standby: The monitor shall display a black screen
+	- Credits Standby: The monitor shall display a black screen
 - Implementation: Pinout
 
-![Raspberry Pi 3 Pinout](https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png)
+TODO
+
+## State Flowchart
+
+TODO
 
 # Schedule
 
@@ -200,8 +215,7 @@ The following list of tasks shows the planned date of completion of significant 
 
 
 logic flow file/success criteria state diagram, focus on fail criteria trigger, hyperspace death
-heat shrink connections
 number of inputs, buttoms, stomp pads
 look and feel of room, playthrough: goal posts in snake game, pod and rings in hyperspace
 links to music samples
-hyperspace death
+
