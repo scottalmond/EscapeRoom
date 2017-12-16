@@ -27,7 +27,8 @@ This document details the top level objectives, implementation, and interface de
 
 ## Light Puzzle
 
-- Implementation: Mock up: ![Light Puzzle Mock Up](https://i.imgur.com/LKqFlft.jpg)
+- Implementation: Mock up:
+![Light Puzzle Mock Up](https://i.imgur.com/LKqFlft.jpg)
 
 - Requirement: The wall monitor shall display the remaining time to solve the room during the light puzzle
 
@@ -53,6 +54,12 @@ This document details the top level objectives, implementation, and interface de
 
 ## Snake Game
 
+- Implementation: Three snakes are shown on screen.  One is controlled by the joystick in the captain's chair.  One is controlled by the four buttons in the console.  One is controlled by the four stomp pads.  The corners of the screen provide user feedback of user inputs
+![Snake Game Mock Up](https://i.imgur.com/bh3N98u.jpg)
+
+- Implementation: The music for this section will be inspired by the following reference songs:
+	-
+
 - Requirement: The wall monitor shall display the remaining time to solve the room during the Snake game
 
 - Requirement: The Snake Game shall be designed to be completed within 5 minutes, but allow for shorter or longer play times depending on player skill level
@@ -64,9 +71,21 @@ This document details the top level objectives, implementation, and interface de
 	- A joystick that can be operated while a player is seated the captain's chair.  Each direction, plus fire, has two wires for sesne plus return.  10 wires total.
 	- Four stomp pads arranged as two pairs of two.  One pair of pads represents left and right commands.  The other pair represents up and down control.  The pads are designed to be operated by players while standing.  Each pad contains three wires: power, sense and return.  12 wires total.
 
-- Implementation: 
+- Implementation: When one snake hits the tail of another snake, the damanged portion of the tail is deleted.  Once a snake has grown a long enough tail, goal posts will appear at the bottom of the screen.  Navigating the correctly colored snake through the goal posts represents completion of one third of the puzzle.  Navigating all three Snakes through the goal posts represents completion of the game.  Specificly-colored pellets will appear randomly on screen for the snakes to collect.  A snake that exits the edge of the screen will reappear on the opposing side of the screen in a wrap-around style.
 
 ## Hyperspace Game
+
+- Implementation: The Hyperspace game will start with a cutscene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once.
+![Hyperspace Cut Scene](https://i.imgur.com/nDOovDA.jpg)
+
+- Implementation: The Hyperspace game will consist of 
+![Hyperspace Game Mock Up](https://i.imgur.com/oHnaBpF.jpg)
+
+- Implementation: The console monitor will display a map of the hyperspace maze
+![Hyperspace Map Mock Up](https://i.imgur.com/IudjHqh.jpg)
+
+- Implementation: The music for this section will be inspired by the following reference songs:
+	- 
 
 - Requirement: The wall monitor shall display the remaining time to solve the room during the Hyperspace game
 
@@ -75,6 +94,21 @@ This document details the top level objectives, implementation, and interface de
 - Requirement: Only one or two players can clearly see the map in the console
 
 - Requirement: Upon start of the Hyperspace game, the wall monitor shall emit a trigger signal to the console computer to transition to the map display
+
+- Implementation: The player charcter is a single cargo pod with thrusers and a laser.
+![Cargo Pod](https://i.imgur.com/5g2vbFS.png)
+
+- Implementation: The playing field consists of a branching hyperspace path filled with asteroid obstacles.  The map depicts the full Hyperspace maze.  The Hyperspace path is indicated via linear series of rings and occasional forks where players need to navigate to either the left or right side of the screen to select a branch
+![Hyperspace Ring](https://i.imgur.com/96dxxqV.png)
+![Hyperspace Fork](https://i.imgur.com/cCaWGny.png)
+
+- Implementation: The asteroids consist of three size: small, medium, and large.  The medium asteroid can either be shot with the laser or avoided by moving the pod out of a collision course.  The large asteroid has no room to maneuver around and must be shot with the laser.  The small asteroid (a debris cloud) cannot be shot with the laser and must be avoided.
+![Medium Asteroid](https://i.imgur.com/qjFWaUX.png)
+
+- Implementation: The four buttons in the console and four stomp pads act an Ouija board for controlling the position of the pod.  If only the only user input was the right button in the console, the pod would move at one-third speed to the right.  If the only user input were the right stomp pad, the pod would again move at one-thrid speed to the right.  When both the right pad and right button are activated syncronously, the pod moves at full speed to the right.
+The joystick in the captain's chair controls the laser cross hairs.  When the fire button is pressed, a laser fires.  If the laser hits a medium or large asteroid
+
+- Implementation: Hitting an asteroid triggers a player death.  The pod is reverted back to the start point and briefly flashes to indicate a new life.
 
 ## Proctor
 
@@ -95,12 +129,15 @@ This document details the top level objectives, implementation, and interface de
 
 ## Credits
 
+- Implementation: The credits sequence will be implemented as a slide show.  Following a successful room completion in under 60 minutes, half the screen will display credits for the puzzle builders, artists and support staff.  The other half of the screen will display original static artworks of pod exiting hyperspace, entering a planet's atmosphere, descending under parachute, landing on the surface, and astronauts removing supplies from the pod.  If the room is not completed in under 60 minutes, the artowkr will be replaced with detailed pictures of the puzzles to highlight the assembly and design work.
+
+- Implementation: The music for this section will be inspired by the following reference songs:
+	- 
+
 - Requirement: When the puzzle is successfully completed in under 60 minutes, the total time taken to solve the game shall be displayed on screen during the credits sequence
 
 - Requirement: The wall computer shall automatically play a pre-scripted credits sequence for no longer than 60 seconds following the completion of the Hyperspace puzzle
-
-- Implementation: The credits sequence will be implemented as a slide show.  Following a successful room completion in under 60 minutes, half the screen will display credits for the puzzle builders, artists and support staff.  The other half of the screen will display original static artworks of pod exiting hyperspace, entering a planet's atmosphere, descending under parachute, landing on the surface, and astronauts removing supplies from the pod.  If the room is not completed in under 60 minutes, the artowkr will be replaced with detailed pictures of the puzzles to highlight the assembly and design work.
-
+https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png
 - Implementation: Following the credits sequence, a brief cut scene showing the corporate logo will play.
 
 - Implementation: If the room was successfully completed in under 60 minutes, a humerous blooper cut scene will play after the corporate logo as a reward to the players for successfully completing the room.
@@ -133,6 +170,8 @@ This document details the top level objectives, implementation, and interface de
 	- Blooper video: When the room is successfully completed in under 60 minutes, a bonus video will play after the credits, otherwise the 
 - Implementation: Pinout
 
+![Raspberry Pi 3 Pinout](https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png)
+
 ### Console Computer
 
 - Implementation: Console book chapters
@@ -143,23 +182,26 @@ This document details the top level objectives, implementation, and interface de
 	- Standby: The monitor shall display a black screen
 - Implementation: Pinout
 
+![Raspberry Pi 3 Pinout](https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png)
+
 # Schedule
 
-The following list of tasks shows the planned date of completion of significant code elements to acheive the mid-March "95% completion" deadline.  A functional build entails accepting user and proctor input and displaying relevant game state through the monitors.
+The following list of tasks shows the planned date of completion of significant code elements to acheive the mid-March "95% completion" deadline.  A functional build entails displaying relevant content on the monitors in response to user and proctor inputs to facilitate an end-to-end playthroguh of the room.
 
-12/18/17 Architecture Plan
-12/31/17 Functional Architecture, IO Handler, Core
-1/2/17 Handoff to Morse Code puzzle developer
-1/8/17 Video Functional Build
-2/5/17 Hyperspace Functional Build
-2/19/17 Snake Functional Build
-2/26/17 Credits Functional Build
-3/12/17 Integration with Morse Code
+- 12/18/17 Architecture Plan
+- 12/31/17 Functional Architecture, IO Handler, Core
+- 1/2/17 Handoff to Morse Code puzzle developer
+- 1/8/17 Video Functional Build
+- 2/5/17 Hyperspace Functional Build
+- 2/19/17 Snake Functional Build
+- 2/26/17 Credits Functional Build
+- 3/12/17 Integration with Morse Code
 
 
 
-logic flow file/success criteria state diagram, focus on fail criteria trigger
+logic flow file/success criteria state diagram, focus on fail criteria trigger, hyperspace death
 heat shrink connections
 number of inputs, buttoms, stomp pads
 look and feel of room, playthrough: goal posts in snake game, pod and rings in hyperspace
 links to music samples
+hyperspace death
