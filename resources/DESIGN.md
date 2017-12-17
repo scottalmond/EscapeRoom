@@ -140,7 +140,7 @@ The joystick in the captain's chair controls the laser cross hairs.  When the fi
 		- Derived Requirement: The proctor shall receive no fewer than one snapshot of the room at no less than once per second
 	- Implementation: Allow the state of the finale computers to be queried and configured through an Ethernet connection.  The computers will be organized as a two-tiered state machine with a top level 'book' controlling the narrative sequence of 'chapters'.  Each chapter is a game, puzzle, video sequence, or blank screen.
 
-- Requirement: One goal shall be to give the proctor the ability to pause and resume the countdown timer and puzzle progression manually
+- Requirement: The goal shall be to give the proctor the ability to pause and resume the countdown timer and puzzle progression manually
 
 - Requirement: The proctor shall have the capability to broadcast hints to players without using the finale speakers
 
@@ -201,7 +201,7 @@ TODO
 
 ## State Flowchart
 
-TODO
+![State Transition Diagram](https://i.imgur.com/ZLY4JB3.png)
 
 # Schedule
 
