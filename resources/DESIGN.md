@@ -26,6 +26,12 @@ This document details the top level objectives, implementation, and interface de
 
 - Requirement: Custom eletrical connections such as with the joystick and buttons will use heat shrink to strain relief the connections and reduce the risk of inadvertant eletrical contact
 
+- Requirement: The wall, console and proctor computers shall be connected to uninterrupted wall power at all times.
+
+- Requirement: The wall, console and proctor monitors shall be connected to uninterrupted wall power at all times.
+
+- Requirement: When power is applied, the wall, console and proctor computers shall boot to a standby state in no longer than 5 minutes
+
 ## Light Puzzle
 
 - Implementation: Mock up:
@@ -85,7 +91,7 @@ This document details the top level objectives, implementation, and interface de
 - Implementation: The Hyperspace game will start with a cutscene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once.
 ![Hyperspace Cut Scene](https://i.imgur.com/nDOovDA.jpg)
 
-- Implementation: The Hyperspace game will consist of 
+- Implementation: The Hyperspace game will consist of a cargo pod navigating through a series of hyperspace rings
 ![Hyperspace Game Mock Up](https://i.imgur.com/oHnaBpF.jpg)
 
 - Implementation: The console monitor will display a map of the hyperspace maze
@@ -158,12 +164,6 @@ The joystick in the captain's chair controls the laser cross hairs.  When the fi
 
 # Detailed Implementation
 
-## Computers
-
-- Requirement: The computers shall be provided with uninterrupted wall power at all times.
-
-- Requirement: When power is applied, computers will boot to a standby state within 5 minutes
-
 ## Connection Diagram
 
 ![Connection Diagram](https://i.imgur.com/KcypXCK.png)
@@ -207,14 +207,14 @@ TODO
 
 The following list of tasks shows the planned date of completion of significant code elements to acheive the mid-March "95% completion" deadline.  A functional build entails displaying relevant content on the monitors in response to user and proctor inputs to facilitate an end-to-end playthroguh of the room.
 
-- 12/18/17 Architecture Plan
-- 12/31/17 Functional Architecture, IO Handler, Core
-- 1/2/17 Handoff to Morse Code puzzle developer
-- 1/8/17 Video Functional Build
-- 2/5/17 Hyperspace Functional Build
-- 2/19/17 Snake Functional Build
-- 2/26/17 Credits Functional Build
-- 3/12/17 Integration with Morse Code
+- Dec 18, 2017 Architecture Plan
+- Dec 31, 2017 Functional Architecture, IO Handler, Core
+- Jan 2, 2018 Handoff to Morse Code puzzle developer
+- Jan 8, 2018 Video Functional Build
+- Feb 5, 2018 Hyperspace Functional Build
+- Feb 19, 2018 Snake Functional Build
+- Feb 26, 2018 Credits Functional Build
+- Mar 12, 2018 Integration with Morse Code
 
 
 
@@ -223,3 +223,4 @@ number of inputs, buttoms, stomp pads
 look and feel of room, playthrough: goal posts in snake game, pod and rings in hyperspace
 links to music samples
 
+make housing for speakers to protect them
