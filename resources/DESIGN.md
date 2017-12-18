@@ -204,7 +204,8 @@ The joystick in the captain's chair controls the laser cross hairs.  When the fi
 
 ![Raspberry Pi 3 Pinout](https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png)
 
-**TODO**
+**TODO UPDATE**
+![Project Box Pinout](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/project_box_pinout.png)
 
 ### Console Computer
 
