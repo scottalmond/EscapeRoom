@@ -169,7 +169,7 @@ The joystick in the captain's chair controls the laser cross hairs.  When the fi
 
 ## Connection Diagram
 
-![Connection Diagram](https://i.imgur.com/KcypXCK.png)
+![Connection Diagram](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/system_layout.png)
 
 ## Wall Computer
 
@@ -227,7 +227,7 @@ The following is a state transition diagram that will live on both the Wall and 
 
 clean should be nearly idential to initialize.  used for shutting down autonomous processes cleanly like video players
 
-![State Transition Diagram](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/flow.png)
+![State Transition Diagram](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/state_transition_diagram.png)
 
 # Schedule
 
