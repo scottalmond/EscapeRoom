@@ -223,11 +223,11 @@ The following is a state transition diagram that will live on both the Wall and 
 	- **Is Book Command?** If the proctor command is formatted as a book command, it is processed.  This includes the "dispose" command which will stop both the TCP Listener and the Book threads.  "set next chapter" is another book command that the proctor can send.
 	- **Is Chapter Command?** If the proctor command is formmated as a chapter command, it is processed.  This includes the "done" command which stops the execution of the current chapter and prompts the Book state machine to proceed to the next chapter.
 - Chapter
-	- **Enter Chapter:** Every time the chapter is run, the first command is 
+	- **Enter Chapter:** Every time the chapter is run, the first command is a special boot up sequnce.  
 
 clean should be nearly idential to initialize.  used for shutting down autonomous processes cleanly like video players
 
-![State Transition Diagram](https://i.imgur.com/ZLY4JB3.png)
+![State Transition Diagram](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/flow.png)
 
 # Schedule
 
