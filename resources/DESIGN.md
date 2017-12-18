@@ -32,6 +32,9 @@ This document details the top level objectives, implementation, and interface de
 
 - Requirement: When power is applied, the wall, console and proctor computers shall boot to a standby state in no longer than 5 minutes
 
+- Implementation: The Wall PC will act as MASTER to the SLAVE Console.  The Proctor will act as MASTER to the SLAVE Wall.
+	- Requirement: The Proctor shall not send commands to the Console.
+
 ## Light Puzzle
 
 - Implementation: Mock up:
@@ -200,6 +203,29 @@ TODO
 TODO
 
 ## State Flowchart
+
+The Wall computer is treated as a MASTER to the SLAVE Console.
+The Proctor computer is treated as a MASTER to the SLAVE Wall.
+
+The following is a state transition diagram that will live on both the Wall and Console computers.
+- Book
+	- **Boot:** A boot up sequence entails creating, but not running, the object-oriented chapters.
+	- **Start TCP:** A separeate thread is launched to listen for TCP commands from the proctor console.  The TCP Listener is created after the constants have been defined to avoid the potential for the proctor to access constants before they exist
+	- **Next Chapter Exists:** Fetches the next chapter queued in the book state space.  For example if the current puzzle is "Snake", the next chapter will be "Hyperspace".
+	- **Queue Chapter:** If the PC this code is running in is the Wall (MASTER), then the "next chapter" is immediately defined.
+		- For example in the Wal computer, if the upcoming chapter is "Hyperspace" the queued chapter will be "Credits".  Queuing the following chapter immediately upon entering the current chapter allows the proctor to configure the next chapter at any time.  For example, the proctor could set "Snake" as the next chapter while "Hyperspace" is running.  Following a "next chapter" command by a "chapter done" command will transition the state machine to that commanded chapter.
+		- If the PC is the Console, the next chapter is not updated.  The Console is run as a SLAVE to the Wall.
+	- **Enter Chapter:** After fetching the chapter to run, a chapter configuration sequence is run.
+	- **Is alive?:** If the proctor has sent a "dispose" command, the is_alive state will be False, prompting the Wall PC to send a command to the Console to die, followed by disposing of the Wall's own chapters and book.  This ensures a clean exit to the desktop whan commanded by the proctor
+	- **Update Chapter:** The Book calls the Chapter update loop at nominally 30 Hz.  This loop updates the Chapter state machine and renders graphics on the screen.
+- TCP Listener
+	- **Is alive, TCP Command Received?** The TCP listener listens for new commands in an infinite loop at nominally 30 Hz.
+	- **Is Book Command?** If the proctor command is formatted as a book command, it is processed.  This includes the "dispose" command which will stop both the TCP Listener and the Book threads.  "set next chapter" is another book command that the proctor can send.
+	- **Is Chapter Command?** If the proctor command is formmated as a chapter command, it is processed.  This includes the "done" command which stops the execution of the current chapter and prompts the Book state machine to proceed to the next chapter.
+- Chapter
+	- **Enter Chapter:** Every time the chapter is run, the first command is 
+
+clean should be nearly idential to initialize.  used for shutting down autonomous processes cleanly like video players
 
 ![State Transition Diagram](https://i.imgur.com/ZLY4JB3.png)
 
