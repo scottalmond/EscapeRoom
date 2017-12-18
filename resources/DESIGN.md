@@ -53,7 +53,7 @@ This document details the top level objectives, implementation, and interface de
 
 - Requirement: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed on the wall
 
-- Requirement: The wall computer shall be configured to run at TODO resolution
+- Requirement: The wall computer shall be configured to run at **TODO** resolution
 
 ## Morse Code
 
@@ -64,7 +64,7 @@ This document details the top level objectives, implementation, and interface de
 
 - Requirement: Two buttons shall be installed in the console adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the console computer so that the state of the buttons can be acquired.
 
-- Requirement: The console computer shall be configured to run at TODO resolution
+- Requirement: The console computer shall be configured to run at **TODO** resolution
 
 ## Snake Game
 
@@ -106,6 +106,8 @@ This document details the top level objectives, implementation, and interface de
 	- [Riggsmeister - To The Future](https://youtu.be/JtFy3IusYY8?t=26s)
 
 - Implementation: Sound effects will be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds
+
+- Requirement: A thematic protective shroud shall enclose the speakers to protect them from players and hide them from view without degrading audio output.
 
 - Requirement: The wall monitor shall display the remaining time to solve the room during the Hyperspace game
 
@@ -200,7 +202,7 @@ TODO
 	- Credits Standby: The monitor shall display a black screen
 - Implementation: Pinout
 
-TODO
+**TODO**
 
 ## State Flowchart
 
@@ -209,7 +211,8 @@ The Proctor computer is treated as a MASTER to the SLAVE Wall.
 
 The following is a state transition diagram that will live on both the Wall and Console computers.
 - Book
-	- **Boot:** A boot up sequence entails creating, but not running, the object-oriented chapters.
+	- **Boot:** The Raspberry Pi will perform a Linux boot sequnce followed by execution of the main Python program
+	- **Create All Chapters:** The object-oriented chapters are created, but not executed here.   Execution of time-intensive processes such as loading video codecs and 3D graphics will also occur here.  Following Chapter creation, the chapter's clean method will be called to configure the chapter constants to default values.
 	- **Start TCP:** A separeate thread is launched to listen for TCP commands from the proctor console.  The TCP Listener is created after the constants have been defined to avoid the potential for the proctor to access constants before they exist
 	- **Next Chapter Exists:** Fetches the next chapter queued in the book state space.  For example if the current puzzle is "Snake", the next chapter will be "Hyperspace".
 	- **Queue Chapter:** If the PC this code is running in is the Wall (MASTER), then the "next chapter" is immediately defined.
@@ -221,11 +224,11 @@ The following is a state transition diagram that will live on both the Wall and 
 - TCP Listener
 	- **Is alive, TCP Command Received?** The TCP listener listens for new commands in an infinite loop at nominally 30 Hz.
 	- **Is Book Command?** If the proctor command is formatted as a book command, it is processed.  This includes the "dispose" command which will stop both the TCP Listener and the Book threads.  "set next chapter" is another book command that the proctor can send.
-	- **Is Chapter Command?** If the proctor command is formmated as a chapter command, it is processed.  This includes the "done" command which stops the execution of the current chapter and prompts the Book state machine to proceed to the next chapter.
+	- **Is Chapter Command?** If the proctor command is formated as a chapter command, it is processed.  This includes the "done" command which stops the execution of the current chapter and prompts the Book state machine to proceed to the next chapter.
 - Chapter
-	- **Enter Chapter:** Every time the chapter is run, the first command is a special boot up sequnce.  
-
-clean should be nearly idential to initialize.  used for shutting down autonomous processes cleanly like video players
+	- **Enter Chapter:** Every time the chapter is run, the first method call is a dedicated initialization sequence.  For the Wall PC, an important step here is to send the TCP commands to ensure the Console is in the proper state.
+	- **Update Chapter:** Some chapters like Hyperspace or the Light Puzzle need to stop operations if the 60 minute window expires.  This update step checks whether the 60 minutes has expired and if so, exits the chapter.  Other chapters like the Credits will always play, so this check is ignored.  The game state is incremented and a graphical frame is displayed.
+	- **Clean:** This method will always be called prior to exiting any chapter.  Configuring the constants on exit in preparation for the next run, rather than on initialization immediately before running chapter, allows the proctor time to configure constants while running other puzzles.  This ensures a clean entry into the chapter in whatever state the proctor desires.  This avoids the design limitation of requiring the proctor to change the chapter state only after entering the puzzle, which may break the illusion for players as graphics and game state rapidly change on screen.  This clean step is also where resource deallocations will occur such as stopping playback of video.
 
 ![State Transition Diagram](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/state_transition_diagram.png)
 
@@ -242,11 +245,3 @@ The following list of tasks shows the planned date of completion of significant 
 - Feb 26, 2018 Credits Functional Build
 - Mar 12, 2018 Integration with Morse Code
 
-
-
-logic flow file/success criteria state diagram, focus on fail criteria trigger, hyperspace death
-number of inputs, buttoms, stomp pads
-look and feel of room, playthrough: goal posts in snake game, pod and rings in hyperspace
-links to music samples
-
-make housing for speakers to protect them
