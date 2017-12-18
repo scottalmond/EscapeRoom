@@ -10,6 +10,7 @@ This document details the top level objectives, implementation, and interface de
 	- Implementation: The wall computer will play video with sound as dictated by the narrative.
 
 - Requirement: The goal of the finale shall be an immersive audio-visual experience that impresses players.
+	- Implementation: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Escape rooms often leverage several inter-dependent physical puzzles that take one or two players to solve.  However, using arcade and platform video games, such as Snake and Crash Bandicoot, as inspiration for the puzzles leads to an experimental multi-person real-time activity that differs from mainstream escape rooms.
 	- Implementation: Music will be played during the Snake game, Hyperspace game, and Credits sequences.
 		- Requirement: Music shall not break the space-themed illusion of the room.
 			- Implementation: Instrumental music will be originally composed that fits the space-theme.  Music will be designed to serve as a background accompaniment to the main player action, as is done to set ambiance in Hollywood movies.
