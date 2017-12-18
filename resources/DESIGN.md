@@ -48,6 +48,7 @@ This document details the top level objectives, implementation, and interface de
 - Requirement: Following a start command from the proctor, an introduction cut scene shall play.
 
 - Implementation: Mock up:
+
 ![Light Puzzle Mock Up](https://i.imgur.com/LKqFlft.jpg)
 
 - Requirement: The wall monitor shall display the remaining time to solve the room.
@@ -86,6 +87,7 @@ This document details the top level objectives, implementation, and interface de
 ## Snake Game
 
 - Implementation: Three snakes are shown on screen.  One is controlled by the joystick in the captain's chair.  One is controlled by the four buttons in the console.  One is controlled by the four stomp pads.  The corners of the screen provide visual user feedback of user inputs.
+
 ![Snake Game Mock Up](https://i.imgur.com/bh3N98u.jpg)
 
 - Implementation: The music for this section will be inspired by the following reference songs:
@@ -108,12 +110,15 @@ This document details the top level objectives, implementation, and interface de
 ## Hyperspace Game
 
 - Implementation: The Hyperspace game will start with a cut scene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once during a normal Hyperspace game play-through, regardless of the number of player deaths.
+
 ![Hyperspace Cut Scene](https://i.imgur.com/nDOovDA.jpg)
 
 - Implementation: The Hyperspace game will consist of a cargo pod navigating through a series of hyperspace rings.
+
 ![Hyperspace Game Mock Up](https://i.imgur.com/oHnaBpF.jpg)
 
 - Implementation: The console monitor will display a map of the hyperspace maze.
+
 ![Hyperspace Map Mock Up](https://i.imgur.com/IudjHqh.jpg)
 
 - Implementation: The music for this section will be inspired by the following reference songs:
@@ -130,13 +135,17 @@ This document details the top level objectives, implementation, and interface de
 - Requirement: Upon start of the Hyperspace game, the wall monitor shall emit a trigger signal to the console computer to transition to the map display.
 
 - Implementation: The player character is a single cargo pod with thrusters and a laser.
+
 ![Cargo Pod](https://i.imgur.com/5g2vbFS.png)
 
 - Implementation: The playing field consists of a branching hyperspace path filled with asteroid obstacles.  The map depicts the full Hyperspace maze.  The Hyperspace path is indicated via linear series of rings and occasional forks where players need to navigate to either the left or right side of the screen to select a branch.
+
 ![Hyperspace Ring](https://i.imgur.com/96dxxqV.png)
+
 ![Hyperspace Fork](https://i.imgur.com/cCaWGny.png)
 
 - Implementation: The asteroids consist of three sizes: small, medium, and large.  The medium asteroid can either be shot with the laser or avoided by moving the pod out of a collision course.  The large asteroid has no room to maneuver around and must be shot with the laser.  The small asteroid (a debris cloud) cannot be shot with the laser and must be avoided.
+
 ![Medium Asteroid](https://i.imgur.com/qjFWaUX.png)
 
 - Implementation: The four buttons in the console and four stomp pads act as an Ouija board for controlling the position of the pod.  If only the only user input was the right button in the console, the pod would move at one-third speed to the right.  If the only user input were the right stomp pad, the pod would again move at one-third speed to the right.  When both the right pad and right button are activated synchronously, the pod moves at full speed to the right.  The logic for the remaining three cardinal directions act in the same combinational manner.
@@ -205,6 +214,7 @@ The joystick in the captain's chair controls the laser cross hairs.  When the fi
 ![Raspberry Pi 3 Pinout](https://i.pinimg.com/originals/84/46/ec/8446eca5728ebbfa85882e8e16af8507.png)
 
 **TODO UPDATE**
+
 ![Project Box Pinout](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/project_box_pinout.png)
 
 ### Console Computer
@@ -221,7 +231,7 @@ The joystick in the captain's chair controls the laser cross hairs.  When the fi
 	- Pause: Hold count down timer, display a pause icon on the screen.
 - Implementation: Pinout
 
-**TODO**
+**TODO CREATE**
 
 ## State Flow Diagram
 
