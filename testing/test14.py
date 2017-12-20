@@ -173,6 +173,18 @@ cross_hairs=[0,0]
 cross_hair_step=30.0;
 
 keys_pressed=[]
+
+import os
+import subprocess
+from omxplayer.player import OMXPlayer
+play_video=True
+video_file='/home/pi/Documents/aux/star_tours_intro.mp4'
+video_file2='/home/pi/Documents/aux/corporate_logo.mp4'
+video_file3='/home/pi/Documents/aux/FIBER OPTICAL (loop).mp4'
+play_audio=True
+audio_file='/home/pi/Documents/aux/Daft Punk - End of Line HQ.mp3'
+pygame.mixer.init()
+pygame.mixer.music.load(audio_file)
 while display.loop_running():
 	#GPIO section:
 	#print("FRAME: %d" % frame_id);
@@ -194,6 +206,35 @@ while display.loop_running():
 		#print("DEBUG 5: %d" % len(this_led_truple))
 		for this_led in range(len(this_led_truple)):
 			wp.digitalWrite(GPIO_IN_NUMBERS[2+this_led],1-this_led_truple[this_led])
+		if(play_video and led_toggle_index==1):
+                    vid1=OMXPlayer(video_file,args=['--no-osd'])
+                    vid1.pause()
+                    #vid1.set_alpha(200)
+		if(play_video and led_toggle_index==2):
+                    #vid1.set_alpha(255)
+                    vid1.play()
+                    #os.system('mkfifo t cat t | omxplayer --no-osd -b '+video_file+' &')
+                    #myprocess=subprocess.Popen(['omxplayer','-b',video_file],stdin=subprocess.PIPE)
+                    #sleep(10)
+                    #myprocess.stdin.write('q')
+		if(play_video and led_toggle_index==3):
+                    #vid2=OMXPlayer(video_file2)
+                    vid2=OMXPlayer(video_file2)
+                    vid1.quit()
+                    #os.system('echo p > t rm t')
+                    #myprocess.stdin.write('q')
+		if(play_video and led_toggle_index==4):
+                    vid2.quit()
+		if(play_audio and led_toggle_index==5):
+                    pygame.mixer.music.play(loops=-1,start=0.0)
+		if(play_video and led_toggle_index==6):
+                    vid3=OMXPlayer(video_file3,args=['--no-osd','--loop'])
+                    vid3.mute()
+		if(play_video and led_toggle_index==7):
+                    vid3.quit()
+		if(play_audio and led_toggle_index==7):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.rewind()
 	led_toggle_state=this_led_toggle
 	#print("LED_STATE: %d" % led_toggle_index)
 	
