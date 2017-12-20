@@ -120,6 +120,9 @@ TODO: 20-30 second demo video
 	- Command: TODO
 		- Run a functional test of all library dependencies
 
+xxx TODO sudo apt-get install vlc --> omxplayer
+xxx TODO sudo pip3 install omxplayer-wrapper
+
 # Connection Diagram
 
 ## Room
