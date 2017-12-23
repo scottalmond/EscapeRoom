@@ -1,82 +1,99 @@
+note to self: avoid shall not - no way to prove negative.  element shall do task subject to contraints
+replace console with helm
+replace PC with computer
+make schematic of proctor, help and wall montors/comuter/human
+
 ﻿# Overview
 
 This document details the top level objectives, implementation, and interface details of the finale in order to facilitate effective communication among the Escape Room development team.
+
+# Definitions
+
+- Implementation: A design element that does not require multiple parties to concur to change
+
+- Requirement: A design element that requires two or more parties to agree to enact a change
+
+- [TIER 1]: These are fundamental stipuations that must be true when the finale is delivered
+
+- [TIER 2]: Following an agile development process, these are strongly desired stipulations, or stipulations that are difficult to define precisely, that must be attempted to be met before changes are to be considered
+
+- [TIER 3]: These are nice-to-have stipulations and may be de-scoped or modified as needed to meet the dictated schedule
+
+- [Hardware]: These are elements that refer to the team building the pyscial set the players will interact with
+
+- [Software]: These are virtual elements that exist on the computer
+
+- [Management]: These are elements that affect multiple puzzles in the room or how the overall escape room is presented
 
 # Requirements
 
 ## Room
 
-- Requirement: The finale shall follow a pre-scripted narrative.
-	- Implementation: The wall computer will play video with sound as dictated by the narrative.
+- Requirement [TIER 1] [Software] [Management]: The finale shall follow a pre-scripted narrative.
+	- Implementation [Software]: The wall computer will play video with sound as dictated by the narrative.
 
-- Requirement: The goal of the finale shall be an immersive audio-visual experience that impresses players.
-	- Implementation: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Escape rooms often leverage several inter-dependent physical puzzles that take one or two players to solve.  However, using arcade and platform video games, such as Snake and Crash Bandicoot, as inspiration for the puzzles leads to an experimental multi-person real-time activity that differs from mainstream escape rooms.
-	- Implementation: Music will be played during the Snake game, Hyperspace game, and Credits sequences.
-		- Requirement: Music shall not break the space-themed illusion of the room.
-			- Implementation: Instrumental music will be originally composed that fits the space-theme.  Music will be designed to serve as a background accompaniment to the main player action, as is done to set ambiance in Hollywood movies.
-		- Requirement: Music shall not be be too loud.
-			- Implementation: Allow the proctor to adjust volume levels prior to and during room play-through.
-			- Implementation: The volume for music will be independent from the volume for sound effects.
-		- Requirement: After the Light Puzzle is completed, no other puzzles shall emit sound during the finale.
+Attempting to design reconfigurable puzzles that target a variable number of players has proven challenging.  To limit scope, a finite number of players was settled upon.
+- Requirement [TIER 1] [Software] [Management]: The finale shall be designed to be operated by five players.
 
-- Requirement: The goal of the finale shall be to encourage team work among the players.
-	- Implementation: The Snake game will be most easily beaten if the players coordinate so only one on-screen character completes the objective at a time (to minimize the risk of players running into one another) rather than all proceeding independently at the same time.
-	- Implementation: The Hyperspace game controls act as an Ouija board where multiple players need to coordinate their actions to achieve the desired outcome.  Additionally, players will be presented with asymmetric controls and information: a limited number of players will be able to see the map to determine how best to reach the end goal; some obstacles like asteroid rubble must be avoided (one set of controls), while other obstacles like large asteroids cannot be avoided and must be destroyed with the laser (joystick in another station).
+- Implementation [TIER 2] [Software]: The goal of the finale shall be an immersive audio-visual experience that impresses players.
+	- Implementation [Software]: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Typically this is accomplished through the use of physcial puzzles that require a subset of the team to solve.  However, this room is focused heavily on the team work aspect and instead requires the full team to coordinate to solve a series of interactive games.
+	- Implementation [TIER 3] [Software]: Music will be played during the Snake game, Hyperspace game, and Credits sequences.
+		- Requirement [TIER 2] [Software] [Management]: Finale sounds shall not break the space-themed illusion of the room.
+			- Implementation [TIER 3] [Software]: Instrumental music will be originally composed that fits the space-theme.  Music will be designed to serve as a background accompaniment to the main player action, as is done to set ambiance in Hollywood movies.
+		- Requirement [TIER 2] [Software] [Management]: Music shall not be be too loud.
+			- Implementation [TIER 3] [Software]: Allow the proctor to adjust volume levels prior to and during room play-through.
+			- Implementation [TIER 3] [Software]: The volume for music will be independent from the volume for sound effects.
+		- Requirement [TIER 2] [Software] [Management]: After the Light Puzzle is completed, no other puzzles shall emit sounds that conflict with the finale.
 
-- Requirement: The cameras, proctor computer, wall computer, and console computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
+- Requirement [TIER 1] [Software] [Management]: The goal of the finale shall be to encourage team work among the players.
+	- Implementation [TIER 3] [Software]: The Snake game will be most easily beaten if the players coordinate so only one on-screen character completes the objective at a time (to minimize the risk of players running into one another) rather than all proceeding independently at the same time.
+	- Implementation [TIER 3] [Software]: The Hyperspace game controls each control one dimension of the on-screen character's movement.  Multiple players need to coordinate their actions to achieve the desired outcome.  Players will be presented with asymmetric abilities and information: a limited number of players will be able to see the map to determine how best to reach the end goal; some obstacles like asteroid rubble must be avoided (one set of controls), while other obstacles like large asteroids cannot be avoided and must be destroyed with the laser (joystick in another station).
 
-- Requirement: Custom electrical connections such as with the joystick and buttons will use heat shrink to strain relief the custom connections and reduce the risk of inadvertent electrical contact.
+- Requirement [TIER 2] [Software] [Management] [Hardware]: The cameras, proctor computer, wall computer, and console computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
 
-- Requirement: The wall, console and proctor computers shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.  Normal play-through and room reset activities shall not disconnect power from the computers.
-	- Implementation: The computers are architected to return to a standby state after a completed play-through and wait for proctor input.
+- Requriement [TIER 1] [Hardware] [Management]: The goal shall be to design the finale stations to be operated without hardware or eletrical failures.
+	- Implementation [TIER 2] [Hardware]: Electrical joints such as in joysticks and buttons will use heat shrink to strain relief the custom connections and reduce the risk of inadvertent electrical contact.
+	- Implementation [TIER 3] [Hardware]: A manually-accessible power switch(es) shall be available for the Proctor, Wall and Console computers, but not readily apparent to players.  This may take the form of a power strip that is only accessible from below a table or behind a wall.  This provides an easily accessible failsafe recovery option for the proctor to use should a computer become non-responsive.
 
-- Requirement: The wall, console and proctor monitors shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.
+- Requirement [TIER 1] [Software] [Hardware] [Management]: The wall, console and proctor _computers_ shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.  Normal play-through and room reset activities shall not disconnect power from the computers.
+	- Implementation [TIER 3] [Software]: The computers are architected to return to a standby state after a completed play-through and wait for proctor input.
 
-- Requirement: A manually-accessible power switch(es) shall be available for the Proctor, Wall and Console computers, but not readily apparent to players.  This may take the form of a power strip that is only accessible from below a table or behind a wall.  This provides an easily accessible failsafe recovery option for the proctor to use should a computer become non-responsive.
+- Requirement [TIER 1] [Software] [Hardware] [Management]: The wall, console and proctor _monitors_ shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.
 
-- Requirement: When power is applied, the wall, console and proctor computers shall boot to a standby state in no more than 5 minutes.
+- Requirement [TIER 2] [Software] [Management]: When power is applied, the wall, console and proctor computers shall boot to a standby state in no more than 5 minutes.
 
-- Implementation: The Wall PC will act as MASTER to the SLAVE Console.  The Proctor will act as MASTER to the SLAVE Wall.
-	- Requirement: The Proctor shall not command the Console directly.  Changing the Console state could lead to an undefined state existing between the Wall and Console computers.
+- Implementation [TIER 3] [Software]: The Proctor will act as MASTER to the SLAVE Wall.  The Wall PC will act as MASTER to the SLAVE Console.
+	- Requirement [TIER 3] [Software] [Management]: The Proctor shall not command the Console directly.  Changing the Console state could lead to an undefined state existing between the Wall and Console computers.
 
-- Requirement: Following the completion of the Light Puzzle, Snake game, Hyperspace game, Credits, or any cut scenes, the Wall computer shall automatically progress to the next chapter, updating the Console computer as dictated by the narrative.
+- Requirement [TIER 2] [Software] [Management]: Following the completion of the Light Puzzle, Snake game, Hyperspace game, Credits, or any cut scenes, the Wall computer shall automatically progress to the next chapter and update the Console computer state as dictated by the narrative.
 
-- Requirement: The wall monitor shall display the remaining time to solve the room prior to the end of the 60 minute window.  Following either a successful or failed attempt to play through the room, the total time taken shall be displayed on the wall monitor until the end of the credits.
+- Requirement [TIER 2] [Software] [Management]: Following either a successful or failed attempt to play through the room, the total time taken shall be displayed on the wall monitor until the end of the credits.
 
 ## Light Puzzle
 
-- Requirement: Following a start command from the proctor, an introduction cut scene shall play.
+- Requirement [TIER 1] [Software] [Management]: Following a start command from the proctor, the finale will begin the first chapter.
 
-- Implementation: Mock up:
+- Requirement [TIER 2] [Software] [Hardware] [Management]: The light puzzle shall provide four discrete signals at 3.3V/0V, and the corresponding discrete ground returns (a total of 8 wires), to the wall computer to indicate the status of the puzzle components.
 
-![Light Puzzle Mock Up](https://i.imgur.com/LKqFlft.jpg)
+- Requirement [TIER 2] [Software] [Management]: When queried by the proctor computer during the light puzzle, the wall computer shall report the state of the four light puzzle components as each either solved or not.
 
-- Requirement: The wall monitor shall display the remaining time to solve the room.
+- Requirement [TIER 1] [Software] [Management]: Once all four light puzzle discreets have changed state, the finale shall be considered finished.
+	- Implementation [TIER 2] [Software]: The Wall computer will then automatically transition to the next chapter, such as a cut scene.
 
-- Requirement: The light puzzle shall provide four discrete signals at 3.3V/0V, and the corresponding discrete ground returns (a total of 8 wires), to the wall computer to indicate the status of the puzzle components.
+- Requirement [TIER 1] [Software] [Hardware] [Management]: A TV or monitor that accepts and displays visual input from a Raspberry Pi shall be installed on the wall.
 
-- Requirement: The wall monitor shall display the state of the four light puzzle components as each either solved or not.
+- Implementation [TIER 2] [Software]: The wall computer shall be configured to run at 1920x1080 60 Hz (16:9, DMT mode 82) resolution.
 
-- Requirement: The wall monitor shall display a list of top level objectives for players to complete in order to solve the room.
-	- Implementation: This will take the form of three bullet points: establish power, stock cargo pod, deliver cargo pod.
-
-- Requirement: Once all four light puzzle discreets have changed state, the finale shall be considered finished.
-	- Implementation: The Wall computer will then automatically transition to the next chapter, such as a cut scene.
-
-- Requirement: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed on the wall.
-
-- Requirement: The wall computer shall be configured to run at 1920x1080 60 Hz (16:9, DMT mode 82) resolution.
-
-- Requirement: A cut scene shall play after the completion of the light puzzle explaining the controls and objective for the Snake and Hyperspace games.
+- Requirement [TIER 3] [Software] [Management]: A tutorial shall play after the completion of the light puzzle to convey the location and operation of the controls for the Snake and Hyperspace games.
+	- Implementation [TIER 3] [Software]: The wall monitor will display the state of all finale controls as inactive.  When players use the controls, the state will transition to active.  Once all controls have been activated, the chapter will be considered complete and will transition automatically to the next chapter such as the Snake game.
 
 ## Morse Code
 
-- Requirement: Once the light puzzle is solved, the wall computer shall send a trigger signal to the console computer.  In response to this command, the console computer shall proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game.
-	- Implementation: The book state machine running in the console computer will cease updating the Morse code puzzle and rendering graphics in response to the relevant Ethernet command from the wall or proctor computers.
+- Requirement [TIER 2] [Software] [Management]: Once the light puzzle is solved, the wall computer shall send a trigger signal to the console computer.  In response to this command, the console computer shall proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game.
+	- Implementation [TIER 3] [Software]: The book state machine running in the console computer will cease updating the state and renering graphics for the Morse code puzzle in response to the relevant Ethernet command from the wall or proctor computers.
 
-- Requirement: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the console.
-
-- Requirement: The monitor shall be situated in the console such that no more than two players can clearly see the screen.
+- Requirement [TIER 2] [Software] [Hardware]: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the console.
+	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the console such that two players or fewer can clearly see the screen.
 
 - Requirement: Two buttons shall be installed in the console adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the console computer so that the state of the buttons can be acquired.
 
