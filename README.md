@@ -125,24 +125,16 @@ xxx TODO sudo pip3 install omxplayer-wrapper
 
 git pull origin master
 
-git add . && git commit -am "command"
+git add . && git commit -am "comment"
 
 git push origin master
 
+### Development Tools
 
-# Connection Diagram
-
-## Room
-
-
-
-## Pinout
-
-### Main Monitor
-
-
-### Auxilary Monitor
+- Markdown editor for editing design documents
+	- Download the latest .deb from: [Remarkable](https://remarkableapp.github.io/linux/download.html)
+	- Command: _sudo apt install /home/linaro/Downloads/remarkable_1.87_all.deb_
 
 # About
 
-
+Our local site president visited an escape room during his travels and found it was a useful activity for building team work.  He subsequently provided hardware funds for an engineering group to pursue building our own escape room on site.  Over a dozen engineers joined and contributed directly to this project.  Scott Almond is one of those engineers and my role is to supply the finale for the escape room.  I developed the finale plan and code.  I also reached out to multiple artists to commission 2D art, 3D art, and musical assets.
