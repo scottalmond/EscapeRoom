@@ -123,6 +123,13 @@ TODO: 20-30 second demo video
 xxx TODO sudo apt-get install vlc --> omxplayer
 xxx TODO sudo pip3 install omxplayer-wrapper
 
+git pull origin master
+
+git add . && git commit -am "command"
+
+git push origin master
+
+
 # Connection Diagram
 
 ## Room
