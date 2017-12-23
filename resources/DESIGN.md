@@ -2,8 +2,9 @@ note to self: avoid shall not - no way to prove negative.  element shall do task
 replace console with helm
 replace PC with computer
 make schematic of proctor, help and wall montors/comuter/human
+include tomorrow land music sound effect reference
 
-﻿# Overview
+# Overview
 
 This document details the top level objectives, implementation, and interface details of the finale in order to facilitate effective communication among the Escape Room development team.
 
@@ -32,7 +33,7 @@ This document details the top level objectives, implementation, and interface de
 - Requirement [TIER 1] [Software] [Management]: The finale shall follow a pre-scripted narrative.
 	- Implementation [Software]: The wall computer will play video with sound as dictated by the narrative.
 
-Attempting to design reconfigurable puzzles that target a variable number of players has proven challenging.  To limit scope, a finite number of players was settled upon.
+Attempting to design reconfigurable puzzles that target a variable number of players has proven challenging.  To limit scope, a finite number of players was chosen.
 - Requirement [TIER 1] [Software] [Management]: The finale shall be designed to be operated by five players.
 
 - Implementation [TIER 2] [Software]: The goal of the finale shall be an immersive audio-visual experience that impresses players.
@@ -51,9 +52,10 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 - Requirement [TIER 2] [Software] [Management] [Hardware]: The cameras, proctor computer, wall computer, and console computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
 
-- Requriement [TIER 1] [Hardware] [Management]: The goal shall be to design the finale stations to be operated without hardware or eletrical failures.
+- Requriement [TIER 1] [Hardware] [Management]: The goal shall be to design the finale stations to be operated without hardware or eletrical failures.  In the case of failures, an easily accessible recovery option shall be available to the proctor.
 	- Implementation [TIER 2] [Hardware]: Electrical joints such as in joysticks and buttons will use heat shrink to strain relief the custom connections and reduce the risk of inadvertent electrical contact.
-	- Implementation [TIER 3] [Hardware]: A manually-accessible power switch(es) shall be available for the Proctor, Wall and Console computers, but not readily apparent to players.  This may take the form of a power strip that is only accessible from below a table or behind a wall.  This provides an easily accessible failsafe recovery option for the proctor to use should a computer become non-responsive.
+	- Implementation [TIER 3] [Hardware]: A manually-accessible power switch(es) shall be available for the Proctor, Wall and Console computers, but not readily apparent to players.  This may take the form of a power strip that is only accessible from below a table or behind a wall.
+	- Implementation [TIER 2] [Hardware]: A thematic shroud shall enclose the speakers to protect them from players and hide them from view without degrading audio output.
 
 - Requirement [TIER 1] [Software] [Hardware] [Management]: The wall, console and proctor _computers_ shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.  Normal play-through and room reset activities shall not disconnect power from the computers.
 	- Implementation [TIER 3] [Software]: The computers are architected to return to a standby state after a completed play-through and wait for proctor input.
@@ -93,59 +95,60 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 	- Implementation [TIER 3] [Software]: The book state machine running in the console computer will cease updating the state and renering graphics for the Morse code puzzle in response to the relevant Ethernet command from the wall or proctor computers.
 
 - Requirement [TIER 2] [Software] [Hardware]: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the console.
-	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the console such that two players or fewer can clearly see the screen.
+	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the console such that two players or fewer can clearly see the screen.  This facilitates the design goal of asymmatric information presented to the players.
+	- Implementation [TIER 3] [Hardware]: An HP L2045W monitor is the current design baseline
 
-- Requirement: Two buttons shall be installed in the console adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the console computer so that the state of the buttons can be acquired.
+- Requirement [TIER 2] [Software] [Hardware]: Two buttons shall be installed in the console adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the console computer so that the state of the buttons can be acquired.
 
-- Requirement: The 'dot' and 'dash' buttons shall be situated such that a seated player can view the monitor while pressing the buttons.
+- Implementation [TIER 2] [Hardware]: The 'dot' and 'dash' buttons will be situated such that a seated player can view the console monitor while pressing the buttons.
 
-- Requirement: The console computer shall be configured to run at 1920x1080 60 Hz (16:9, DMT mode 82) resolution.
+- Implementation [TIER 2] [Software]: The console computer shall be configured to run at 1680x1050 60 Hz (16:10, DMT mode 58) resolution.
 
 ## Snake Game
 
-- Implementation: Three snakes are shown on screen.  One is controlled by the joystick in the captain's chair.  One is controlled by the four buttons in the console.  One is controlled by the four stomp pads.  The corners of the screen provide visual user feedback of user inputs.
+- Implementation [TIER 2] [Software]: Three snakes are shown on screen.  One is controlled by the joystick in the captain's chair.  One is controlled by the joystick in the console.  One is controlled by the two single-axis joysticks in the wing stations.  The corners of the screen provide visual user feedback of user inputs.
 
 ![Snake Game Mock Up](https://i.imgur.com/bh3N98u.jpg)
 
-- Implementation: The music for this section will be inspired by the following reference songs:
-	- [Epic Mountain - Quantum Computers](https://www.youtube.com/watch?v=hUsoHSa4QXI)
-	- [Software Inc - Trailer](https://youtu.be/6M2jonWFHwQ?t=6s)
-	- [Traktion - Mission ASCII](https://www.youtube.com/watch?v=mTbdaC3JsMc&feature=youtu.be&t=22s)
+- Implementation [TIER 3] [Software]: The music for this section will be inspired by the following reference songs:
+	- [Bejweled 2 Soundtrack](https://www.youtube.com/watch?v=4GLkrW9kluo)
+	- [End of Line - Daft Punk](https://www.youtube.com/watch?v=AHGvaQMClEo)
+	- [Lost Years - Lightbringers](https://www.youtube.com/watch?v=k6jjoE5Qt_s)
+	- [Heavy Light - Animusic](https://www.youtube.com/watch?v=DKUTYxJEB44)
 
-- Requirement: The Snake game shall be designed to be completed within 5 minutes, but allow for shorter or longer play times depending on player skill level.
+- Requirement [TIER 1] [Software] [Management]: The Tutorial and Snake game shall be designed to be completed within 5 minutes, but allow for shorter or longer play times depending on player skill level.
 
-- Requirement: The following user inputs shall be installed in the following locations and be electrically connected to the wall computer:
-	- Four buttons in the console.  These buttons will represent up, down, left, and right commands from one seated player.  Each button has a sense and return.  8 wires total.  These buttons serve as the 'blue' user input and the goal shall be to use this theme color when designing the mounting structure in the console.
+- Requirement [TIER 2] [Software] [Hardware]: The following user inputs shall be installed in the following locations and be electrically connected to the wall computer:
+	- Four-direction joystick in the console.  This will represent up, down, left, and right commands from one seated player.  Each direction has a sense and return.  8 wires total.  These buttons serve as the 'blue' user input and the goal shall be to use this theme color when designing the mounting structure in the console.
 	- A joystick that can be operated while a player is seated the captain's chair.  Each direction, plus fire, has two wires for sense plus return.  10 wires total.  This joystick serves as the 'red' user input and the goal shall be to use this theme color when designing the mounting structure in the captain's chair.
-	- Four stomp pads arranged as two pairs of two.  One pair of pads represents left and right commands.  The other pair represents up and down control.  The pads are designed to be operated by players while standing.  Each pad contains three wires: power, sense and return.  12 wires total.  These four pads represent the 'green' user input and the goal shall be to use this theme color when designing the stomp pads.
+	- Two single-axis joysticks, one for each of the two wing stations.  One joystick represents left and right commands.  The other joystick represents up and down control.  The joysticks will contain motion limiters that prevent user inputs in the unused directions.  Each direction has a sense and return.  8 wires total for the two stations.  These controls represent the 'green' user input and the goal shall be to use this theme color when designing the wing stations.
 
-- Implementation: When one snake hits the tail of another snake, the damaged portion of the tail is deleted.  Once a snake has grown a long enough tail, goal posts will appear at the bottom of the screen.  Navigating the correctly colored snake through the goal posts represents completion of one third of the puzzle.  Navigating all three Snakes through the goal posts represents completion of the game.  Specially-colored pellets will appear randomly on screen for the snakes to collect.  A snake that exits the edge of the screen will reappear on the opposing side of the screen in a wrap-around style.
+- Implementation [TIER 3] [Software]: When one snake hits the tail of another snake, the damaged portion of the tail is deleted.  Once a snake has grown a long enough tail, the Snake will be eligable to exit through goal posts.  The console operate with the morse code inputs will need to enter the appropriate code to enable the goal posts for the Snake to exit through.  Navigating the correctly colored snake through the goal posts represents completion of one third of the puzzle.  Navigating all three Snakes through the goal posts represents completion of the game.  Specially-colored pellets will appear randomly on screen for the snakes to collect.  A snake that exits the edge of the screen will reappear on the opposing side of the screen in a wrap-around style.
 
-- Requirement: The Snake game shall be considered complete once all three snakes have exited through the goal posts.
-	- Implementation: The Wall computer will then proceed to the following chapter such as the Hyperspace game.
+- Implementation [TIER 2] [Software]: The Snake game shall be considered complete once all three snakes have exited through the goal posts.
+	- Implementation [TIER 2] [Software]: The Wall computer will then proceed to the following chapter such as the Hyperspace game.
 
 ## Hyperspace Game
 
-- Implementation: The Hyperspace game will start with a cut scene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once during a normal Hyperspace game play-through, regardless of the number of player deaths.
+- Implementation [TIER 3] [Software]: The Hyperspace game will start with a cut scene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once during a normal Hyperspace game play-through, regardless of the number of player deaths.
 
 ![Hyperspace Cut Scene](https://i.imgur.com/nDOovDA.jpg)
 
-- Implementation: The Hyperspace game will consist of a cargo pod navigating through a series of hyperspace rings.
+- Implementation [TIER 2] [Software]: The Hyperspace game will consist of a cargo pod navigating through a series of hyperspace rings.
 
 ![Hyperspace Game Mock Up](https://i.imgur.com/oHnaBpF.jpg)
 
-- Implementation: The console monitor will display a map of the hyperspace maze.
+- Implementation [TIER 2] [Software]: The console monitor will display a map of the hyperspace maze.
 
 ![Hyperspace Map Mock Up](https://i.imgur.com/IudjHqh.jpg)
 
-- Implementation: The music for this section will be inspired by the following reference songs:
-	- [Zabutom - Final Blast](https://www.youtube.com/watch?v=uwlijEs81mI)
-	- [Them's Fightin' Herds - Title Theme](https://www.youtube.com/watch?v=hHCtGhXCKYI)
-	- [Riggsmeister - To The Future](https://youtu.be/JtFy3IusYY8?t=26s)
+- Implementation [TIER 3] [Software]: The music for this section will be inspired by the following reference songs:
+	- [Bejweled 2 Soundtrack](https://www.youtube.com/watch?v=4GLkrW9kluo)
+	- [End of Line - Daft Punk](https://www.youtube.com/watch?v=AHGvaQMClEo)
+	- [Lost Years - Lightbringers](https://www.youtube.com/watch?v=k6jjoE5Qt_s)
+	- [Heavy Light - Animusic](https://www.youtube.com/watch?v=DKUTYxJEB44)
 
-- Implementation: Sound effects will be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds.
-
-- Requirement: A thematic protective shroud shall enclose the speakers to protect them from players and hide them from view without degrading audio output.
+- Implementation [TIER 3] [Software]: Sound effects will be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds.
 
 - Requirement: The Hyperspace Game shall be designed to be completed in no more than 10 minutes, but allow for shorter or longer play times depending on player skill level.
 
