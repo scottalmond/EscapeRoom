@@ -149,13 +149,13 @@ The Python 3 code used within this project was developed by Scott Almond and rel
 
 ## Visual Art Assets
 
-2D and 3D art assets were commissioned from Chilly Prins for this project and released under the following license.  These files are postpended with "by_chilly_prins" in the asset folders within this project.
+2D and 3D art assets were commissioned from Chilly Prins for this project and released under the following license.  These files are postpended with "by_chilly_prins" in the filenames.
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 ## Audio Assets
 
-Music was commissioned from Juan Goncebat for this project and released under the following license.  There files are postpended with "by_juan_goncebat" in the asset folders within this project.
+Music was commissioned from Juan Goncebat for this project and released under the following license.  These files are postpended with "by_juan_goncebat" in the finenames.
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
