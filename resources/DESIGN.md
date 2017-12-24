@@ -130,6 +130,8 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 ## Hyperspace Game
 
+- Implementation [TIER 2] [Software]: The player character is a single cargo pod with thrusters and a laser.
+
 - Implementation [TIER 3] [Software]: The Hyperspace game will start with a cut scene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once during a normal Hyperspace game play-through, regardless of the number of player deaths.
 
 ![Hyperspace Cut Scene](https://i.imgur.com/nDOovDA.jpg)
@@ -150,28 +152,55 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 - Implementation [TIER 3] [Software]: Sound effects will be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds.
 
-- Requirement: The Hyperspace Game shall be designed to be completed in no more than 10 minutes, but allow for shorter or longer play times depending on player skill level.
+- Requirement [TIER 1] [Software] [Management]: The Hyperspace Intro and Game shall be designed to be completed in no more than 10 minutes, but allow for shorter or longer play times depending on player skill level.
 
-- Requirement: Upon start of the Hyperspace game, the wall monitor shall emit a trigger signal to the console computer to transition to the map display.
-
-- Implementation: The player character is a single cargo pod with thrusters and a laser.
+- Implementation [TIER 2] [Software]: Upon start of the Hyperspace game, the wall monitor shall emit a trigger signal to the console computer to transition to the map display.
 
 ![Cargo Pod](https://i.imgur.com/5g2vbFS.png)
 
-- Implementation: The playing field consists of a branching hyperspace path filled with asteroid obstacles.  The map depicts the full Hyperspace maze.  The Hyperspace path is indicated via linear series of rings and occasional forks where players need to navigate to either the left or right side of the screen to select a branch.
+- Implementation [TIER 3] [Software]: The playing field consists of a branching hyperspace path filled with asteroid obstacles.  The map depicts the full Hyperspace maze.  The Hyperspace path is indicated via linear series of rings and occasional forks where players need to navigate to either the left or right side of the screen to select a branch.
 
 ![Hyperspace Ring](https://i.imgur.com/96dxxqV.png)
 
 ![Hyperspace Fork](https://i.imgur.com/cCaWGny.png)
 
-- Implementation: The asteroids consist of three sizes: small, medium, and large.  The medium asteroid can either be shot with the laser or avoided by moving the pod out of a collision course.  The large asteroid has no room to maneuver around and must be shot with the laser.  The small asteroid (a debris cloud) cannot be shot with the laser and must be avoided.
+- Implementation [TIER 3] [Software]: The asteroids consist of three sizes: small, medium, and large.  The medium asteroid can either be shot with the laser or avoided by moving the pod out of a collision course.  The large asteroid has no room to maneuver around and must be shot with the laser.  The small asteroid (a debris cloud) cannot be shot with the laser and must be avoided.
 
 ![Medium Asteroid](https://i.imgur.com/qjFWaUX.png)
 
-- Implementation: The four buttons in the console and four stomp pads act as an Ouija board for controlling the position of the pod.  If only the only user input was the right button in the console, the pod would move at one-third speed to the right.  If the only user input were the right stomp pad, the pod would again move at one-third speed to the right.  When both the right pad and right button are activated synchronously, the pod moves at full speed to the right.  The logic for the remaining three cardinal directions act in the same combinational manner.
-The joystick in the captain's chair controls the laser cross hairs.  When the fire button is pressed, a laser fires.  If the laser hits a medium or large asteroid the asteroid will be destroyed.  Targeting a small asteroid debris field with the laser does nothing.
+- Implementation [TIER 3] [Software]: The joystick in the captain's chair controls the laser cross hairs.  When the fire button is pressed, a laser fires.  If the laser hits a medium or large asteroid the asteroid will be destroyed.  Targeting a small asteroid debris field with the laser does nothing.
 
-- Implementation: Hitting an asteroid triggers a player death.  The pod is reverted back to the start of the hyperspace map and briefly flashes to indicate a new life.
+- Implementation [TIER 3] [Software]: The up-down and left-right joysticks in the wing stations control the location of the pod within the playing field.
+
+- Implementation [TIER 3] [Software]: The four-direction joystick in the console controls the attitude of the camera viewing the pod.  If the camera attitude is not changed after rounding Hyperspace corners, players will be unable to see and respond to upcoming obstacles.
+
+- Implementation [TIER 3] [Software]: Hitting an asteroid degrades player health in three stages.  On the first hit, the edges of the wall monitor screen glow red then fade.  On the second hit, the edge of the screen turns and remains red; the console monitor replaces the map with static.  The third hit triggers player death.  Upon player death the pod is reverted back to the start of the hyperspace map and briefly flashes to indicate a new life.  On a new life the console computer is reverted back to a map display.
+
+### Hyperspace Map
+
+- Implementation [TIER 3] [Software]: The Hyperspace map will be laid out like a subway map with thick monochromatic lines mapped to a rectilinar coordinate system representing the Hyperspace lanes.
+
+- Implementation [TIER 3] [Software]: The start and end points are represented by squares.  The character is represented by a triangle that moves as the pod progresses through the map.
+
+- Implementation [TIER 3] [Software]: Branch nodes are reprsented by circles.  The left branch node is represented by a brief blue strip down the center of the lane line.  The right branch node will have an orange line down the center.  The color code lines up with the branch Hyperspace ring on the screen which will have a faint inner glow of blue for the left branch and a faint inner glow of orange for the right path.
+
+layout like a subway map
+
+nodes that exit and reappear elsewhere in the map
+
+death traps
+
+branches
+
+surpurfuous info
+
+going backward down same stretch of map
+
+access keys/locks...
+
+water-like hazards / space background on map
+
+infinite loop
 
 ## Proctor
 

@@ -138,3 +138,26 @@ git push origin master
 # About
 
 Our local site president visited an escape room during his travels and found it was a useful activity for building team work.  He subsequently provided hardware funds for an engineering group to pursue building our own escape room on site.  Over a dozen engineers joined and contributed directly to this project.  Scott Almond is one of those engineers and my role is to supply the finale for the escape room.  I developed the finale plan and code.  I also reached out to multiple artists to commission 2D art, 3D art, and musical assets.
+
+# Licensing
+
+## Code
+
+The Python 3 code used within this project was developed by Scott Almond and relesed under the following license.  These files contain "Author: Scott Almond" in the header.
+
+[![License: Open Data Commons Attribution](https://img.shields.io/badge/License-ODC_BY-brightgreen.svg)](https://opendatacommons.org/licenses/by/)
+
+## Visual Art Assets
+
+2D and 3D art assets were commissioned from Chilly Prins for this project and released under the following license.  These files are postpended with "by_chilly_prins" in the asset folders within this project.
+
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
+## Audio Assets
+
+Music was commissioned from Juan Goncebat for this project and released under the following license.  There files are postpended with "by_juan_goncebat" in the asset folders within this project.
+
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
+Sound effects were acquired from [Freesound](https://freesound.org/).
+
