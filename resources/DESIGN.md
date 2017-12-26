@@ -183,6 +183,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 - Implementation [TIER 3] [Software]: The four-direction joystick in the Helm controls the attitude of the camera viewing the pod.  If the camera attitude is not changed after rounding Hyperspace corners, players will be unable to see and respond to upcoming obstacles.
 
 - Implementation [TIER 3] [Software]: Hitting an asteroid degrades player health in three stages.  On the first hit, the edges of the Wall monitor screen glow red then fade.  On the second hit, the edge of the screen turns and remains red; the Helm monitor replaces the map with static.  The third hit triggers player death.  Upon player death the pod is reverted back to the start of the hyperspace map and briefly flashes to indicate a new life.  On a new life the Helm computer is reverted back to a map display.
+	- Implementation [TIER 3] [Software]: Upon the player returning to the starting point, the map will revert to the initial conditions.  This includes asteroid placement and obstacle pods that move during play.
 
 ### Hyperspace Map
 
@@ -196,7 +197,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 - Implementation [TIER 3] [Software]: Non-playable pods, that act as obstacles moving against the flow, are represented by upside down triangles that appear out of instant-death nodes and disappear into instant-death nodes.  These pods will appear on the main monitor as pods moving in the opposite direction to the player, risking a head-on collision.
 
-- Implementation [TIER 3] [Software]: In sections of the map that will have non-playable pods travelling along them, no large asteroid will appear.
+- Implementation [TIER 3] [Software]: In sections of the map that will have non-playable pods travelling along them, no large asteroids will appear.
 
 - Implementation [TIER 3] [Software]: Wormholes are represented by a termination of a Hyperspace line with a 'T'.  When entering a 'T', the pod will be transported to the 'T' of the same color with a triangle pointing to it.  There may be multiple entry wormhole entrances, but only one exit wormhole.
 
