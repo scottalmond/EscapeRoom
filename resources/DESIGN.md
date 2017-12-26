@@ -1,8 +1,5 @@
-note to self: avoid shall not - no way to prove negative.  element shall do task subject to contraints
-replace console with helm
-replace PC with computer
-make schematic of proctor, help and wall montors/comuter/human
-include tomorrow land music sound effect reference
+TODO make schematic of proctor, help and wall montors/comuter/human
+TODO update connection diagram
 
 # Overview
 
@@ -20,7 +17,7 @@ This document details the top level objectives, implementation, and interface de
 
 - [TIER 3]: These are nice-to-have stipulations and may be de-scoped or modified as needed to meet the dictated schedule
 
-- [Hardware]: These are elements that refer to the team building the pyscial set the players will interact with
+- [Hardware]: These are elements that refer to the team building the pysical set the players will interact with
 
 - [Software]: These are virtual elements that exist on the computer
 
@@ -31,7 +28,7 @@ This document details the top level objectives, implementation, and interface de
 ## Room
 
 - Requirement [TIER 1] [Software] [Management]: The finale shall follow a pre-scripted narrative.
-	- Implementation [Software]: The wall computer will play video with sound as dictated by the narrative.
+	- Implementation [Software]: The Wall computer will play video with sound as dictated by the narrative.
 
 Attempting to design reconfigurable puzzles that target a variable number of players has proven challenging.  To limit scope, a finite number of players was chosen.
 - Requirement [TIER 1] [Software] [Management]: The finale shall be designed to be operated by five players.
@@ -39,10 +36,10 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 - Implementation [TIER 2] [Software]: The goal of the finale shall be an immersive audio-visual experience that impresses players.
 	- Implementation [Software]: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Typically this is accomplished through the use of physcial puzzles that require a subset of the team to solve.  However, this room is focused heavily on the team work aspect and instead requires the full team to coordinate to solve a series of interactive games.
 	- Implementation [TIER 3] [Software]: Music will be played during the Snake game, Hyperspace game, and Credits sequences.
-		- Requirement [TIER 2] [Software] [Management]: Finale sounds shall not break the space-themed illusion of the room.
+		- Requirement [TIER 2] [Software] [Management]: Finale sounds shall support the space-themed illusion of the room.
 			- Implementation [TIER 3] [Software]: Instrumental music will be originally composed that fits the space-theme.  Music will be designed to serve as a background accompaniment to the main player action, as is done to set ambiance in Hollywood movies.
-		- Requirement [TIER 2] [Software] [Management]: Music shall not be be too loud.
-			- Implementation [TIER 3] [Software]: Allow the proctor to adjust volume levels prior to and during room play-through.
+		- Requirement [TIER 2] [Software] [Management]: Music shall be played at a moderate volume.
+			- Implementation [TIER 3] [Software]: Allow the Proctor computer to issue commands to adjust volume levels prior to and during room play-through.
 			- Implementation [TIER 3] [Software]: The volume for music will be independent from the volume for sound effects.
 		- Requirement [TIER 2] [Software] [Management]: After the Light Puzzle is completed, no other puzzles shall emit sounds that conflict with the finale.
 
@@ -50,63 +47,72 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 	- Implementation [TIER 3] [Software]: The Snake game will be most easily beaten if the players coordinate so only one on-screen character completes the objective at a time (to minimize the risk of players running into one another) rather than all proceeding independently at the same time.
 	- Implementation [TIER 3] [Software]: The Hyperspace game controls each control one dimension of the on-screen character's movement.  Multiple players need to coordinate their actions to achieve the desired outcome.  Players will be presented with asymmetric abilities and information: a limited number of players will be able to see the map to determine how best to reach the end goal; some obstacles like asteroid rubble must be avoided (one set of controls), while other obstacles like large asteroids cannot be avoided and must be destroyed with the laser (joystick in another station).
 
-- Requirement [TIER 2] [Software] [Management] [Hardware]: The cameras, proctor computer, wall computer, and console computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
+- Requirement [TIER 2] [Software] [Management] [Hardware]: The cameras, Proctor computer, Wall computer, and Helm computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
 
 - Requriement [TIER 1] [Hardware] [Management]: The goal shall be to design the finale stations to be operated without hardware or eletrical failures.  In the case of failures, an easily accessible recovery option shall be available to the proctor.
 	- Implementation [TIER 2] [Hardware]: Electrical joints such as in joysticks and buttons will use heat shrink to strain relief the custom connections and reduce the risk of inadvertent electrical contact.
-	- Implementation [TIER 3] [Hardware]: A manually-accessible power switch(es) shall be available for the Proctor, Wall and Console computers, but not readily apparent to players.  This may take the form of a power strip that is only accessible from below a table or behind a wall.
+	- Implementation [TIER 3] [Hardware]: A manually-accessible power switch(es) shall be available for the Proctor, Wall and Helm computers, but not readily apparent to players.  This may take the form of a power strip that is only accessible from below a table or behind a wall.
 	- Implementation [TIER 2] [Hardware]: A thematic shroud shall enclose the speakers to protect them from players and hide them from view without degrading audio output.
 
-- Requirement [TIER 1] [Software] [Hardware] [Management]: The wall, console and proctor _computers_ shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.  Normal play-through and room reset activities shall not disconnect power from the computers.
-	- Implementation [TIER 3] [Software]: The computers are architected to return to a standby state after a completed play-through and wait for proctor input.
+- Requirement [TIER 1] [Software] [Hardware] [Management]: The Wall, Helm and Proctor _computers_ shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.
+	- Implementation [TIER 3] [Software]: The computers are architected to return to a standby state after a completed play-through and wait for Proctor computer input.
 
-- Requirement [TIER 1] [Software] [Hardware] [Management]: The wall, console and proctor _monitors_ shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.
+- Requirement [TIER 1] [Software] [Hardware] [Management]: The Wall, Helm and Proctor _monitors_ shall be supplied with 120 VAC, 60 Hz power except in extenuating circumstances.
 
-- Requirement [TIER 2] [Software] [Management]: When power is applied, the wall, console and proctor computers shall boot to a standby state in no more than 5 minutes.
+- Requirement [TIER 1] [Software] [Hardware] [Management]: The finale shall be resettable within 5 minutes by a single operator.  This supports a 15 minute total reset time for the room.
+	- Requirement [TIER 2] [Software] [Management]: When power is applied, the Wall, Helm and Proctor computers shall boot to a standby state in no more than 5 minutes.
 
-- Implementation [TIER 3] [Software]: The Proctor will act as MASTER to the SLAVE Wall.  The Wall PC will act as MASTER to the SLAVE Console.
-	- Requirement [TIER 3] [Software] [Management]: The Proctor shall not command the Console directly.  Changing the Console state could lead to an undefined state existing between the Wall and Console computers.
+- Implementation [TIER 3] [Software]: The Proctor computer will act as MASTER to the SLAVE Wall computer.  The Wall computer will act as MASTER to the SLAVE Helm computer.
+	- Changing the Helm computer state directly through a command from the Proctor computer could lead to an undefined state existing between the Wall and Helm computers.
 
-- Requirement [TIER 2] [Software] [Management]: Following the completion of the Light Puzzle, Snake game, Hyperspace game, Credits, or any cut scenes, the Wall computer shall automatically progress to the next chapter and update the Console computer state as dictated by the narrative.
+- Requirement [TIER 2] [Software] [Management]: Following the completion of the Light Puzzle, Snake game, Hyperspace game, Credits, or any cut scenes, the Wall computer shall automatically progress to the next chapter and update the Helm computer state as dictated by the narrative.
 
-- Requirement [TIER 2] [Software] [Management]: Following either a successful or failed attempt to play through the room, the total time taken shall be displayed on the wall monitor until the end of the credits.
+- Requirement [TIER 2] [Software] [Management]: Following either a successful or failed attempt to play through the room, the total time taken shall be displayed on the Wall monitor until the end of the credits.
+
+- Requirement [TIER 2] [Software] [Hardware] [Management]: The computers, players and proctor shall be laid out as shown in the following.
+
+![Top Level Room Layout](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/computer_layout.png)
 
 ## Light Puzzle
 
-- Requirement [TIER 1] [Software] [Management]: Following a start command from the proctor, the finale will begin the first chapter.
+- Requirement [TIER 1] [Software] [Management]: Following a start command from the Proctor computer, the finale will begin the first chapter.
 
-- Requirement [TIER 2] [Software] [Hardware] [Management]: The light puzzle shall provide four discrete signals at 3.3V/0V, and the corresponding discrete ground returns (a total of 8 wires), to the wall computer to indicate the status of the puzzle components.
+- Requirement [TIER 2] [Software] [Hardware] [Management]: The light puzzle shall provide no fewer than one and no more than four discrete signals at 3.3V/0V, and the corresponding discrete ground returns (a total of 8 wires), to the Wall computer to indicate the status of the puzzle component(s).
 
-- Requirement [TIER 2] [Software] [Management]: When queried by the proctor computer during the light puzzle, the wall computer shall report the state of the four light puzzle components as each either solved or not.
+- Requirement [TIER 2] [Software] [Management]: The Proctor computer shall have the ability to override the state of some or all of the light puzzle components by sending a command to the Wall computer.
 
-- Requirement [TIER 1] [Software] [Management]: Once all four light puzzle discreets have changed state, the finale shall be considered finished.
+- Requirement [TIER 2] [Software] [Management]: When queried by the Proctor computer during the light puzzle, the Wall computer shall report the state of the four light puzzle components as each either solved or not.
+
+- Requirement [TIER 1] [Software] [Management]: Once all light puzzle discreets have changed state, the light puzzle shall be considered finished.
 	- Implementation [TIER 2] [Software]: The Wall computer will then automatically transition to the next chapter, such as a cut scene.
 
 - Requirement [TIER 1] [Software] [Hardware] [Management]: A TV or monitor that accepts and displays visual input from a Raspberry Pi shall be installed on the wall.
 
-- Implementation [TIER 2] [Software]: The wall computer shall be configured to run at 1920x1080 60 Hz (16:9, DMT mode 82) resolution.
+- Implementation [TIER 2] [Software]: The Wall computer shall be configured to run at 1920x1080 60 Hz (16:9, DMT mode 82) resolution.
 
 - Requirement [TIER 3] [Software] [Management]: A tutorial shall play after the completion of the light puzzle to convey the location and operation of the controls for the Snake and Hyperspace games.
-	- Implementation [TIER 3] [Software]: The wall monitor will display the state of all finale controls as inactive.  When players use the controls, the state will transition to active.  Once all controls have been activated, the chapter will be considered complete and will transition automatically to the next chapter such as the Snake game.
+	- Implementation [TIER 3] [Software]: The Wall monitor will display the state of all finale controls as inactive.  When players use the controls, the state will transition to active.  Once all controls have been activated, the chapter will be considered complete and will transition automatically to the next chapter such as the Snake game.
+	
+- Requirement [TIER 3] [Software] [Management]: The Wall monitor shall display static noise on screen during the light puzzle.
 
 ## Morse Code
 
-- Requirement [TIER 2] [Software] [Management]: Once the light puzzle is solved, the wall computer shall send a trigger signal to the console computer.  In response to this command, the console computer shall proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game.
-	- Implementation [TIER 3] [Software]: The book state machine running in the console computer will cease updating the state and renering graphics for the Morse code puzzle in response to the relevant Ethernet command from the wall or proctor computers.
+- Requirement [TIER 2] [Software] [Management]: Once the light puzzle is solved, the Wall computer shall send a trigger signal to the Helm computer.  In response to this command, the Helm computer shall stop the Morse Code puzzle and proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game.
+	- Implementation [TIER 3] [Software]: The book state machine running in the Helm computer will cease updating the state and renering graphics for the Morse code puzzle in response to the relevant Ethernet command from the wall or proctor computers.
 
-- Requirement [TIER 2] [Software] [Hardware]: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the console.
-	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the console such that two players or fewer can clearly see the screen.  This facilitates the design goal of asymmatric information presented to the players.
-	- Implementation [TIER 3] [Hardware]: An HP L2045W monitor is the current design baseline
+- Requirement [TIER 2] [Software] [Hardware]: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the Helm.
+	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the Helm such that two players or fewer can clearly see the screen.  This facilitates the design goal of asymmatric information presented to the players.
+	- Implementation [TIER 3] [Hardware]: An HP L2045W monitor is the current design baseline.
 
-- Requirement [TIER 2] [Software] [Hardware]: Two buttons shall be installed in the console adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the console computer so that the state of the buttons can be acquired.
+- Requirement [TIER 2] [Software] [Hardware]: Two buttons shall be installed in the Helm adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the Helm computer so that the state of the buttons can be acquired.
 
-- Implementation [TIER 2] [Hardware]: The 'dot' and 'dash' buttons will be situated such that a seated player can view the console monitor while pressing the buttons.
+- Implementation [TIER 2] [Hardware]: The 'dot' and 'dash' buttons will be situated such that a seated player can view the Helm monitor while pressing the buttons.
 
-- Implementation [TIER 2] [Software]: The console computer shall be configured to run at 1680x1050 60 Hz (16:10, DMT mode 58) resolution.
+- Implementation [TIER 2] [Software]: The Helm computer shall be configured to run at 1680x1050 60 Hz (16:10, DMT mode 58) resolution.
 
 ## Snake Game
 
-- Implementation [TIER 2] [Software]: Three snakes are shown on screen.  One is controlled by the joystick in the captain's chair.  One is controlled by the joystick in the console.  One is controlled by the two single-axis joysticks in the wing stations.  The corners of the screen provide visual user feedback of user inputs.
+- Implementation [TIER 2] [Software]: Three snakes are shown on screen.  One is controlled by the joystick in the captain's chair.  One is controlled by the joystick in the Helm.  One is controlled by the two single-axis joysticks in the wing stations.  The corners of the screen provide visual user feedback of user inputs.
 
 ![Snake Game Mock Up](https://i.imgur.com/bh3N98u.jpg)
 
@@ -115,15 +121,16 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 	- [End of Line - Daft Punk](https://www.youtube.com/watch?v=AHGvaQMClEo)
 	- [Lost Years - Lightbringers](https://www.youtube.com/watch?v=k6jjoE5Qt_s)
 	- [Heavy Light - Animusic](https://www.youtube.com/watch?v=DKUTYxJEB44)
+	- [Area Music Loop - Tomorrowland](https://www.youtube.com/watch?v=wHiAnXroGbw)
 
 - Requirement [TIER 1] [Software] [Management]: The Tutorial and Snake game shall be designed to be completed within 5 minutes, but allow for shorter or longer play times depending on player skill level.
 
-- Requirement [TIER 2] [Software] [Hardware]: The following user inputs shall be installed in the following locations and be electrically connected to the wall computer:
-	- Four-direction joystick in the console.  This will represent up, down, left, and right commands from one seated player.  Each direction has a sense and return.  8 wires total.  These buttons serve as the 'blue' user input and the goal shall be to use this theme color when designing the mounting structure in the console.
+- Requirement [TIER 2] [Software] [Hardware]: The following user inputs shall be installed in the following locations and be electrically connected to the Wall computer:
+	- Four-direction joystick in the Helm.  This will represent up, down, left, and right commands from one seated player.  Each direction has a sense and return.  8 wires total.  These buttons serve as the 'blue' user input and the goal shall be to use this theme color when designing the mounting structure in the Helm.
 	- A joystick that can be operated while a player is seated the captain's chair.  Each direction, plus fire, has two wires for sense plus return.  10 wires total.  This joystick serves as the 'red' user input and the goal shall be to use this theme color when designing the mounting structure in the captain's chair.
 	- Two single-axis joysticks, one for each of the two wing stations.  One joystick represents left and right commands.  The other joystick represents up and down control.  The joysticks will contain motion limiters that prevent user inputs in the unused directions.  Each direction has a sense and return.  8 wires total for the two stations.  These controls represent the 'green' user input and the goal shall be to use this theme color when designing the wing stations.
 
-- Implementation [TIER 3] [Software]: When one snake hits the tail of another snake, the damaged portion of the tail is deleted.  Once a snake has grown a long enough tail, the Snake will be eligable to exit through goal posts.  The console operate with the morse code inputs will need to enter the appropriate code to enable the goal posts for the Snake to exit through.  Navigating the correctly colored snake through the goal posts represents completion of one third of the puzzle.  Navigating all three Snakes through the goal posts represents completion of the game.  Specially-colored pellets will appear randomly on screen for the snakes to collect.  A snake that exits the edge of the screen will reappear on the opposing side of the screen in a wrap-around style.
+- Implementation [TIER 3] [Software]: When one snake hits the tail of another snake, the damaged portion of the tail is deleted.  Once a snake has grown a long enough tail, the Snake will be eligable to exit through goal posts.  The Helm player with the morse code inputs will need to enter the appropriate code to enable the goal posts for the Snake to exit through.  Navigating the correctly colored snake through the goal posts represents completion of one third of the puzzle.  Navigating all three Snakes through the goal posts represents completion of the game.  Specially-colored pellets will appear randomly on screen for the snakes to collect.  A snake that exits the edge of the screen will reappear on the opposing side of the screen in a wrap-around style.
 
 - Implementation [TIER 2] [Software]: The Snake game shall be considered complete once all three snakes have exited through the goal posts.
 	- Implementation [TIER 2] [Software]: The Wall computer will then proceed to the following chapter such as the Hyperspace game.
@@ -132,7 +139,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 - Implementation [TIER 2] [Software]: The player character is a single cargo pod with thrusters and a laser.
 
-- Implementation [TIER 3] [Software]: The Hyperspace game will start with a cut scene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once during a normal Hyperspace game play-through, regardless of the number of player deaths.
+- Implementation [TIER 3] [Software]: The Hyperspace game will start with a cut scene depicting the pod descending from the space craft and entering hyperspace.  This cut scene will only be played once during a normal Hyperspace game play-through, regardless of the number of player failures.
 
 ![Hyperspace Cut Scene](https://i.imgur.com/nDOovDA.jpg)
 
@@ -140,21 +147,22 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 ![Hyperspace Game Mock Up](https://i.imgur.com/oHnaBpF.jpg)
 
-- Implementation [TIER 2] [Software]: The console monitor will display a map of the hyperspace maze.
+- Implementation [TIER 2] [Software]: The Helm monitor will display a map of the hyperspace maze.
 
-![Hyperspace Map Mock Up](https://i.imgur.com/IudjHqh.jpg)
+![Hyperspace Map Mock Up](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/map_mockup_pencils.jpg)
 
 - Implementation [TIER 3] [Software]: The music for this section will be inspired by the following reference songs:
 	- [Bejweled 2 Soundtrack](https://www.youtube.com/watch?v=4GLkrW9kluo)
 	- [End of Line - Daft Punk](https://www.youtube.com/watch?v=AHGvaQMClEo)
 	- [Lost Years - Lightbringers](https://www.youtube.com/watch?v=k6jjoE5Qt_s)
 	- [Heavy Light - Animusic](https://www.youtube.com/watch?v=DKUTYxJEB44)
+	- [Area Music Loop - Tomorrowland](https://www.youtube.com/watch?v=wHiAnXroGbw)
 
 - Implementation [TIER 3] [Software]: Sound effects will be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds.
 
 - Requirement [TIER 1] [Software] [Management]: The Hyperspace Intro and Game shall be designed to be completed in no more than 10 minutes, but allow for shorter or longer play times depending on player skill level.
 
-- Implementation [TIER 2] [Software]: Upon start of the Hyperspace game, the wall monitor shall emit a trigger signal to the console computer to transition to the map display.
+- Implementation [TIER 2] [Software]: Upon start of the Hyperspace game, the Wall monitor shall emit a trigger signal to the Helm computer to transition to the map display.
 
 ![Cargo Pod](https://i.imgur.com/5g2vbFS.png)
 
@@ -172,9 +180,9 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 - Implementation [TIER 3] [Software]: The up-down and left-right joysticks in the wing stations control the location of the pod within the playing field.
 
-- Implementation [TIER 3] [Software]: The four-direction joystick in the console controls the attitude of the camera viewing the pod.  If the camera attitude is not changed after rounding Hyperspace corners, players will be unable to see and respond to upcoming obstacles.
+- Implementation [TIER 3] [Software]: The four-direction joystick in the Helm controls the attitude of the camera viewing the pod.  If the camera attitude is not changed after rounding Hyperspace corners, players will be unable to see and respond to upcoming obstacles.
 
-- Implementation [TIER 3] [Software]: Hitting an asteroid degrades player health in three stages.  On the first hit, the edges of the wall monitor screen glow red then fade.  On the second hit, the edge of the screen turns and remains red; the console monitor replaces the map with static.  The third hit triggers player death.  Upon player death the pod is reverted back to the start of the hyperspace map and briefly flashes to indicate a new life.  On a new life the console computer is reverted back to a map display.
+- Implementation [TIER 3] [Software]: Hitting an asteroid degrades player health in three stages.  On the first hit, the edges of the Wall monitor screen glow red then fade.  On the second hit, the edge of the screen turns and remains red; the Helm monitor replaces the map with static.  The third hit triggers player death.  Upon player death the pod is reverted back to the start of the hyperspace map and briefly flashes to indicate a new life.  On a new life the Helm computer is reverted back to a map display.
 
 ### Hyperspace Map
 
@@ -184,58 +192,53 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 - Implementation [TIER 3] [Software]: Branch nodes are reprsented by circles.  The left branch node is represented by a brief blue strip down the center of the lane line.  The right branch node will have an orange line down the center.  The color code lines up with the branch Hyperspace ring on the screen which will have a faint inner glow of blue for the left branch and a faint inner glow of orange for the right path.
 
-layout like a subway map
+- Implementation [TIER 3] [Software]: The navigator will only have a view of the map and will be responsible for conveying to the team which branches to take.  The rest of the team will have access to the pod controls and will be responsible for navigating the pod around obstacles and toward the proper branches.
 
-nodes that exit and reappear elsewhere in the map
+- Implementation [TIER 3] [Software]: Non-playable pods, that act as obstacles moving against the flow, are represented by upside down triangles that appear out of instant-death nodes and disappear into instant-death nodes.  These pods will appear on the main monitor as pods moving in the opposite direction to the player, risking a head-on collision.
 
-death traps
+- Implementation [TIER 3] [Software]: In sections of the map that will have non-playable pods travelling along them, no large asteroid will appear.
 
-branches
+- Implementation [TIER 3] [Software]: Wormholes are represented by a termination of a Hyperspace line with a 'T'.  When entering a 'T', the pod will be transported to the 'T' of the same color with a triangle pointing to it.  There may be multiple entry wormhole entrances, but only one exit wormhole.
 
-surpurfuous info
+- Implementation [TIER 3] [Software]: Dead ends are represented by instant death nodes.  On the map these appear as 'X's.  When approaching an instant death node the Wall monitor will display *TBD* to indicate player death.  During play testing a "Pod Distroyed" message will appear briefly on screen before returning the player to the start point.
 
-going backward down same stretch of map
+- Impelemntation [TIER 3] [Software]: A short cut will be available for players who recognize the wormhole dynamic and also surmise that it is possible to travel backward along the same stretch of map.  Using a series of nodes connected in a circle it is possible for the pod to travel down a Hyperspace lane in the opposite direction and access lanes otherwise not accessible.
 
-access keys/locks...
+- Implementation [TIER 3] [Software]: An infinite loop will be available for players to travel down.  Entering the same wormhole multiple times does not change the outcome. This map element also serves as map clutter to obfuscate a clear path to the finish.
 
-water-like hazards / space background on map
+- Implementation [TIER 3] [Software]: There is the oppotuity to add background elements to the map.  In typical subway maps these typically flag large bodies of water or rivers.  In a Hyperspace map this may be more thematically represented by rectilinear galaxies.
 
-infinite loop
+## Proctor Computer
 
-## Proctor
+- Requirement [TIER 1] [Software] [Management]: The Proctor computer shall emit signal(s) over Ethernet to prompt the Wall and Helm computers out of idle standby and begin the countdown timer.
 
-- Requirement: The proctor shall emit signal(s) over Ethernet to prompt the wall and console computers out of idle standby and begin the 60 minute countdown timer.
+- Requirement [TIER 1] [Software] [Management]: The time to complete the room shall be adjustable and have a nominal value of 65 mintues.
 
-- Requirement: The proctor shall have the capability to change the remaining time to complete the room.
+- Requirement [TIER 2] [Software] [Management]: The Proctor computer shall have the capability to change the remaining time to complete the room.
 
-- Requirement: The proctor shall have the capability to independently advance from one puzzle to the next.
+- Requirement [TIER 2] [Software] [Management]: The Proctor computer shall have the capability to manually advance from one puzzle to the next in the narrative.
 
-- Requirement: The proctor shall have the ability to view the status of the available puzzles.
-	- Requirement: The proctor shall have the ability to view the players within the room.
-		- Requirement: The proctor shall receive no fewer than one snapshot of the room at no less than once per second.
-	- Implementation: Allow the state of the finale computers to be queried and configured through an Ethernet connection.  The computers will be organized as a two-tiered state machine with a top level 'book' controlling the narrative sequence of 'chapters'.  Each chapter is a game, puzzle, video sequence, or blank screen.
+- Requirement [TIER 1] [Hardware] [Management]: The Proctor computer shall be able to determine the status of the active puzzles.
+	- Requirement [TIER 2] [Software] [Hardware] [Management]: The Proctor computer shall have the ability to view the players within the room.
+		- Requirement [TIER 2] [Software] [Management]: The Proctor computer shall receive and display no fewer than one snapshot of the room at no less than once per second.
+	- Requirement [TIER 2] [Software] [Management]: When queried by the Proctor computer, the Wall computer shall respond with the current state of the finale.
+		- Implementation [TIER 2] [Software]: Allow the state of the finale computers to be queried and configured through an Ethernet connection.  The computers will be organized as a two-tiered state machine with a top level 'book' controlling the narrative sequence of 'chapters'.  Each chapter is a game, puzzle, video sequence, or blank screen.
 
-- Requirement: The goal shall be to give the proctor the ability to pause and resume the countdown timer and puzzle progression manually.
-
-- Requirement: The proctor shall have the capability to broadcast verbal hints to players without using the finale speakers.
+- Requirement [TIER 2] [Hardware] [Management]: The Proctor shall have the capability to broadcast verbal hints to players without using the finale speakers.
 
 ## Credits
 
-- Implementation: The credits sequence will be implemented as a slide show.  Following a successful room completion in under 60 minutes, half the screen will display credits for the puzzle builders, artists and support staff.  The other half of the screen will display original static artworks of pod exiting hyperspace, entering a planet's atmosphere, descending under parachute, landing on the surface, and astronauts removing supplies from the pod.  If the room is not completed in under 60 minutes, the artwork will be replaced with detailed pictures of the puzzles to highlight the assembly and design work.
+- Implementation [TIER 2] [Software]: The credits sequence will be implemented as a slide show.  Following a successful room completion in under 60 minutes, half the screen will display credits for the puzzle builders, artists and support staff.  The other half of the screen will display original stationary artworks of the pod exiting hyperspace, entering a planet's atmosphere, descending under parachute, landing on the surface, and astronauts removing supplies from the pod.  If the room is not completed in under 60 minutes, the artwork will be replaced with detailed pictures of the puzzles to highlight the assembly and design work.
 
-- Implementation: The music for this section will be inspired by the following reference songs:
-	- [Incredible Machine 3 - Unplugged](https://www.youtube.com/watch?v=WToAEdHbH7A)
+- Implementation [TIER 3] [Software]: The music for this section will be inspired by the following reference songs:
 	- [Firewatch - Camp Approach](https://www.youtube.com/watch?v=US-Eqtr3x08)
+	- [Incredible Machine 3 - Unplugged](https://www.youtube.com/watch?v=WToAEdHbH7A)
 
-- Requirement: When the puzzle is successfully completed in under 60 minutes, the total time taken to solve the game shall be displayed on screen during the credits sequence.
+- Requirement [TIER 2] [Software] [Management]: The total time taken to solve the game shall be displayed on screen during the credits sequence.
 
-- Requirement: The wall computer shall play a pre-scripted credits sequence for no longer than 60 seconds following the completion of the Hyperspace puzzle.
+- Requirement [TIER 1] [Software] [Management]: The Wall computer shall play a pre-scripted credits sequence for no longer than 60 seconds following the completion of the Hyperspace puzzle.
 
-- Implementation: Following the credits sequence, a brief cut scene showing the corporate logo will play.
-
-- Requirement: If the room was successfully completed in under 60 minutes, a humorous blooper cut scene shall play after the corporate logo as a reward to the players for successfully completing the room.
-
-- Implementation: Following either the blooper reel in a successful room completion, or the corporate logo in a failed room play-through, the wall monitor shall proceed to the idle standby state.
+- Implementation [TIER 2] [Software]: Following the credits sequence, a brief cut scene showing the corporate logo will play.
 
 # Detailed Implementation
 
@@ -245,17 +248,15 @@ infinite loop
 
 ## Wall Computer
 
-- Implementation: The Wall PC will automatically proceed through these chapters in the listed order as players play the finale unless overridden by the proctor
-	- Idle Standby: The monitor will display a black screen and emit no sound.  This chapter will complete when the proctor provides the appropriate input.
-	- Opening cut scene: A cut scene explaining the room setting and objectives.  The end of the chapter constitutes completion of the chapter.
-	- Light puzzle: Display light puzzle component status.  Display and update countdown timer.  Activation of all four light puzzle components constitutes compeltion of the puzzle.
-	- Instructions cut scene: A cut scene explaining the remaining objectives and user controls.
+- Requirement [TIER 2] [Software] [Management]: The Wall computer shall automatically proceed through these chapters in the listed order as players play the finale.  The chapters shall also also be manually progressed through when the Proctor computer send commands to the Wall computer.
+	- Idle Standby: The monitor will display a black screen and emit no sound.  This chapter will complete when the Wall computer is sent a 'start' command from the Proctor computer
+	- Light puzzle: Display static on the Wall monitor.  Report the status of the light puzzle components to the Proctor computer.
+	- Controls Tutorial: An on-screen prompt on the Wall monitor will display the status of all the finale user inputs.  Actuating all user inputs at least once constitutes completion of this chapter.
 	- Snake: A 5-person video game where 1-2 players each control an on-screen character.  The game is complete when all snakes are long enough and have exited the playing field.
 	- Hyperspace: A 5-person video game where players work together to navigate a cargo pod through hyperspace, while avoiding and blasting obstacles.  Reaching the end of the hyperspace maze constitutes completion of the game.
 	- Credits: A pre-scripted sequence highlighing the efforts of the escape room development team.
 	- Corporate logo cut scene: The corporate logo animation will play for a few seconds.
-	- Blooper video: When the room is successfully completed in under 60 minutes, a bonus video will play after the credits, otherwise this chapter is skipped.  The next chapter after this is to return to idle standby.
-- Unaccessible Chapters: the following chapters will exist and can only be reached through proctor commands
+- Unaccessible Chapters: the following chapters will exist and can only be reached via commands from the Proctor computer.
 	- Debug: Display the state of user inputs to aid in troubleshooting.
 	- Pause: Hold count down timer, display a pause icon on the screen.
 - Implementation: Pinout
@@ -266,16 +267,15 @@ infinite loop
 
 ![Project Box Pinout](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/project_box_pinout.png)
 
-### Console Computer
+### Helm Computer
 
-- Implementation: The Console will have references to the following chapters but will only enter/exit chapters in response to external (Wall PC) commanding
+- Requirement [TIER 2] [Software] [Management]: The Helm computer shall have references to the following chapters but will only enter/exit chapters in response to external (Wall computer) commanding
 	- Idle Standby: The monitor will display a black screen.
-	- Light Puzzle Standby: The monitor will display a black screen.
 	- Morse Code: The puzzle will accept user input via 'dot' and 'dash' buttons and display information on the screen when the proper passcode is entered.
-	- Snake Game Standby: The monitor will display a black screen.
-	- Map: The monitor will display the hyperspace map and the location of the cargo pod
-	- Credits Standby: The monitor will display a black screen
-- Unaccessible Chapters: the following chapters will exist and can only be reached through proctor commands
+	- Snake Game Standby: The monitor will display a series of Morse code sequences that need to be entered to activate the goal posts for the snakes to exit through.
+	- Map: The monitor will display the hyperspace map and the location of the cargo pod.
+	- Credits Standby: The monitor will display a black screen.
+- Unaccessible Chapters: the following chapters will exist and can only be reached through Proctor computer commands
 	- Debug: Display the state of user inputs to aid in troubleshooting.
 	- Pause: Hold count down timer, display a pause icon on the screen.
 - Implementation: Pinout
@@ -284,27 +284,26 @@ infinite loop
 
 ## State Flow Diagram
 
-The Wall computer is treated as a MASTER to the SLAVE Console.
-The Proctor computer is treated as a MASTER to the SLAVE Wall.
+The Proctor computer is treated as MASTER to the SLAVE Wall computer.  The Wall computer is treated as MASTER to the SLAVE Helm computer.
 
-The following is a state transition diagram that will have nearly-identical copies running on both the Wall and Console computers.
+- Implementation [TIER 3] [Software]: The following is a state transition diagram that will have nominally-identical copies running on both the Wall and Helm computers.
 - Book
 	- **Boot:** The Raspberry Pi will perform a Linux boot sequence followed by execution of the main Python program
 	- **Create All Chapters:** The object-oriented chapters are created, but not executed here.   Execution of time-intensive processes such as loading video codecs and 3D graphics will also occur here.  Following Chapter creation, the chapter's clean method will be called to configure the chapter constants to default values.
-	- **Start TCP:** A separate thread is launched to listen for TCP commands from the proctor console.  The TCP Listener is created after the constants have been defined to avoid the potential for the proctor to access constants before they exist.
+	- **Start TCP:** A separate thread is launched to listen for TCP commands from the Proctor computer.  The TCP Listener is created after the constants have been defined to avoid the potential for the proctor to access constants before they exist.
 	- **Next Chapter Exists:** Fetches the next chapter queued in the book state space.  For example if the current puzzle is "Snake", the next chapter will be "Hyperspace".
-	- **Queue Chapter:** If the PC this code is running in is the Wall (MASTER), then the "next chapter" is immediately defined.
-		- For example in the Wal computer, if the upcoming chapter is "Hyperspace" the queued chapter will be "Credits".  Queuing the following chapter immediately upon entering the current chapter allows the proctor to configure the next chapter at any time.  For example, the proctor could set "Snake" as the next chapter while "Hyperspace" is running.  Following a "next chapter" command by a "chapter done" command will transition the state machine to that commanded chapter.
-		- If the PC is the Console, the next chapter is not updated.  The Console is run as a SLAVE to the Wall.
+	- **Queue Chapter:** If the computer this code is running in is the Wall (MASTER), then the "next chapter" is immediately defined.
+		- For example in the Wall computer, if the upcoming chapter is "Hyperspace" the queued chapter will be "Credits".  Queuing the following chapter immediately upon entering the current chapter allows the proctor to configure the next chapter at any time.  For example, the proctor could set "Snake" as the next chapter while "Hyperspace" is running.  Following a "next chapter" command by a "chapter done" command will transition the state machine to that commanded chapter.
+		- If the computer is the Helm, the next chapter is not updated.  The Helm is run as a SLAVE to the Wall.
 	- **Enter Chapter:** After fetching the chapter to run, a chapter configuration sequence is run.
-	- **Is alive?** If the proctor has sent a "dispose" command, the is_alive state will be False, prompting the Wall PC to send a command to the Console to die, followed by disposing of the Wall's own chapters and book.  This ensures a clean exit to the desktop when commanded by the proctor.
+	- **Is alive?** If the Proctor computer has sent a "dispose" command, the is_alive state will be False, prompting the Wall computer to send a command to the Helm to die, followed by disposing of the Wall's own chapters and book.  This ensures a clean exit to the desktop when commanded by the proctor.
 	- **Update Chapter:** The Book calls the Chapter update loop at nominally 30 Hz.  This loop updates the Chapter state machine and renders graphics on the screen.
 - TCP Listener
 	- **Is alive, TCP Command Received?** The TCP listener listens for new commands in an infinite loop at nominally 30 Hz.
-	- **Is Book Command?** If the proctor command is formatted as a book command, it is processed.  This includes the "dispose" command which will stop both the TCP Listener and the Book threads.  "set next chapter" is another book command that the proctor can send.
-	- **Is Chapter Command?** If the proctor command is formated as a chapter command, it is processed.  This includes the "done" command which stops the execution of the current chapter and prompts the Book state machine to proceed to the next chapter.
+	- **Is Book Command?** If the Proctor command is formatted as a book command, it is processed.  This includes the "dispose" command which will stop both the TCP Listener and the Book threads.  "set next chapter" is another book command that the proctor can send.
+	- **Is Chapter Command?** If the Proctor command is formated as a chapter command, it is processed.  This includes the "done" command which stops the execution of the current chapter and prompts the Book state machine to proceed to the next chapter.
 - Chapter
-	- **Enter Chapter:** Every time the chapter is run, the first method call is a dedicated initialization sequence.  For the Wall PC, an important step here is to send the TCP commands to ensure the Console is in the proper state.
+	- **Enter Chapter:** Every time the chapter is run, the first method call is a dedicated initialization sequence.  For the Wall computer, an important step here is to send the TCP commands to ensure the Helm is in the proper state.
 	- **Update Chapter:** Some chapters like Hyperspace or the Light Puzzle need to stop operations if the 60 minute window expires.  This update step checks whether the 60 minutes has expired and if so, exits the chapter.  Other chapters like the Credits will always play, so this check is ignored.  The game state is incremented and a graphical frame is displayed.
 	- **Clean:** This method will always be called prior to exiting any chapter.  Configuring the constants on exit in preparation for the next run, rather than on initialization immediately before running chapter, allows the proctor time to configure constants while running other puzzles.  This ensures a clean entry into the chapter in whatever state the proctor desires.  This avoids the design limitation of requiring the proctor to change the chapter state only after entering the puzzle, which may break the illusion for players as graphics and game state rapidly change on screen.  This clean step is also where resource deallocations will occur such as stopping playback of video.
 
@@ -312,7 +311,8 @@ The following is a state transition diagram that will have nearly-identical copi
 
 # Schedule
 
-The following list of tasks shows the planned date of completion of significant code elements to achieve the mid-March "95% completion" deadline.  A functional build entails displaying relevant content on the monitors in response to user and proctor inputs to facilitate an end-to-end play-through of the room.
+- Requirement [TIER 1] [Software] [Management]: The software development shall be "95% complete" by mid-March to facilitate an end-to-end play-through of the room.
+	- Implementation [TIER 2] [Software]: The following list of tasks shows the planned date of completion of significant code elements.  A functional build entails displaying relevant content on the monitors in response to user and proctor inputs.
 
 - Dec 18, 2017 Architecture Plan
 - Dec 31, 2017 Functional Architecture, IO Handler, Core
