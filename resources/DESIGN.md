@@ -1,7 +1,4 @@
-TODO make schematic of proctor, help and wall montors/comuter/human
-TODO update connection diagram
-
-# Overview
+﻿# Overview
 
 This document details the top level objectives, implementation, and interface details of the finale in order to facilitate effective communication among the Escape Room development team.
 
@@ -11,13 +8,13 @@ This document details the top level objectives, implementation, and interface de
 
 - Requirement: A design element that requires two or more parties to agree to enact a change
 
-- [TIER 1]: These are fundamental stipuations that must be true when the finale is delivered
+- [TIER 1]: These are fundamental stipulations that must be true when the finale is delivered
 
 - [TIER 2]: Following an agile development process, these are strongly desired stipulations, or stipulations that are difficult to define precisely, that must be attempted to be met before changes are to be considered
 
 - [TIER 3]: These are nice-to-have stipulations and may be de-scoped or modified as needed to meet the dictated schedule
 
-- [Hardware]: These are elements that refer to the team building the pysical set the players will interact with
+- [Hardware]: These are elements that refer to the team building the physical set the players will interact with
 
 - [Software]: These are virtual elements that exist on the computer
 
@@ -33,8 +30,8 @@ This document details the top level objectives, implementation, and interface de
 Attempting to design reconfigurable puzzles that target a variable number of players has proven challenging.  To limit scope, a finite number of players was chosen.
 - Requirement [TIER 1] [Software] [Management]: The finale shall be designed to be operated by five players.
 
-- Implementation [TIER 2] [Software]: The goal of the finale shall be an immersive audio-visual experience that impresses players.
-	- Implementation [Software]: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Typically this is accomplished through the use of physcial puzzles that require a subset of the team to solve.  However, this room is focused heavily on the team work aspect and instead requires the full team to coordinate to solve a series of interactive games.
+- Implementation [TIER 2] [Software]: The goal of the finale shall be an immerse audio-visual experience that impresses players.
+	- Implementation [Software]: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Typically this is accomplished through the use of physical puzzles that require a subset of the team to solve.  However, this room is focused heavily on the team work aspect and instead requires the full team to coordinate to solve a series of interactive games.
 	- Implementation [TIER 3] [Software]: Music will be played during the Snake game, Hyperspace game, and Credits sequences.
 		- Requirement [TIER 2] [Software] [Management]: Finale sounds shall support the space-themed illusion of the room.
 			- Implementation [TIER 3] [Software]: Instrumental music will be originally composed that fits the space-theme.  Music will be designed to serve as a background accompaniment to the main player action, as is done to set ambiance in Hollywood movies.
@@ -49,7 +46,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 - Requirement [TIER 2] [Software] [Management] [Hardware]: The cameras, Proctor computer, Wall computer, and Helm computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
 
-- Requriement [TIER 1] [Hardware] [Management]: The goal shall be to design the finale stations to be operated without hardware or eletrical failures.  In the case of failures, an easily accessible recovery option shall be available to the proctor.
+- Requirement [TIER 1] [Hardware] [Management]: The goal shall be to design the finale stations to be operated without hardware or electrical failures.  In the case of failures, an easily accessible recovery option shall be available to the proctor.
 	- Implementation [TIER 2] [Hardware]: Electrical joints such as in joysticks and buttons will use heat shrink to strain relief the custom connections and reduce the risk of inadvertent electrical contact.
 	- Implementation [TIER 3] [Hardware]: A manually-accessible power switch(es) shall be available for the Proctor, Wall and Helm computers, but not readily apparent to players.  This may take the form of a power strip that is only accessible from below a table or behind a wall.
 	- Implementation [TIER 2] [Hardware]: A thematic shroud shall enclose the speakers to protect them from players and hide them from view without degrading audio output.
@@ -98,10 +95,10 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 ## Morse Code
 
 - Requirement [TIER 2] [Software] [Management]: Once the light puzzle is solved, the Wall computer shall send a trigger signal to the Helm computer.  In response to this command, the Helm computer shall stop the Morse Code puzzle and proceed to a blank screen within 1 second in preparation for the map portion of the Hyperspace game.
-	- Implementation [TIER 3] [Software]: The book state machine running in the Helm computer will cease updating the state and renering graphics for the Morse code puzzle in response to the relevant Ethernet command from the wall or proctor computers.
+	- Implementation [TIER 3] [Software]: The book state machine running in the Helm computer will cease updating the state and rendering graphics for the Morse code puzzle in response to the relevant Ethernet command from the wall or proctor computers.
 
 - Requirement [TIER 2] [Software] [Hardware]: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the Helm.
-	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the Helm such that two players or fewer can clearly see the screen.  This facilitates the design goal of asymmatric information presented to the players.
+	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the Helm such that two players or fewer can clearly see the screen.  This facilitates the design goal of asymmetric information presented to the players.
 	- Implementation [TIER 3] [Hardware]: An HP L2045W monitor is the current design baseline.
 
 - Requirement [TIER 2] [Software] [Hardware]: Two buttons shall be installed in the Helm adjacent to the monitor to represent 'dot' and 'dash' user inputs.  These buttons shall be electrically connected to the Helm computer so that the state of the buttons can be acquired.
@@ -117,7 +114,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 ![Snake Game Mock Up](https://i.imgur.com/bh3N98u.jpg)
 
 - Implementation [TIER 3] [Software]: The music for this section will be inspired by the following reference songs:
-	- [Bejweled 2 Soundtrack](https://www.youtube.com/watch?v=4GLkrW9kluo)
+	- [Bejeweled 2 Soundtrack](https://www.youtube.com/watch?v=4GLkrW9kluo)
 	- [End of Line - Daft Punk](https://www.youtube.com/watch?v=AHGvaQMClEo)
 	- [Lost Years - Lightbringers](https://www.youtube.com/watch?v=k6jjoE5Qt_s)
 	- [Heavy Light - Animusic](https://www.youtube.com/watch?v=DKUTYxJEB44)
@@ -130,7 +127,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 	- A joystick that can be operated while a player is seated the captain's chair.  Each direction, plus fire, has two wires for sense plus return.  10 wires total.  This joystick serves as the 'red' user input and the goal shall be to use this theme color when designing the mounting structure in the captain's chair.
 	- Two single-axis joysticks, one for each of the two wing stations.  One joystick represents left and right commands.  The other joystick represents up and down control.  The joysticks will contain motion limiters that prevent user inputs in the unused directions.  Each direction has a sense and return.  8 wires total for the two stations.  These controls represent the 'green' user input and the goal shall be to use this theme color when designing the wing stations.
 
-- Implementation [TIER 3] [Software]: When one snake hits the tail of another snake, the damaged portion of the tail is deleted.  Once a snake has grown a long enough tail, the Snake will be eligable to exit through goal posts.  The Helm player with the morse code inputs will need to enter the appropriate code to enable the goal posts for the Snake to exit through.  Navigating the correctly colored snake through the goal posts represents completion of one third of the puzzle.  Navigating all three Snakes through the goal posts represents completion of the game.  Specially-colored pellets will appear randomly on screen for the snakes to collect.  A snake that exits the edge of the screen will reappear on the opposing side of the screen in a wrap-around style.
+- Implementation [TIER 3] [Software]: When one snake hits the tail of another snake, the damaged portion of the tail is deleted.  Once a snake has grown a long enough tail, the Snake will be eligible to exit through goal posts.  The Helm player with the Morse code inputs will need to enter the appropriate code to enable the goal posts for the Snake to exit through.  Navigating the correctly colored snake through the goal posts represents completion of one third of the puzzle.  Navigating all three Snakes through the goal posts represents completion of the game.  Specially-colored pellets will appear randomly on screen for the snakes to collect.  A snake that exits the edge of the screen will reappear on the opposing side of the screen in a wrap-around style.
 
 - Implementation [TIER 2] [Software]: The Snake game shall be considered complete once all three snakes have exited through the goal posts.
 	- Implementation [TIER 2] [Software]: The Wall computer will then proceed to the following chapter such as the Hyperspace game.
@@ -152,7 +149,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 ![Hyperspace Map Mock Up](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/map_mockup_pencils.jpg)
 
 - Implementation [TIER 3] [Software]: The music for this section will be inspired by the following reference songs:
-	- [Bejweled 2 Soundtrack](https://www.youtube.com/watch?v=4GLkrW9kluo)
+	- [Bejeweled 2 Soundtrack](https://www.youtube.com/watch?v=4GLkrW9kluo)
 	- [End of Line - Daft Punk](https://www.youtube.com/watch?v=AHGvaQMClEo)
 	- [Lost Years - Lightbringers](https://www.youtube.com/watch?v=k6jjoE5Qt_s)
 	- [Heavy Light - Animusic](https://www.youtube.com/watch?v=DKUTYxJEB44)
@@ -166,11 +163,21 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 
 ![Cargo Pod](https://i.imgur.com/5g2vbFS.png)
 
-- Implementation [TIER 3] [Software]: The playing field consists of a branching hyperspace path filled with asteroid obstacles.  The map depicts the full Hyperspace maze.  The Hyperspace path is indicated via linear series of rings and occasional forks where players need to navigate to either the left or right side of the screen to select a branch.
+- Implementation [TIER 3] [Software]: The playing field consists of a branching hyperspace path filled with asteroid obstacles.  The map depicts the full Hyperspace maze.  The Hyperspace path is formed from a linear series of rings with occasional forks where players need to navigate to either the left or right side of the screen to select a branch.  These moving rings will appear to the players in a manner such as the following:
+	- [Space Boss Battle - Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s)
+	- [Fiber Optical Loop - Beeple](https://www.youtube.com/watch?v=FUUw3zNTXH8)
 
 ![Hyperspace Ring](https://i.imgur.com/96dxxqV.png)
 
 ![Hyperspace Fork](https://i.imgur.com/cCaWGny.png)
+
+- Implementation [TIER 3] [Software]: The cargo pod will nominally pass through a new ring every 2 seconds.
+
+- Implementation [TIER 3] [Software]: Nominally 60% of the rings will contain asteroids or other obstacles.
+
+- Implementation [TIER 3] [Software]: The cargo pod will be presented with a fork in the hyperspace lane nominally every 40-60 seconds.
+
+- Implementation [TIER 3] [Software]: The hyperspace lane will consist of straight sections broken up by rounded corners.  Not all corners will appear on the map. 70% of straight sections will consist of 2-3 ring stretches, while the rest of the straight sections will be 4-5 rings.
 
 - Implementation [TIER 3] [Software]: The asteroids consist of three sizes: small, medium, and large.  The medium asteroid can either be shot with the laser or avoided by moving the pod out of a collision course.  The large asteroid has no room to maneuver around and must be shot with the laser.  The small asteroid (a debris cloud) cannot be shot with the laser and must be avoided.
 
@@ -185,35 +192,40 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 - Implementation [TIER 3] [Software]: Hitting an asteroid degrades player health in three stages.  On the first hit, the edges of the Wall monitor screen glow red then fade.  On the second hit, the edge of the screen turns and remains red; the Helm monitor replaces the map with static.  The third hit triggers player death.  Upon player death the pod is reverted back to the start of the hyperspace map and briefly flashes to indicate a new life.  On a new life the Helm computer is reverted back to a map display.
 	- Implementation [TIER 3] [Software]: Upon the player returning to the starting point, the map will revert to the initial conditions.  This includes asteroid placement and obstacle pods that move during play.
 
+- Implementation [TIER 3] [Software]: If the game proves too easy, the pod will travel through hyperspace faster (~20%) when near the goal.
+
+- Implementation [TIER 3] [Software]: If the game proves too difficult, the pod will trigger checkpoints during play and will restart from these points, rather than the start, upon player death.
+
 ### Hyperspace Map
 
-- Implementation [TIER 3] [Software]: The Hyperspace map will be laid out like a subway map with thick monochromatic lines mapped to a rectilinar coordinate system representing the Hyperspace lanes.
+- Implementation [TIER 3] [Software]: The Hyperspace map will be laid out like a subway map with thick monochromatic lines mapped to a rectilinear coordinate system representing the Hyperspace lanes.
 
 - Implementation [TIER 3] [Software]: The start and end points are represented by squares.  The character is represented by a triangle that moves as the pod progresses through the map.
 
-- Implementation [TIER 3] [Software]: Branch nodes are reprsented by circles.  The left branch node is represented by a brief blue strip down the center of the lane line.  The right branch node will have an orange line down the center.  The color code lines up with the branch Hyperspace ring on the screen which will have a faint inner glow of blue for the left branch and a faint inner glow of orange for the right path.
+- Implementation [TIER 3] [Software]: Branch nodes are represented by circles.  The left branch node is represented by a brief blue strip down the center of the lane line.  The right branch node will have an orange line down the center.  The color code lines up with the branch Hyperspace ring on the screen which will have a faint inner glow of blue for the left branch and a faint inner glow of orange for the right path.
 
 - Implementation [TIER 3] [Software]: The navigator will only have a view of the map and will be responsible for conveying to the team which branches to take.  The rest of the team will have access to the pod controls and will be responsible for navigating the pod around obstacles and toward the proper branches.
 
 - Implementation [TIER 3] [Software]: Non-playable pods, that act as obstacles moving against the flow, are represented by upside down triangles that appear out of instant-death nodes and disappear into instant-death nodes.  These pods will appear on the main monitor as pods moving in the opposite direction to the player, risking a head-on collision.
 
-- Implementation [TIER 3] [Software]: In sections of the map that will have non-playable pods travelling along them, no large asteroids will appear.
+To address questions and coding considerations about how NPC pods will get around large obstacles, there won't be any.  This is thematically appropriate for paths that may see more hyperspace traffic.
+- Implementation [TIER 3] [Software]: In sections of the map that will have non-playable pods traveling along them, no large asteroids will appear.
 
 - Implementation [TIER 3] [Software]: Wormholes are represented by a termination of a Hyperspace line with a 'T'.  When entering a 'T', the pod will be transported to the 'T' of the same color with a triangle pointing to it.  There may be multiple entry wormhole entrances, but only one exit wormhole.
 
-- Implementation [TIER 3] [Software]: Dead ends are represented by instant death nodes.  On the map these appear as 'X's.  When approaching an instant death node the Wall monitor will display *TBD* to indicate player death.  During play testing a "Pod Distroyed" message will appear briefly on screen before returning the player to the start point.
+- Implementation [TIER 3] [Software]: Dead ends are represented by instant death nodes.  On the map these appear as 'X's.  When approaching an instant death node the Wall monitor will display *TBD* to indicate player death.  During play testing a "Pod Destroyed" message will appear briefly on screen before returning the player to the start point.
 
-- Impelemntation [TIER 3] [Software]: A short cut will be available for players who recognize the wormhole dynamic and also surmise that it is possible to travel backward along the same stretch of map.  Using a series of nodes connected in a circle it is possible for the pod to travel down a Hyperspace lane in the opposite direction and access lanes otherwise not accessible.
+- Implementation [TIER 3] [Software]: A short cut will be available for players who recognize the wormhole dynamic and also surmise that it is possible to travel backward along the same stretch of map.  Using a series of nodes connected in a circle it is possible for the pod to travel down a Hyperspace lane in the opposite direction and access lanes otherwise not accessible.
 
 - Implementation [TIER 3] [Software]: An infinite loop will be available for players to travel down.  Entering the same wormhole multiple times does not change the outcome. This map element also serves as map clutter to obfuscate a clear path to the finish.
 
-- Implementation [TIER 3] [Software]: There is the oppotuity to add background elements to the map.  In typical subway maps these typically flag large bodies of water or rivers.  In a Hyperspace map this may be more thematically represented by rectilinear galaxies.
+- Implementation [TIER 3] [Software]: There is the opportunity to add background elements to the map.  In typical subway maps these typically flag large bodies of water or rivers.  In a Hyperspace map this may be more thematically represented by rectilinear galaxies.
 
 ## Proctor Computer
 
 - Requirement [TIER 1] [Software] [Management]: The Proctor computer shall emit signal(s) over Ethernet to prompt the Wall and Helm computers out of idle standby and begin the countdown timer.
 
-- Requirement [TIER 1] [Software] [Management]: The time to complete the room shall be adjustable and have a nominal value of 65 mintues.
+- Requirement [TIER 1] [Software] [Management]: The time to complete the room shall be adjustable and have a nominal value of 65 minutes.
 
 - Requirement [TIER 2] [Software] [Management]: The Proctor computer shall have the capability to change the remaining time to complete the room.
 
