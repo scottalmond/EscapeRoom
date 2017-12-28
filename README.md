@@ -82,6 +82,7 @@ TODO: 10-20 second demo video
 	- Command: _sudo apt-get update_
 		- Connect to the internet then enter command into a terminal shell
 	- Command: _sudo apt-get upgrade_
+		- Type 'y' at the prompt
 - Git
 	- Command: _cd /home/pi/Documents/_
 		- Parent folder where the project files will be stored
@@ -122,6 +123,48 @@ TODO: 10-20 second demo video
 
 xxx TODO sudo apt-get install vlc --> omxplayer
 xxx TODO sudo pip3 install omxplayer-wrapper
+
+- opencv: https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi/
+	- CMake:
+		- command: sudo apt-get install build-essential cmake pkg-config
+	- Image I/O Packages:
+		- command: sudo apt-get install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
+			- Type 'y' at the prompt
+	- Video I/O Packages:
+		- command: sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+		- command: sudo apt-get install libxvidcore-dev libx264-dev
+	- GTK Development Library:
+		- command: sudo apt-get install libgtk2.0-dev libgtk-3-dev
+	- OpenCV Optimizations:
+		- command: sudo apt-get install libatlas-base-dev gfortran
+	- OpenCV Source Code:
+		- command: cd ~
+		- command: wget -O opencv.zip https://github.com/Itseez/opencv/archive/3.3.0.zip
+		- command: unzip opencv.zip
+		- command: wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.3.0.zip
+		- command: unzip opencv_contrib.zip
+	- Compile OpenCV:
+		- command: cd ~/opencv-3.3.0/
+		- command: mkdir build
+		- command: cd build
+		- command: cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_PYTHON_EXAMPLES=ON -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.3.0/modules \-D BUILD_EXAMPLES=ON ..
+	- Increase Swap Space Size:
+		- command: sudo nano /etc/dphys-swapfile
+			- Change CONF_SWAPSIZE=100 to CONF_SWAPSIZE=1024
+			- Ctrl + X, Y, Enter
+	- Restart swap service:
+		- Command: sudo /etc/init.d/dphys-swapfile stop
+		- Command: sudo /etc/init.d/dphys-swapfile start
+	- Compile OpenCV
+		- command: make -j4
+			- This will take ~90 minutes
+	- Install OpenCV
+		- Command: sudo make install
+		- Command: sudo ldconfig
+
+
+reset swap size back when done
+
 
 ### Development Tools
 
