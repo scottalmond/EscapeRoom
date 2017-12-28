@@ -129,6 +129,8 @@ xxx TODO sudo pip3 install omxplayer-wrapper
 	- Download the latest .deb from: [Remarkable](https://remarkableapp.github.io/linux/download.html)
 	- Command: _sudo apt install /home/linaro/Downloads/remarkable_1.87_all.deb_
 
+sudo apt-get install geany
+
 git pull origin master
 
 git add . && git commit -am "comment"

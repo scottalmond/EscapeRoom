@@ -1,58 +1,104 @@
 """
-Class used to execute a series of Chapters
+Author: Scott Almond
+Date: December 25, 2017
+
+Purpose: Provides the interface between the Chapters and the TCP socket; used to execute a series of Chapters
+Serves as the MASTER to the SLAVE chapters by calling initialize, clean, update and draw methods
 Coordinates preparation, execution and disposal of Chapters
+
+Usage:
+from util.Book import Book
+book=Book(BOOK_TYPE)
+book.init()
+book.start()
+book.dispose()
 """
 
-TYPE_DEBUG=0 #for development testing
-TYPE_MAIN=1 #for running operationally on main monitor
-TYPE_AUX=2 #for running operationally on auxilary monitor
-TYPE_IO=3 #for testing IO response
+from enum import Enum #for Enum references like book type
+
+class BOOK_TYPE(Enum):
+	DEBUG=0 #for development testing
+	IO=1 #for testing IO response
+	WALL=2 #for running operationally on main monitor
+	HELM=3 #for running operationally on auxilary monitor
 
 class Book:
-    """
-    Create chapters for the specified book type
-    """
-    def __init__(self,environment,book_type):
-        self.my_environment=environment
-        self.chapter_list=[]
-        if(book_type==self.TYPE_DEBUG):
-            chapter_list.append(Hyperspace(environment))
-        elif(book_type==self.TYPE_MAIN):
-            pass#TODO
-        elif(book_type==self.TYPE_AUX):
-            pass#TODO
-        elif(book_type==self.TYPE_IO):
-            chapter_list.append(IO_Test(environment))
-        else:
-            raise ValueError("Undefined Book type: "+str(book_type))
-    
-    """
-    Acquire resources needed to run the chapters
-    Chapters initialized in FIFO order
-    """
-    def init(self):
-        for chapter in self.chapter_list:
-            chapter.init()
-    
-    """
-    Step through all chapters in the book once
-    """
-    def run(self):
-        for chapter in self.chapter_list:
-            chapter_frame=0
-            while(not chapter.isComplete() and not self.isStopped()):
-                chapter.step(chapter_frame)#ie, draw one frame from this chapter
-                chapter_frame+=1
-        print("Book: HERE")
-        
-    """
-    Release resources that all chapters hold
-    Chapters disposed in LIFO order for symmetry with init()
-    """
-    def dispose():
-        for chapter in reversed(self.chapter_list):
-            chapter.dispose()
-    
-    def isStopped():
-        return self.my_environment.isStopped()
-        
+	#CONSTANTS
+	
+	#VARIABLES
+	
+	#CONSTRUCTOR
+	
+	# this_book_type - an ENUM defining 
+	def __init__(self,this_book_type):
+		print("Book: Hello World")
+		#configure variables
+		self._is_alive=True
+		self._book_type=this_book_type
+		
+		#configure lists and object consuctors
+		self._chapter_list=[]
+		self._tcp_listener=None #placeholder, need to define object and create constructor
+		self._io_manager=None #placeholder, need to define object and create constructor
+	
+	#METHODS
+	
+	"""
+	use a stand-alone init() method to allow long-duration tasks to be
+	completed in a separate method call from the constructor
+	"""
+	def init(self):
+		#initialize objects
+		self.__init_resources()
+	
+	def __init_resources(self):
+		self.__create_all_chapters(self.book_type)
+		self.__create_TCP_listener(self.book_type)
+	
+	def dispose(self):
+		self.is_alive=False
+	
+	#allow easy extensibility for Book extend a Thread
+	def start(self):
+		self.run()
+	
+	def run(self):	
+		pass
+	
+	def __create_all_chapters(self,this_book_type):
+		#only create if not already initialized
+		if(len(self._chapter_list)==0):
+			if(this_book_type==BOOK_TYPE.DEBUG):
+				pass
+			elif(this_book_type==BOOK_TYPE.IO):
+				pass
+			elif(this_book_type==BOOK_TYPE.WALL):
+				pass
+			elif(this_book_type==BOOK_TYPE.HELM):
+				pass
+	
+	def __create_TCP_listener(self,this_book_type):
+		#only create if not already initialized
+		if(self._tcp_listener is None):
+			pass
+	
+	#GET/SET
+	
+	@property
+	def is_alive(self): return self._is_alive
+
+	@is_alive.setter
+	def is_alive(self, value):
+		if(not value):
+			self._is_alive = False
+		else:
+			#only allow external actors to set is_alive to False to
+			#avoid conflicting access/revival in multi-threaded environment
+			raise ValueError("Cannot configure is_alive to: "+str(value))
+	
+	@property
+	def book_type(self): return self._book_type
+	
+	@book_type.setter
+	def book_type(self,value):
+		raise ValueError("Changing book_type after initialization is not supported: "+str(value))

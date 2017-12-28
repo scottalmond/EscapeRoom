@@ -1,33 +1,41 @@
 """
-Main
+Author: Scott Almond
+Date: December 26, 2017
 
+Purpose: 
 This class is responsible for initializing a thread and running the escape room operations within that thread
 Encapsulating all processes within a thread allows for asyncronous debugging operations
 
-To kickoff, run:
-Main().start()
+Usage:
+Main(0).start() #creates a DEBUG BOOK_TYPE per the ENUM definition in Book
 """
 
 import time
 import threading
+from util.Book import Book
 
 class Main(threading.Thread):
 	
+	def __init__(self,this_book_type):
+		threading.Thread.__init__(self)
+		print("Main.__init__: Hello World")
+		#configure constants
+		
+		#configure lists and objects
+		self.my_book=Book(this_book_type)
+		
 	"""
 	Extends Thread
 	"""
 	def run(self):
 		self.__init()
-		self.__main()
-		self.__dispose()
+		#self.__main()
+		#self.__dispose()
 	
 	"""
 	Create Environment and Book
 	"""
-	def __init(self,environment_type=Environment.,book_type=Book.TYPE_DEBUG):
-		self.my_environment=Environment(environment_type)
-		self.my_environment.init()
-		self.my_book=Book(self.my_environment,book_type)
+	def __init(self):
 		self.my_book.init()
 	
 	"""
@@ -45,11 +53,5 @@ class Main(threading.Thread):
 	"""
 	def __dispose(self):
 		self.my_book.dispose()
-		self.my_environment.dispose()
 	
-	"""
-	check if environment has been stopped
-	"""		
-	def __isStopped():
-		return self.my_environment.isStopped()
-		
+Main(0).start()	
