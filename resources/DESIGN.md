@@ -1,4 +1,4 @@
-﻿# Overview
+# Overview
 
 This document details the top level objectives, implementation, and interface details of the finale in order to facilitate effective communication among the Escape Room development team.
 
@@ -195,6 +195,30 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 - Implementation [TIER 3] [Software]: If the game proves too easy, the pod will travel through hyperspace faster (~20%) when near the goal.
 
 - Implementation [TIER 3] [Software]: If the game proves too difficult, the pod will trigger checkpoints during play and will restart from these points, rather than the start, upon player death.
+
+### Game Speed
+
+- Implementation [TIER 3] [Software]: The baseline speed will replicate the [Crash Bandicoot](https://youtu.be/Er0AzrrjrJI?t=14m47s) envionment.
+	- Implementation [TIER 3] [Software]: One ring (or branch node) will pass by the player every 2 seconds.  In a 10-minute average playthrough this will account for ~290 straight rings and ~10 branch nodes
+	- Implementation [TIER 3] [Software]: 
+
+#### Background
+
+Several stress tests were run to determine the most suitable method for generating a moving hyperspace background.  The default method of using an EnvironmentSphere in Pi3D proved to be a notable limiting factor in frame rate (~15 FPS) when rendered together with foreground objects (vs 25 FPS when excluding the background rendering from the baseline) and only provided a short loop of a few seconds (the background texture was slid along the sphere to simulate motion).
+
+An EnvironmentSphere appears very similar to a polar image projection.  However, using two methods (one with and one without Open Computer Vision 2 in Python 3) to polar project a sizable image, the frame rate did not exceed 5 FPS.  The only other option appears to be to use a looping pre-rendered background video, and reposition it on the screen in response to player motions to simulate changes in the direction of view.  Using this technique improved the frame rate to the point the foreground object rending was the limiting factor (~25 FPS).
+
+- Implementation [TIER 3] [Software]: The background will consist of a ~60 second looping video (in a 10 minute average play through, the video will loop 10 times).  This video will depict a hyperspace effect emanating from the center to simulate motion of the pod towards a point.
+
+- Implementation [TIER 3] [Software]: The Background will be built up using the following steps in pre-production:
+	- Generating a large rectangular hyperspace background that tessellates with itself
+	- Polar projecting the image such that the focal point is in the middle of the canvas
+	- Creating video frames by sliding the image offset in the polar projection
+	- Stiching the frames together produces a video with a moving star field moving from the center of the canvas to the edges
+
+pixel rate from center to edge?
+
+The max dimension of a Photoshop drawing is 30,000 pixels on a side [source](https://helpx.adobe.com/photoshop-elements/kb/maximum-image-size-limits-photoshop.html).  
 
 ### Hyperspace Map
 
