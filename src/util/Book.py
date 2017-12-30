@@ -15,12 +15,12 @@ book.dispose()
 """
 
 from enum import Enum #for Enum references like book type
+import util.Environment
+import util.ResourceManager
 
 class BOOK_TYPE(Enum):
-	DEBUG=0 #for development testing
-	IO=1 #for testing IO response
-	WALL=2 #for running operationally on main monitor
-	HELM=3 #for running operationally on auxilary monitor
+	WALL=0 #for running operationally on main monitor
+	HELM=1 #for running operationally on auxilary monitor
 
 class Book:
 	#CONSTANTS
@@ -31,7 +31,7 @@ class Book:
 	
 	# this_book_type - an ENUM defining 
 	def __init__(self,this_book_type):
-		print("Book: Hello World")
+		print("Book.__init__: Hello World")
 		#configure variables
 		self._is_alive=True
 		self._book_type=this_book_type
@@ -68,11 +68,7 @@ class Book:
 	def __create_all_chapters(self,this_book_type):
 		#only create if not already initialized
 		if(len(self._chapter_list)==0):
-			if(this_book_type==BOOK_TYPE.DEBUG):
-				pass
-			elif(this_book_type==BOOK_TYPE.IO):
-				pass
-			elif(this_book_type==BOOK_TYPE.WALL):
+			if(this_book_type==BOOK_TYPE.WALL):
 				pass
 			elif(this_book_type==BOOK_TYPE.HELM):
 				pass

@@ -1,9 +1,16 @@
 """
-Class to provide a standard interface to all periphreals such as IO pins, strain gauges, light sensors, UART, etc
+Author: Scott Almond
+Date: December 28, 2017
+
+Purpose:
+Class to provide a standard interface to all periphreals such as IO pins,
+strain gauges, light sensors, UART, etc.  These methods are desigend to
+be light-weight and may be called frequently (~30 Hz)
+
+Usage:
+
 """
 
-MAIN_MONITOR=1
-AUX_MONITOR=2
 
 class Environment:
     MAX_TIME_SECONDS=60*60 #number of seconds allowed to solve the room before room auto-times out
