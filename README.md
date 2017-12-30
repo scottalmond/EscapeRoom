@@ -124,6 +124,14 @@ TODO: 10-20 second demo video
 xxx TODO sudo apt-get install vlc --> omxplayer
 xxx TODO sudo pip3 install omxplayer-wrapper
 
+
+
+### Development Tools
+
+- Markdown editor for editing design documents
+	- Download the latest .deb from: [Remarkable](https://remarkableapp.github.io/linux/download.html)
+	- Command: _sudo apt install /home/linaro/Downloads/remarkable_1.87_all.deb_
+
 - opencv: https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi/
 	- CMake:
 		- command: sudo apt-get install build-essential cmake pkg-config
@@ -156,21 +164,34 @@ xxx TODO sudo pip3 install omxplayer-wrapper
 		- Command: sudo /etc/init.d/dphys-swapfile stop
 		- Command: sudo /etc/init.d/dphys-swapfile start
 	- Compile OpenCV
+		- command: cd ~/opencv-3.3.0/build/
 		- command: make -j4
 			- This will take ~90 minutes
+			- Note: This may freeze the system and require a reboot.  To resume the compile from the latest checkpoint, re-run the above cd and make commands after power cycling the raspberry pi
 	- Install OpenCV
+		- command: cd ~/opencv-3.3.0/build/
 		- Command: sudo make install
 		- Command: sudo ldconfig
-
-
-reset swap size back when done
-
-
-### Development Tools
-
-- Markdown editor for editing design documents
-	- Download the latest .deb from: [Remarkable](https://remarkableapp.github.io/linux/download.html)
-	- Command: _sudo apt install /home/linaro/Downloads/remarkable_1.87_all.deb_
+		- Command: cd /usr/local/lib/python3.5/dist-packages/
+		- Command: sudo mv cv2.cpython-35m-arm-linux-gnueabihf.so cv2.so
+			- Done in order to rename OpenCV to shorter name
+	- Install verification
+		- Command: python3
+		- Command: import cv2
+		- Command: cv2.__version__
+			- Returns '3.3.0'
+		- Command: quit()
+	- Return Swap Space to Original Size:
+		- command: sudo nano /etc/dphys-swapfile
+			- Change CONF_SWAPSIZE=1024 to CONF_SWAPSIZE=100
+			- Ctrl + X, Y, Enter
+	- Restart swap service:
+		- Command: sudo /etc/init.d/dphys-swapfile stop
+		- Command: sudo /etc/init.d/dphys-swapfile start
+- Gimp, 2D image processing
+	- command: sudo apt-get install gimp
+- Blender, 3D model processing
+	- command: sudo apt-get install blender
 
 sudo apt-get install geany
 

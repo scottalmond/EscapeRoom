@@ -217,6 +217,8 @@ An EnvironmentSphere appears very similar to a polar image projection.  However,
 	- Stiching the frames together produces a video with a moving star field moving from the center of the canvas to the edges
 
 pixel rate from center to edge?
+demo runs at 17 FPS, and loops a 1300 pixel long image in 40-80 frames - 270-560 pixels/second.  53-108 seconds for 30k mural.  Alternatively tesseract at 60 degree offset for a 5k long mural.
+Using 1920 x 1080 --> radius from center to edge is 1100 pixels, circumference 6.9k --> height of mural to support polar transform
 
 The max dimension of a Photoshop drawing is 30,000 pixels on a side [source](https://helpx.adobe.com/photoshop-elements/kb/maximum-image-size-limits-photoshop.html).  
 
