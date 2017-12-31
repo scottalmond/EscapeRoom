@@ -12,7 +12,7 @@ This document details the top level objectives, implementation, and interface de
 
 - [TIER 2]: Following an agile development process, these are strongly desired stipulations, or stipulations that are difficult to define precisely, that must be attempted to be met before changes are to be considered
 
-- [TIER 3]: These are nice-to-have stipulations and may be de-scoped or modified as needed to meet the dictated schedule
+- [TIER 3]: These are nice-to-have stipulations and may be modified or de-scoped as needed to meet the dictated schedule
 
 - [Hardware]: These are elements that refer to the team building the physical set the players will interact with
 
