@@ -203,13 +203,13 @@ Several stress tests were run to determine the most suitable method for generati
 
 Sliding a texture along the inside of an EnvironmentSphere appears very similar to a polar image projection.  However, using two methods (one with, and one without, Open Computer Vision 2 in Python 3) to polar project a sizable image, the frame rate did not exceed 5 FPS.
 
-The only other option appears to be to use a looping pre-rendered background video, and reposition it on the screen in response to player motions to simulate changes in the direction of view.  Using this technique improved the frame rate to the point the foreground object rending was the limiting factor (~25 FPS).
+The only other option appears to be to use a looping pre-rendered background video, and reposition it on the screen in response to player motions to simulate changes in the direction of view.  Using this technique improved the frame rate to the point the foreground object rending was the limiting factor (~25 FPS), so this will be method employed in this project.
 
 - Implementation [TIER 3] [Software]: The background will consist of a ~60 second looping video.  This video will depict a hyperspace effect emanating from the center to simulate motion of the pod moving foward.
 	- In a 10 minute average play through, the background video will loop 10 times
 
-- Implementation [TIER 3] [Software]: The Background will be built up using the following steps in pre-production:
-	- Generating a large rectangular hyperspace background that tessellates with itself
+- Implementation [TIER 3] [Software]: The background video will be built up using the following steps in pre-production:
+	- Generating a large rectangular hyperspace background "mural" that tessellates with itself
 	- Polar projecting the image such that the focal point is in the middle of the canvas
 	- Creating video frames by sliding the image offset in the polar projection
 	- Stiching the frames together produces a video with a moving star field moving from the center of the canvas to the edges
@@ -220,7 +220,7 @@ The Pi3D EnvironmentSphere demo was used to determine nominal rates of backgroun
 
 ![Hyperspace Background Frame Synthesis](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_frame_synthesis.png)
 
-- Implementation [TIER 3] [Software]: Designing to a 30,000 x 6,900 pixel mural may pose processing limitations in Photoshop.  One design redution that may be pursued is to divide the mural into an even number of segments and repeat those segments.  To avoid clear repetition, the small murals may be desgiend to fit together only when shifted.  This produces a pattern that should be more difficult to discern since the repeated portions will appear to the player to occur on different locations on the screen during play.  The example below shows what such a technique may look like if the long mural were broken into 6 small murals.
+- Implementation [TIER 3] [Software]: Designing to a 30,000 x 6,900 pixel mural may pose processing limitations in Photoshop.  One design redution that may be pursued is to divide the mural into an even number of segments and repeat those segments.  To avoid clear repetition, the small murals may be desgiend to fit together only when shifted.  This produces a pattern that should be more difficult to discern since the repeated portions will appear to the player to occur on different locations on the screen during play.  The example below shows what such a technique may look like if the long mural were replaced by one small mural.  The gray rectangle in the second diagram shows howseveral copies of the small mural can be combined to form one large mural.
 
 ![Hyperspace Background Tessellation](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_mural_length.png)
 
@@ -240,7 +240,7 @@ If the navigator pushed the control stick up and right (to look down right), the
 ![Hyperspace Demo View Right Down](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo3.png)
 
 - Implementation [TIER 3] [Software]: To accomplish this simulated background motion requires a video that is larger than the screen.  In testing, a 2x by 2x upscale worked well since the center of the video (focal point of the hyperspace tunnel) appeared directly on the edge of the screen.  Restricting the navigator field of view to this limit would help ensure that players still see at least one ring approaching even when the view port is very much askew.
-	- Implementation [TIER 3] [Software]: This upscale could be accomplished by neglecting the 1:1 aspect ratio design goal for elements outside the center of the video (which will be moving past the players faster and stretching will be less evident), and by using a longer polar transform window when creating frames from the mural (1,550 pixels long rather than 1,100 pixels)
+	- Implementation [TIER 3] [Software]: This upscale could be accomplished by neglecting the 1:1 aspect ratio design goal for elements outside the center of the video (which will be moving past the players faster and the pixel stretching effect will be less evident), and by using a longer polar transform window when creating frames from the mural (2,200 pixels long rather than 1,100 pixels)
 
 ![Hyperspace Background Demo Video](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo4.png)
 
