@@ -31,7 +31,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 - Requirement [TIER 1] [Software] [Management]: The finale shall be designed to be operated by five players.
 
 - Implementation [TIER 2] [Software]: The goal of the finale shall be an immerse audio-visual experience that impresses players.
-	- Implementation [Software]: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Typically this is accomplished through the use of physical puzzles that require a subset of the team to solve.  However, this room is focused heavily on the team work aspect and instead requires the full team to coordinate to solve a series of interactive games.
+	- Implementation [Software]: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Typically this is accomplished through the use of physical puzzles that require a subset of the team to solve.  A large portion of this Escape room follows this paragism, however, this finale is focused heavily on the team work aspect and instead requires the full team to coordinate to solve a series of interactive games.
 	- Implementation [TIER 3] [Software]: Music will be played during the Snake game, Hyperspace game, and Credits sequences.
 		- Requirement [TIER 2] [Software] [Management]: Finale sounds shall support the space-themed illusion of the room.
 			- Implementation [TIER 3] [Software]: Instrumental music will be originally composed that fits the space-theme.  Music will be designed to serve as a background accompaniment to the main player action, as is done to set ambiance in Hollywood movies.
