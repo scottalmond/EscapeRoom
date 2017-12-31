@@ -98,6 +98,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 	- Implementation [TIER 3] [Software]: The book state machine running in the Helm computer will cease updating the state and rendering graphics for the Morse code puzzle in response to the relevant Ethernet command from the wall or proctor computers.
 
 - Requirement [TIER 2] [Software] [Hardware]: A monitor that accepts and displays visual input from a Raspberry Pi shall be installed in the Helm.
+	- Requirement [TIER 2] [Software] [Hardware]: The monitor shall be mounted in portrait mode (the short axis is horizontal)
 	- Implementation [TIER 2] [Hardware]: The monitor will be situated in the Helm such that two players or fewer can clearly see the screen.  This facilitates the design goal of asymmetric information presented to the players.
 	- Implementation [TIER 3] [Hardware]: An HP L2045W monitor is the current design baseline.
 
