@@ -226,7 +226,7 @@ A mock up was coded to aid in determining nominal rates for background motion.  
 - Implementation [TIER 3] [Software]: One player will have control over the camera.  This navigator will be able to adjust the pitch and yaw within limits.  This player will naturally try to keep the camera pointed at the center so the other players can most clearly see up coming obstacles and address them.  When rounding corners, the camera will remain pointed in the previous direction, so the navigator will need to adjust the direction of view.
 	- Implementation [TIER 3] [Software]: To achieve this simulated yaw and pitch of the camera, the foreground 3D assets will be rendered from the new view point, and the background video will be shifted on screen.
 
-For example, if the cargo pod (green) were to the left of the center of the playing field, and if the navigator pointed the camera dead center, the players would be presented with a view like the following.  The light blue hyperspace rings arc to the right and down.
+For example, if the cargo pod (green) were to the left of the center of the playing field, and if the navigator pointed the camera dead center, the players would be presented with a view like the following.  The light blue hyperspace rings follow a hyperspace lane that arcs to the right and down.
 	
 ![Hyperspace Demo View Straight](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo1.png)
 
@@ -238,8 +238,8 @@ If the navigator pushed the control stick up and right (to look down right), the
 
 ![Hyperspace Demo View Right Down](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo3.png)
 
-	- Implementation [TIER 3] [Software]: To accomplish this simulated background motion requires a video that is larger than the screen.  In testing, a 2x by 2x upscale worked well since the center of the video (focal point of the hyperspace tunnel) appeared directly on the edge of the screen.  Limiting the navigator field of view to this limit would help ensure that players still see at least one ring approaching even when the view port is very much askew.
-		- Implementation [TIER 3] [Software]: This upscale could be accomplished by neglecting the 1:1 aspect ratio design goal for elements outside the center of the video (which will be moving past the players faster than the center portion), and by using a longer window when creating frames from the mural (1,550 pixels long rather than 1,100 pixels)
+- Implementation [TIER 3] [Software]: To accomplish this simulated background motion requires a video that is larger than the screen.  In testing, a 2x by 2x upscale worked well since the center of the video (focal point of the hyperspace tunnel) appeared directly on the edge of the screen.  Limiting the navigator field of view to this limit would help ensure that players still see at least one ring approaching even when the view port is very much askew.
+	- Implementation [TIER 3] [Software]: This upscale could be accomplished by neglecting the 1:1 aspect ratio design goal for elements outside the center of the video (which will be moving past the players faster than the center portion), and by using a longer window when creating frames from the mural (1,550 pixels long rather than 1,100 pixels)
 
 ![Hyperspace Background Demo Video](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo4.png)
 
