@@ -205,7 +205,8 @@ Sliding a texture along the inside of an EnvironmentSphere appears very similar 
 
 The only other option appears to be to use a looping pre-rendered background video, and reposition it on the screen in response to player motions to simulate changes in the direction of view.  Using this technique improved the frame rate to the point the foreground object rending was the limiting factor (~25 FPS).
 
-- Implementation [TIER 3] [Software]: The background will consist of a ~60 second looping video (in a 10 minute average play through, the video will loop 10 times).  This video will depict a hyperspace effect emanating from the center to simulate motion of the pod moving foward.
+- Implementation [TIER 3] [Software]: The background will consist of a ~60 second looping video.  This video will depict a hyperspace effect emanating from the center to simulate motion of the pod moving foward.
+	- In a 10 minute average play through, the background video will loop 10 times
 
 - Implementation [TIER 3] [Software]: The Background will be built up using the following steps in pre-production:
 	- Generating a large rectangular hyperspace background that tessellates with itself
@@ -213,7 +214,7 @@ The only other option appears to be to use a looping pre-rendered background vid
 	- Creating video frames by sliding the image offset in the polar projection
 	- Stiching the frames together produces a video with a moving star field moving from the center of the canvas to the edges
 
-A mock up was coded to aid in determining nominal rates for background motion.  The demo ran at 17 FPS and cycled through a looping background image every 40 frames.  The background image was 1,300 pixels in the direction of motion.  Using this baseline yields a rate of motion of 560 pixels/second.  The max dimension of a Photoshop drawing is 30,000 pixels on a side [source](https://helpx.adobe.com/photoshop-elements/kb/maximum-image-size-limits-photoshop.html).  Imagining a mural that was 30,000 pixels in the long axis and was moved at 560 pixels/second along a polar transform would produce a 53 second video.
+The Pi3D EnvironmentSphere demo was used to determine nominal rates of background motion that gave the desired motion effect.  The demo ran at 17 FPS and cycled through a looping background image every 40 frames.  The background image was 1,300 pixels in the direction of motion.  Using this baseline yields a rate of motion of 560 pixels/second.  The max dimension of a Photoshop drawing is 30,000 pixels on a side [source](https://helpx.adobe.com/photoshop-elements/kb/maximum-image-size-limits-photoshop.html).  Imagining a mural that was 30,000 pixels in the long axis, and was moved at 560 pixels/second along a polar transform, would produce a 53 second video.
 
 - Implementation [TIER 3] [Software]: Using a direct approach, a long (30,000 pixel) hyperspace mural could be composed as shown below.  In pre-processing, sections of the mural would be extracted, subjected to a polar transform, and then cropped to the screen resolution to form each frame.  Using a 1,920 x 1,080 pixel resolution as the baseline, the radius of the polar transform would be 1,100 pixels, which would be the length of the window moving along the mural (gray, light green, light blue). Assuming a design goal of a 1:1 pixel resolution match between the mural height and the polar projection image circumference (light blue), then the height of the mural would be 6,900 pixels.
 
@@ -238,8 +239,8 @@ If the navigator pushed the control stick up and right (to look down right), the
 
 ![Hyperspace Demo View Right Down](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo3.png)
 
-- Implementation [TIER 3] [Software]: To accomplish this simulated background motion requires a video that is larger than the screen.  In testing, a 2x by 2x upscale worked well since the center of the video (focal point of the hyperspace tunnel) appeared directly on the edge of the screen.  Limiting the navigator field of view to this limit would help ensure that players still see at least one ring approaching even when the view port is very much askew.
-	- Implementation [TIER 3] [Software]: This upscale could be accomplished by neglecting the 1:1 aspect ratio design goal for elements outside the center of the video (which will be moving past the players faster than the center portion), and by using a longer window when creating frames from the mural (1,550 pixels long rather than 1,100 pixels)
+- Implementation [TIER 3] [Software]: To accomplish this simulated background motion requires a video that is larger than the screen.  In testing, a 2x by 2x upscale worked well since the center of the video (focal point of the hyperspace tunnel) appeared directly on the edge of the screen.  Restricting the navigator field of view to this limit would help ensure that players still see at least one ring approaching even when the view port is very much askew.
+	- Implementation [TIER 3] [Software]: This upscale could be accomplished by neglecting the 1:1 aspect ratio design goal for elements outside the center of the video (which will be moving past the players faster and stretching will be less evident), and by using a longer polar transform window when creating frames from the mural (1,550 pixels long rather than 1,100 pixels)
 
 ![Hyperspace Background Demo Video](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo4.png)
 
