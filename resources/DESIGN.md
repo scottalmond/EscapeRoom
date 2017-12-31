@@ -225,15 +225,16 @@ A mock up was coded to aid in determining nominal rates for background motion.  
 
 - Implementation [TIER 3] [Software]: One player will have control over the camera.  This navigator will be able to adjust the pitch and yaw within limits.  This player will naturally try to keep the camera pointed at the center so the other players can most clearly see up coming obstacles and address them.  When rounding corners, the camera will remain pointed in the previous direction, so the navigator will need to adjust the direction of view.
 	- Implementation [TIER 3] [Software]: To achieve this simulated yaw and pitch of the camera, the foreground 3D assets will be rendered from the new view point, and the background video will be shifted on screen.
-		- For example, if the cargo pod (green) were to the left of the center of the playing field, and if the navigator pointed the camera dead center, the players would be presented with a view like the following.  The light blue hyperspace rings arc to the right and down.
+
+For example, if the cargo pod (green) were to the left of the center of the playing field, and if the navigator pointed the camera dead center, the players would be presented with a view like the following.  The light blue hyperspace rings arc to the right and down.
 	
 ![Hyperspace Demo View Straight](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo1.png)
 
-		- If the navigator pushed the control stick left to view to the left of the pod, the background would be shifted right, and the rings would be drawn from the right side:
+If the navigator pushed the control stick left to view to the left of the pod, the background would be shifted right, and the rings would be drawn from the right side:
 	
 ![Hyperspace Demo View Left](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo2.png)
 
-		- If the navigator pushed the control stick up and right (to look down right), the background would move up and left; the rings would be rendered from the left side.
+If the navigator pushed the control stick up and right (to look down right), the background would move up and left; the rings would be rendered from the left side.
 
 ![Hyperspace Demo View Right Down](https://raw.githubusercontent.com/scottalmond/EscapeRoom/master/resources/hyperspace_background_demo3.png)
 
