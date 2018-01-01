@@ -14,9 +14,11 @@
    limitations under the License.
 
 Purpose:
-The wall monitor is filled with static noise.  The IO_Manager is polled
-for the status of the light puzzle components which are relayed to the Proctor
-when all four components have changed state, the chapter is considered done
+This tutorial presents the players with an iconic representation of
+all player controls, whith al marked as inactive.  When players actuate the
+corresponding controls, that sub-component is marked as active.  Once
+players have activated all controls (and presumably sat in the chairs next to
+the controls) then the chapter is considered done
 
 Usage:
 
@@ -25,10 +27,10 @@ Usage:
 
 from util.Chapter import Chapter
 
-class LightPuzzle(Chapter):
+class Tutorial(Chapter):
 	def __init__(self,this_book):
 		super().__init__(this_book)
-		print("LightPuzzle: Hello World")
+		print("Tutorial: Hello World")
 		
 	def update(self):
 		pass

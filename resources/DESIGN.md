@@ -24,11 +24,15 @@ This document details the top level objectives, implementation, and interface de
 
 ## Room
 
-- Requirement [TIER 1] [Software] [Management]: The finale shall follow a pre-scripted narrative.
-	- Implementation [Software]: The Wall computer will play video with sound as dictated by the narrative.
+- Requirement [TIER 1] [Software] [Management]: The goal of the finale shall be to encourage team work among the players.
+	- Implementation [TIER 3] [Software]: The Snake game will be most easily beaten if the players coordinate so only one on-screen character completes the objective at a time (to minimize the risk of players running into one another) rather than all proceeding independently at the same time.
+	- Implementation [TIER 3] [Software]: The Hyperspace game controls each control one dimension of the on-screen character's movement.  Multiple players need to coordinate their actions to achieve the desired outcome.  Players will be presented with asymmetric abilities and information: a limited number of players will be able to see the map to determine how best to reach the end goal; some obstacles like asteroid rubble must be avoided (one set of controls), while other obstacles like large asteroids cannot be avoided and must be destroyed with the laser (joystick in another station).
 
 Attempting to design reconfigurable puzzles that target a variable number of players has proven challenging.  To limit scope, a finite number of players was chosen.
 - Requirement [TIER 1] [Software] [Management]: The finale shall be designed to be operated by five players.
+
+- Requirement [TIER 1] [Software] [Management]: The finale shall follow a pre-scripted narrative.
+	- Implementation [Software]: The Wall computer will play video with sound as dictated by the narrative.
 
 - Implementation [TIER 2] [Software]: The goal of the finale shall be an immerse audio-visual experience that impresses players.
 	- Implementation [Software]: Escape rooms are typically designed around the setting of graphic adventure puzzle video games common in the 1980's and into the 1990's.  Typically this is accomplished through the use of physical puzzles that require a subset of the team to solve.  A large portion of this Escape room follows this paragism, however, this finale is focused heavily on the team work aspect and instead requires the full team to coordinate to solve a series of interactive games.
@@ -39,10 +43,6 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 			- Implementation [TIER 3] [Software]: Allow the Proctor computer to issue commands to adjust volume levels prior to and during room play-through.
 			- Implementation [TIER 3] [Software]: The volume for music will be independent from the volume for sound effects.
 		- Requirement [TIER 2] [Software] [Management]: After the Light Puzzle is completed, no other puzzles shall emit sounds that conflict with the finale.
-
-- Requirement [TIER 1] [Software] [Management]: The goal of the finale shall be to encourage team work among the players.
-	- Implementation [TIER 3] [Software]: The Snake game will be most easily beaten if the players coordinate so only one on-screen character completes the objective at a time (to minimize the risk of players running into one another) rather than all proceeding independently at the same time.
-	- Implementation [TIER 3] [Software]: The Hyperspace game controls each control one dimension of the on-screen character's movement.  Multiple players need to coordinate their actions to achieve the desired outcome.  Players will be presented with asymmetric abilities and information: a limited number of players will be able to see the map to determine how best to reach the end goal; some obstacles like asteroid rubble must be avoided (one set of controls), while other obstacles like large asteroids cannot be avoided and must be destroyed with the laser (joystick in another station).
 
 - Requirement [TIER 2] [Software] [Management] [Hardware]: The cameras, Proctor computer, Wall computer, and Helm computer shall all be connected together in such a way that near-real-time communication (latency shall be no greater than 100 ms) can occur between them, for example through Ethernet communication.
 

@@ -1,15 +1,22 @@
 """
-Author: Scott Almond
-Date: December 27, 2017
+   Copyright 2018 Scott Almond
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
 Purpose:
 This is an abstract base class that all Chapters inherent from
 
 Usage:
-from chapters.Chapter import Chapter
-class CLAZZ_NAME(Chapter):
-
-book sudo-code:
 for chapter in book
 	chapter=Chapter() #chapter is created
 for playthrough=1:inf
@@ -31,13 +38,15 @@ for chapter in book
 from abc import ABC, abstractmethod
 
 class Chapter():
+	
+	@abstractmethod
 	def __init__(self,this_book):
 		print("Chapter: Hello World")
 		self._this_book=this_book
 		self.clean()
 
 	#called immmediately prior to updating/drawing frames
-	def enterChapter(): pass
+	def enterChapter(self): pass
 	
 	#called every frame by the Book to update the chapter state
 	#prior to calling draw()
@@ -50,7 +59,7 @@ class Chapter():
 	
 	#called after last frame draw for this chapter in this playthrough
 	#method should execute very quickly (no asset loads/dumps)
-	def exitChapter(): pass
+	def exitChapter(self): pass
 
 	#called between play-throughs and prior to first play through
 	#method run time is not a limitation
@@ -73,9 +82,9 @@ class Chapter():
 	def is_visible(self, value):
 		self._is_done = bool(value)
 		if(self.is_done):
-			enterChapter()
+			self.enterChapter()
 		else:
-			exitChapter()
+			self.exitChapter()
 		
 	#during a single chapter run
 	@property
