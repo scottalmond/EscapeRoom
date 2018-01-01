@@ -211,7 +211,7 @@ Our local site president visited an escape room during his travels and found it 
 
 The Python 3 code used within this project was developed by Scott Almond and released under the following license.  These files contain "Author: Scott Almond" in the header.
 
-[![License: Open Data Commons Attribution](https://img.shields.io/badge/License-ODC_BY-brightgreen.svg)](https://opendatacommons.org/licenses/by/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Visual Art Assets
 
