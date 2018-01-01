@@ -28,30 +28,17 @@ class Main(threading.Thread):
 	Extends Thread
 	"""
 	def run(self):
-		self.__init()
-		#self.__main()
+		self.my_book.start()
 		#self.__dispose()
-	
-	"""
-	Create Environment and Book
-	"""
-	def __init(self):
-		self.my_book.init()
-	
-	"""
-	Loop execution here until ready to exit
-	"""
-	def __main(self):
-		while(not self.__isStopped()):
-			print("Main: HERE")
-			self.my_book.run()
-			time.sleep(3.0)
 	
 	"""
 	Close references to open environmental variables
 	Do so in reverse order from init()
 	"""
-	def __dispose(self):
+	def dispose(self):
 		self.my_book.dispose()
 	
-Main(0).start()	
+my_main=Main(0)
+my_main.start()
+sleep(20)
+my_main.dispose()

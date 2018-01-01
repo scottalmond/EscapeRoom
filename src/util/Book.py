@@ -13,10 +13,13 @@ book.start()
 book.dispose()
 """
 
+#supporting libraries
 from enum import Enum #for Enum references like book type
-import util.IO_Manager #interface for reading button state
-import util.ResourceManager #wrapper for fetching art assets
-import util.MasterListener #interface for receiving external commands from Proctor or Wall computer
+
+#custom support assets
+from util.IO_Manager import IO_Manager #interface for reading button state
+from util.ResourceManager import ResourceManager #wrapper for fetching art assets
+from util.MasterListener import MasterListener#interface for receiving external commands from Proctor or Wall computer
 
 #Wall Chapters
 import chapters.wall.Standby
@@ -63,27 +66,12 @@ class Book:
 	
 	
 	"""
-	use a stand-alone init() method to allow long-duration tasks to be
-	completed in a separate method call from the constructor
-	
 	kicks off threads and other resource/time-heavy tasks
 	"""
 	def start(self):
 		#initialize objects
-		self.__start_resources()
+		self.clean()
 		self.run()
-	
-	def __start_resources(self):
-		self._resource_manager.start()
-		self._io_manager.start()
-		for this_chapter in self._chapter_list:
-			this_chapter.start()
-		self._master_listener.start()
-	
-	def __init_resources(self):
-		self._io_manager.init()
-		self._resource_manager.init()
-		self._tcp_listener.init()
 	
 	def clean(self):
 		self._index_next_chapter=0 #index of the next chapter within _chapter_list
@@ -91,8 +79,11 @@ class Book:
 		self._playthrough_time_offset_seconds=0 #allow for proctor to add/subtract time
 		if(self.book_type==BOOK_TYPE.WALL):
 			raise NotImplementedError("Need to notify Helm via TCP to perform clean: set next chapter to zero and current chapter to done")
+		self._io_manager.clean()
+		self._resource_manager.clean()
 		for chapter in self._chapter_list:
 			chapter.clean()
+		self._master_listener.clean()
 	
 	def dispose(self):
 		if(self.book_type==BOOK_TYPE.WALL):
@@ -146,6 +137,7 @@ class Book:
 			return [ #Wall book assumes the sane number of chapters exist in the Helm book
 				chapters.helm.Standby.Standby(self), #chapter 0
 				chapters.helm.MorseCode.MorseCode(self), #chapter 1
+				chapters.helm.BlackScreen.BlackScreen(self),
 				chapters.helm.BlackScreen.BlackScreen(self),
 				chapters.helm.Map.Map(self),
 				chapters.helm.BlackScreen.BlackScreen(self),

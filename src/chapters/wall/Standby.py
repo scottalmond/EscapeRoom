@@ -14,6 +14,7 @@ Usage:
 
 import util.Chapter
 
-class Standby(Chapter):
+class Standby(util.Chapter.Chapter):
 	def __init__(self,this_book):
 		super.__init__(this_book)
+		print("Standby: Hello World")

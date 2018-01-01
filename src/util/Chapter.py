@@ -37,31 +37,27 @@ class Chapter():
 		self.clean()
 
 	#called immmediately prior to updating/drawing frames
-	@abstractmethod
 	def enterChapter(): pass
 	
 	#called every frame by the Book to update the chapter state
 	#prior to calling draw()
 	@abstractmethod
-	def update(self): pass
+	def update(self): raise NotImplementedError("Chapter abstract method not implemented: update()");
 	
 	#called to render one frame
 	@abstractmethod
-	def draw(self): pass
+	def draw(self): raise NotImplementedError("Chapter abstract method not implemented: draw()");
 	
 	#called after last frame draw for this chapter in this playthrough
 	#method should execute very quickly (no asset loads/dumps)
-	@abstractmethod
 	def exitChapter(): pass
 
 	#called between play-throughs and prior to first play through
 	#method run time is not a limitation
-	@abstractmethod
 	def clean(self): self._is_done=False
 		
 	#discontinue asset use, stop threads and async processes in preparation
 	#for a clean exit to the terminal
-	@abstractmethod
 	def dispose(self): pass
 
 	#called between chapters in a normal play-through
@@ -73,7 +69,7 @@ class Chapter():
 	def is_visible(self): return self._is_visible
 	
 	#overload to re-define behavior
-	@is_done.setter
+	@is_visible.setter
 	def is_visible(self, value):
 		self._is_done = bool(value)
 		if(self.is_done):
