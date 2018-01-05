@@ -48,7 +48,7 @@ class Standby(Chapter):
 		super().draw(frame_number,seconds_since_last_frame)
 		#fill screen with black
 		#draw standby...
-		print("wall.standby.draw, frame: "+str(frame_number))#observing ~100 FPS on home PC
+		print("wall.standby.draw, frame: "+str(frame_number))#observing ~100 FPS on home PC, ~30 FPS on RPi 3
 		textsurface=self.font.render('Standby FPS: '+str(math.floor(1/np.max((0.00001,seconds_since_last_frame)))),False,(0,0,0))
 		self._io_manager.screen_2d.fill((0,0,255))
 		self._io_manager.screen_2d.blit(textsurface,(0,0))

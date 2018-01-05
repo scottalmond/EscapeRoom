@@ -21,8 +21,20 @@ Usage:
 
 """
 
-import pygame
+#General Support Libraries
 import time
+import numpy as np
+
+#Physical Interfaces
+import wiringpi as wp
+
+#2D Graphics
+import pygame
+
+#3D Graphics
+import pi3d
+import sys
+sys.path.insert(1, '/home/pi/pi3d')
 
 class IO_Manager:
 	def __init__(self,this_book_type):
