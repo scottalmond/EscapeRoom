@@ -40,10 +40,11 @@ from abc import ABC, abstractmethod
 class Chapter():
 	
 	@abstractmethod
-	def __init__(self,this_book):
+	def __init__(self,this_book,this_resource_manager,this_io_manager):
 		print("Chapter: Hello World")
 		self._this_book=this_book
-		self.clean()
+		self._resource_manager=this_resource_manager
+		self._io_manager=this_io_manager
 
 	#called immmediately prior to updating/drawing frames
 	def enterChapter(self): pass
@@ -51,11 +52,11 @@ class Chapter():
 	#called every frame by the Book to update the chapter state
 	#prior to calling draw()
 	@abstractmethod
-	def update(self): raise NotImplementedError("Chapter abstract method not implemented: update()");
+	def update(self,frame_number,seconds_since_last_frame): pass
 	
 	#called to render one frame
 	@abstractmethod
-	def draw(self): raise NotImplementedError("Chapter abstract method not implemented: draw()");
+	def draw(self,frame_number,seconds_since_last_frame): pass
 	
 	#called after last frame draw for this chapter in this playthrough
 	#method should execute very quickly (no asset loads/dumps)
@@ -63,7 +64,8 @@ class Chapter():
 
 	#called between play-throughs and prior to first play through
 	#method run time is not a limitation
-	def clean(self): self._is_done=False
+	def clean(self):
+		self.is_done=False
 		
 	#discontinue asset use, stop threads and async processes in preparation
 	#for a clean exit to the terminal
@@ -80,8 +82,7 @@ class Chapter():
 	#overload to re-define behavior
 	@is_visible.setter
 	def is_visible(self, value):
-		self._is_done = bool(value)
-		if(self.is_done):
+		if(bool(value)):
 			self.enterChapter()
 		else:
 			self.exitChapter()
@@ -93,4 +94,5 @@ class Chapter():
 
 	@is_done.setter
 	def is_done(self, value):
-		self._is_done = value
+		self._is_done = bool(value)
+		

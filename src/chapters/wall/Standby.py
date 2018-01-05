@@ -24,20 +24,32 @@ Usage:
 """
 
 from util.Chapter import Chapter
+import time
+import numpy as np
+import math
 
 class Standby(Chapter):
-	def __init__(self,this_book):
-		super().__init__(this_book)
-		print("Standby: Hello World")
+	def __init__(self,this_book,this_resource_manager,this_io_manager):
+		super().__init__(this_book,this_resource_manager,this_io_manager)
+		print("Wall Standby: Hello World")
 		
 	def enterChapter(self):
+		super().enterChapter()
+		print("wall.standby.enterChapter")
 		#set 2D layer to top
-		pass
+		self.font=self._io_manager.pygame.font.SysFont('Comic Sans MS',300)
 		
-	def update(self):
-		pass
+	def update(self,frame_number,seconds_since_last_frame):
+		super().update(frame_number,seconds_since_last_frame)
+		print("wall.standby.update, frame: "+str(frame_number))
+		#pass #frame number, time since last frame, time of start of frame
 		
-	def draw(self):
+	def draw(self,frame_number,seconds_since_last_frame):
+		super().draw(frame_number,seconds_since_last_frame)
 		#fill screen with black
 		#draw standby...
-		pass
+		print("wall.standby.draw, frame: "+str(frame_number))#observing ~100 FPS on home PC
+		textsurface=self.font.render('Standby FPS: '+str(math.floor(1/np.max((0.00001,seconds_since_last_frame)))),False,(0,0,0))
+		self._io_manager.screen_2d.fill((0,0,255))
+		self._io_manager.screen_2d.blit(textsurface,(0,0))
+		self._io_manager.pygame.display.flip()

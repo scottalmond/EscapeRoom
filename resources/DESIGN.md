@@ -385,3 +385,8 @@ The Proctor computer is treated as MASTER to the SLAVE Wall computer.  The Wall 
 - Feb 26, 2018 Credits Functional Build
 - Mar 12, 2018 Integration with Morse Code
 
+TODO
+
+Layer order
+state flow diagram for puzzles
+update state flow diagram for book

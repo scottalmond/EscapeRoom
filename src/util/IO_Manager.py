@@ -22,19 +22,27 @@ Usage:
 """
 
 import pygame
+import time
 
 class IO_Manager:
 	def __init__(self,this_book_type):
-		pass
+		self.pygame=pygame
 
 	def clean(self):
-		pass
+		self.__create2Dgraphics()
 		
 	def dispose(self):
-		pass
+		self.__dispose2Dgraphics()
 
 	def __create2Dgraphics(self):
-		pass
+		self.pygame.init()
+		self.pygame.font.init()
+		self.pygame.mouse.set_visible(False)
+		display_info=pygame.display.Info()
+		self.screen_2d=pygame.display.set_mode((display_info.current_w,display_info.current_h),pygame.FULLSCREEN)
+		self.screen_2d.fill((0,0,255))
+		self.pygame.display.flip()
 		
 	def __dispose2Dgraphics(self):
-		pass
+		self.pygame.display.quit()
+		self.pygame.quit()
