@@ -25,7 +25,7 @@ background_rgba=(0.3,0.3,0.7,1.0)
 #background_rgba=(0.0,0.0,0.0,1.0)
 #background_rgba=(0.0,0.0,0.0,0.0) #transparent
 display.set_background(background_rgba[0],background_rgba[1],background_rgba[2],background_rgba[3])
-lights = pi3d.Light(lightamb=(0.8,0.8,0.9))
+#lights = pi3d.Light(lightamb=(0.8,0.8,0.9))
 
 HWIDTH, HHEIGHT = display.width / 2.0, display.height / 2.0
 QWIDTH = HWIDTH/2 # quarter width

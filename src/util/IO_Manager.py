@@ -37,6 +37,8 @@ import sys
 sys.path.insert(1, '/home/pi/pi3d')
 
 class IO_Manager:
+	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only
+	
 	def __init__(self,this_book_type):
 		self.pygame=pygame
 
@@ -62,7 +64,8 @@ class IO_Manager:
 		self.pygame.quit()
 		
 	def __create3Dgraphics(self):
-		pass
+		self.display_3d = pi3d.Display.create(samples=OVERSAMPLE_RATIO_3D)
+		self.display_3d.set_background(0,0,0,0)#transparent background
 		
 	def __dispose3Dgraphics(self):
 		pass
