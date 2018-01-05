@@ -29,7 +29,7 @@ import numpy as np
 import wiringpi as wp
 
 #2D Graphics
-import pygame
+#import pygame
 
 #3D Graphics
 import pi3d
@@ -40,17 +40,19 @@ class IO_Manager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only
 	
 	def __init__(self,this_book_type):
-		self.pygame=pygame
+		#self.pygame=pygame
+		pass
 
 	def clean(self):
-		self.__create2Dgraphics()
+		#self.__create2Dgraphics()
 		self.__create3Dgraphics()
 		
 	def dispose(self):
 		self.__dispose3Dgraphics()
-		self.__dispose2Dgraphics()
+		#self.__dispose2Dgraphics()
 
 	def __create2Dgraphics(self):
+		print("IO_Manager: Create 2D Graphics")
 		self.pygame.init()
 		self.pygame.font.init()
 		self.pygame.mouse.set_visible(False)
@@ -64,7 +66,8 @@ class IO_Manager:
 		self.pygame.quit()
 		
 	def __create3Dgraphics(self):
-		self.display_3d = pi3d.Display.create(samples=OVERSAMPLE_RATIO_3D)
+		print("IO_Manager: Create 3D Graphics")
+		self.display_3d = pi3d.Display.create(samples=self.OVERSAMPLE_RATIO_3D)
 		self.display_3d.set_background(0,0,0,0)#transparent background
 		
 	def __dispose3Dgraphics(self):

@@ -37,7 +37,7 @@ class Standby(Chapter):
 		super().enterChapter()
 		print("wall.standby.enterChapter")
 		#set 2D layer to top
-		self.font=self._io_manager.pygame.font.SysFont('Comic Sans MS',300)
+		#self.font=self._io_manager.pygame.font.SysFont('Comic Sans MS',300)
 		
 	def update(self,frame_number,seconds_since_last_frame):
 		super().update(frame_number,seconds_since_last_frame)
@@ -49,7 +49,7 @@ class Standby(Chapter):
 		#fill screen with black
 		#draw standby...
 		print("wall.standby.draw, frame: "+str(frame_number))#observing ~100 FPS on home PC, ~30 FPS on RPi 3
-		textsurface=self.font.render('Standby FPS: '+str(math.floor(1/np.max((0.00001,seconds_since_last_frame)))),False,(0,0,0))
-		self._io_manager.screen_2d.fill((0,0,255))
-		self._io_manager.screen_2d.blit(textsurface,(0,0))
-		self._io_manager.pygame.display.flip()
+		#textsurface=self.font.render('Standby FPS: '+str(math.floor(1/np.max((0.00001,seconds_since_last_frame)))),False,(0,0,0))
+		#self._io_manager.screen_2d.fill((0,0,255))
+		#self._io_manager.screen_2d.blit(textsurface,(0,0))
+		#self._io_manager.pygame.display.flip()

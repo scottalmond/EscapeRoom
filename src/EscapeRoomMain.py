@@ -24,6 +24,8 @@ time.sleep(5)
 my_main.is_live=False
 """
 
+ # XInitThreads dequeue_pending_request bug?
+ 
 import time
 import threading
 from util.Book import Book, BOOK_TYPE
