@@ -30,8 +30,10 @@ class IO_Manager:
 
 	def clean(self):
 		self.__create2Dgraphics()
+		self.__create3Dgraphics()
 		
 	def dispose(self):
+		self.__dispose3Dgraphics()
 		self.__dispose2Dgraphics()
 
 	def __create2Dgraphics(self):
@@ -40,9 +42,15 @@ class IO_Manager:
 		self.pygame.mouse.set_visible(False)
 		display_info=pygame.display.Info()
 		self.screen_2d=pygame.display.set_mode((display_info.current_w,display_info.current_h),pygame.FULLSCREEN)
-		self.screen_2d.fill((0,0,255))
+		#self.screen_2d.fill((0,0,255))
 		self.pygame.display.flip()
 		
 	def __dispose2Dgraphics(self):
 		self.pygame.display.quit()
 		self.pygame.quit()
+		
+	def __create3Dgraphics(self):
+		pass
+		
+	def __dispose3Dgraphics(self):
+		pass
