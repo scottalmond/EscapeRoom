@@ -55,7 +55,7 @@ class Main(threading.Thread):
 print("Main: START")
 my_main=Main(0)
 my_main.start()
-for iter in range(5):
+for iter in range(2):
 	time.sleep(1)
 	print("Main: "+str(iter))
 my_main.dispose()
