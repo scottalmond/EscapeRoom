@@ -309,7 +309,7 @@ while display.loop_running():
 	if(joy_state[0]): stars.draw()
 	
 	u1=0#((number_sprite_id/10)%40)/40.0
-	v1=(number_sprite_id%80)/80.0
+	v1=(number_sprite_id%40)/40.0
 	
 	background_sphere.set_offset((u1,v1))
 	if(play_background_video):
