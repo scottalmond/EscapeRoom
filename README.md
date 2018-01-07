@@ -132,7 +132,7 @@ xxx TODO sudo pip3 install omxplayer-wrapper
 	- Download the latest .deb from: [Remarkable](https://remarkableapp.github.io/linux/download.html)
 	- Command: _sudo apt install /home/linaro/Downloads/remarkable_1.87_all.deb_
 
-- opencv: https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi/
+- opencv for rpi: https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi/
 	- CMake:
 		- command: sudo apt-get install build-essential cmake pkg-config
 	- Image I/O Packages:
@@ -194,6 +194,49 @@ xxx TODO sudo pip3 install omxplayer-wrapper
 	- command: sudo apt-get install blender
 - Mini Mic
 	- command: arecord --device=plughw:1,0 --format S16_LE --rate 44100 -c1 test.wav -d 5
+
+A home computer running Ubuntu 16 was used to polar-project a mural into a sequence of frames that were stitched together to form the background video of the Hyperspace game.
+- ffmpeg for ubuntu
+	- command: sudo apt-get install ffmpeg
+	- command: sudo apt autoremove
+- opencv for ubuntu: https://www.pyimagesearch.com/2016/10/24/ubuntu-16-04-how-to-install-opencv/
+	- command: sudo apt-get install build-essential cmake pkg-config
+	- command: sudo apt-get install libjpeg8-dev libtiff5-dev libjasper-dev libpng12-dev
+	- command: sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+	- command: sudo apt-get install libxvidcore-dev libx264-dev
+	- command: sudo apt-get install libgtk-3-dev
+	- command: sudo apt-get install libatlas-base-dev gfortran
+	- command: sudo apt-get install python3.5-dev
+	- command: cd ~
+	- command: wget -O opencv.zip https://github.com/Itseez/opencv/archive/3.4.0.zip
+	- command: unzip opencv.zip
+	- command: wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.4.0.zip
+	- command: unzip opencv_contrib.zip
+	- command: cd ~
+	- command: wget https://bootstrap.pypa.io/get-pip.py
+	- command: sudo python get-pip.py
+	- command: pip3 install numpy
+	- command: cd ~/opencv-3.4.0/
+	- command: mkdir build
+	- command: cd build
+	- command: cmake -D CMAKE_BUILD_TYPE=RELEASE  -D CMAKE_INSTALL_PREFIX=/usr/local  -D INSTALL_PYTHON_EXAMPLES=ON  -D INSTALL_C_EXAMPLES=OFF  -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.4.0/modules  -D PYTHON3_EXECUTABLE=/usr/bin/python3  -D PYTHON_INCLUDE_DIR=/usr/include/python3.5m  PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.5m  -D BUILD_EXAMPLES=ON ..
+	- command: make -j4
+	- command: make clean
+	- command: make
+	- command: sudo make install
+	- command: sudo ldconfig
+	- command: cd /usr/local/lib/python3.5/dist-packages/
+	- command: ls -l
+		- Should show cv2.cpython-35m-x86_64-linux-gnu.so in th ouput list
+	- command: sudo mv cv2.cpython-35m-x86_64-linux-gnu.so cv2.so
+	- command: python3
+	- command: import cv2
+	- command: cv2.__version__
+		- Should print '3.4.0'
+	- command: quit()
+	- command: rm -rf opencv-3.4.0 opencv_contrib-3.4.0 opencv.zip opencv_contrib.zip
+
+	
 
 
 sudo apt-get install geany
