@@ -26,12 +26,12 @@ Usage:
 from util.Chapter import Chapter
 
 class LightPuzzle(Chapter):
-	def __init__(self,this_book):
-		super().__init__(this_book)
+	def __init__(self,this_book,this_resource_manager,this_io_manager):
+		super().__init__(this_book,this_resource_manager,this_io_manager)
 		print("LightPuzzle: Hello World")
 		
-	def update(self):
-		pass
+	def update(self,frame_number,seconds_since_last_frame):
+		super().update(frame_number,seconds_since_last_frame)
 		
-	def draw(self):
-		pass
+	def draw(self,frame_number,seconds_since_last_frame):
+		super().draw(frame_number,seconds_since_last_frame)

@@ -24,6 +24,8 @@ time.sleep(5)
 my_main.is_live=False
 """
 
+ # XInitThreads dequeue_pending_request bug?
+ 
 import time
 import threading
 from util.Book import Book, BOOK_TYPE
@@ -55,9 +57,10 @@ class Main(threading.Thread):
 print("Main: START")
 my_main=Main(0)
 my_main.start()
-for iter in range(5):
+for iter in range(4):
 	time.sleep(1)
 	print("Main: "+str(iter))
 my_main.dispose()
 print("Main: DONE")
+#time.sleep(3)#allow time for async threads to close before existing Python env
 

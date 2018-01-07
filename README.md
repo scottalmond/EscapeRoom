@@ -192,6 +192,9 @@ xxx TODO sudo pip3 install omxplayer-wrapper
 	- command: sudo apt-get install gimp
 - Blender, 3D model processing
 	- command: sudo apt-get install blender
+- Mini Mic
+	- command: arecord --device=plughw:1,0 --format S16_LE --rate 44100 -c1 test.wav -d 5
+
 
 sudo apt-get install geany
 
