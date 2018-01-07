@@ -155,6 +155,7 @@ Attempting to design reconfigurable puzzles that target a variable number of pla
 	- [Lost Years - Lightbringers](https://www.youtube.com/watch?v=k6jjoE5Qt_s)
 	- [Heavy Light - Animusic](https://www.youtube.com/watch?v=DKUTYxJEB44)
 	- [Area Music Loop - Tomorrowland](https://www.youtube.com/watch?v=wHiAnXroGbw)
+	- [USS Callister: The Next Adentures - Daniel Pemberton](https://www.youtube.com/watch?v=pSUHg2pgcV4)
 
 - Implementation [TIER 3] [Software]: Sound effects will be played in response to user inputs in the Hyperspace puzzle, for example thruster and laser-firing sounds.
 
