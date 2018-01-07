@@ -67,6 +67,8 @@ class Book:
 		self._is_alive=True
 		self._book_type=this_book_type
 		self._is_running=False
+		self.playthrough_index=0 #this is the number of playthroughs completed
+		self._index_next_chapter=0 #next chapter to play after the current one completes
 		
 		#configure lists and object consuctors
 		self._visible_chapter=None #pointer to currently running chapter
@@ -83,7 +85,7 @@ class Book:
 	"""
 	def start(self):
 		#initialize objects
-		self.clean()
+		#self.clean()
 		self.run()
 	
 	def clean(self):
@@ -138,6 +140,8 @@ class Book:
 						self._visible_chapter.draw(frame_number,seconds_since_last_frame)
 						#self.overlay_draw()
 					frame_number=frame_number+1
+			print("Book: Playthrough number "+str(self.playthrough_index)+" complete")
+			self.playthrough_index+=1
 					
 
 	#list of chapters in order as they will be played in the book
@@ -146,7 +150,7 @@ class Book:
 		if(this_book_type==BOOK_TYPE.WALL):
 			return [
 				chapters.wall.Standby.Standby(self,resource_manager,io_manager), #chapter 0
-				#chapters.wall.LightPuzzle.LightPuzzle(self), #chapter 1
+				chapters.wall.LightPuzzle.LightPuzzle(self,resource_manager,io_manager), #chapter 1
 				#chapters.wall.Tutorial.Tutorial(self),
 				#chapters.wall.Snake.Snake(self),
 				#chapters.wall.Hyperspace.Hyperspace(self),

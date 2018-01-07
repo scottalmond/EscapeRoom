@@ -57,9 +57,10 @@ class Main(threading.Thread):
 print("Main: START")
 my_main=Main(0)
 my_main.start()
-for iter in range(5):
+for iter in range(4):
 	time.sleep(1)
 	print("Main: "+str(iter))
 my_main.dispose()
 print("Main: DONE")
+time.sleep(3)#allow time for async threads to close before existing Python env
 
