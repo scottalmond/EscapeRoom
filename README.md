@@ -40,7 +40,7 @@ A cut scene is played showing the cargo pod exiting from the space ship, followe
 TODO: 20-30 second demo video
 
 ## Chapter 6: Credits
-Upon completion of the hyperspace puzzle, a credits sequence is played.  Half the screen is used to list the puzzle contributors one-puzzle-at-a-time.  When the room is completed within the alloted time, the other half shows images of the pod exiting hyperspace, landing on the planet, and the crew collecting supplies from the pod.  If the room is not completed in the alloted time, the artwork is replaced with images depicting the construction and integration of each puzzle.  Finally, a full-screen corporate logo is displayed.
+Upon completion of the hyperspace puzzle, a credits sequence is played.  Half the screen is used to list the puzzle contributors one-puzzle-at-a-time.  When the room is completed within the allotted time, the other half shows images of the pod exiting hyperspace, landing on the planet, and the crew collecting supplies from the pod.  If the room is not completed in the allotted time, the artwork is replaced with images depicting the construction and integration of each puzzle.  Finally, a full-screen corporate logo is displayed.
 
 TODO: 10-20 second demo video
 
