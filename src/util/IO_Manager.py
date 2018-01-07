@@ -46,10 +46,10 @@ class IO_Manager:
 
 	def clean(self):
 		print("IO_Manager clean()")
-		#self.dispose()
-		#self.__create3Dgraphics()
-		#self.__create2Dgraphics()
+		self.dispose()
 		#needs to be 3D first then 2D, because 3D graphics has some pygame interaction/conflicts
+		self.__create3Dgraphics()
+		self.__create2Dgraphics()
 		
 	def dispose(self):
 		self.__dispose3Dgraphics()

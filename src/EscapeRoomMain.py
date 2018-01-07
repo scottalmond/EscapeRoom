@@ -62,5 +62,5 @@ for iter in range(4):
 	print("Main: "+str(iter))
 my_main.dispose()
 print("Main: DONE")
-time.sleep(3)#allow time for async threads to close before existing Python env
+#time.sleep(3)#allow time for async threads to close before existing Python env
 
