@@ -1,0 +1,65 @@
+"""
+   Copyright 2018 Scott Almond
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+Purpose:
+Chapter waits for a command from the proctor
+Routinely checks on the status of the Helm PC, commands it to Standby
+if the detected chapter is incorrect (ie, if Helm got out of sync with Master)
+
+Usage:
+
+
+"""
+
+from util.Chapter import Chapter
+import time
+import numpy as np
+import math
+
+class Hyperspace(Chapter):
+	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/hyperspace_background.mp4'
+	
+	def __init__(self,this_book):
+		super().__init__(this_book)
+		#variables
+		
+		
+		#objects
+		self.background_video_player=None #reference to the omxplayer
+		#that plays the background hyperspace video
+
+	def clean(self):
+		super().clean(self)
+		self.dispose(False)
+		self.background_video_player=loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO)
+		
+	def dipose(self,is_final_call):
+		super().dipose(self,is_final_call)
+		if(not self.background_video_player is None):
+			self.io.disposeVideo(self.background_video_player)
+		
+	def enterChapter(self,unix_time_seconds):
+		super().enterChapter(unix_time_seconds)
+		self.io.playVideo(self.background_video_player)
+		
+	def exitChapter(self):
+		super().exitChapter()
+	
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
+		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+		
+	def draw(self):
+		super().draw()
+

@@ -31,8 +31,8 @@ import math
 from omxplayer.player import OMXPlayer
 
 class Standby(Chapter):
-	def __init__(self,this_book,this_resource_manager,this_io_manager):
-		super().__init__(this_book,this_resource_manager,this_io_manager)
+	def __init__(self,this_book):
+		super().__init__(this_book)
 		print("Wall Standby: Hello World")
 		
 		self.vid_back=None
@@ -40,23 +40,23 @@ class Standby(Chapter):
 	def clean(self):
 		super().clean()
 		
-	def dispose(self):
-		super().dispose() 
+	def dispose(self,is_final_call):
+		super().dispose(is_final_call) 
 		
-	def enterChapter(self):
-		super().enterChapter()
+	def enterChapter(self,unix_time_seconds):
+		super().enterChapter(unix_time_seconds)
 		print("wall.standby.enterChapter")
 		#set 2D layer to top
-		self.chapter_start_unix_seconds=time.time()
+		self.chapter_start_unix_seconds=unix_time_seconds
 		try:
-			self.font=self._io_manager.pygame.font.SysFont('Comic Sans MS',300)
+			self.font=self.io.pygame.font.SysFont('Comic Sans MS',300)
 		except:
 			pass
 			
 		self.screen_width=1920#self._io_manager.display_3d.width
 		self.screen_height=1080#self._io_manager.display_3d.height
 		
-		if(True):
+		if(False):
 			video_file3='/home/pi/Documents/aux/FIBER OPTICAL (loop).mp4'
 			self.vid_back=OMXPlayer(video_file3,args=['--no-osd','-o','local','--layer','-100'])
 			#time.sleep(2)
@@ -80,22 +80,27 @@ class Standby(Chapter):
 			print("T3: "+str(time.time()-self.chapter_start_unix_seconds))
 		
 		
-	def update(self,frame_number,seconds_since_last_frame):#perhaps include total time elapsed in chapter... and playthrough number...
-		super().update(frame_number,seconds_since_last_frame)
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):#perhaps include total time elapsed in chapter... and playthrough number...
+		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		#print("wall.standby.update, frame: "+str(frame_number))
 		#pass #frame number, time since last frame, time of start of frame
-		if(self.chapter_start_unix_seconds+3<time.time()):
-			self.is_done=True
+		self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
+		#if(self.chapter_start_unix_seconds+3<time.time()):
+		#	self.is_done=True
 		
-	def draw(self,frame_number,seconds_since_last_frame):
-		super().draw(frame_number,seconds_since_last_frame)
+	def draw(self):
+		super().draw()
 		#fill screen with black
 		#draw standby...
 		#print("wall.standby.draw, frame: "+str(frame_number))#observing ~100 FPS on home PC, ~30 FPS on RPi 3
 		try:
-			textsurface=self.font.render('Standby FPS: '+str(math.floor(1/np.max((0.00001,seconds_since_last_frame)))),False,(0,0,0))
-			self._io_manager.screen_2d.fill((0,0,255))
-			self._io_manager.screen_2d.blit(textsurface,(0,0))
-			self._io_manager.pygame.display.flip()
+			#print("wall.standby.draw: "+str(self.font))
+			textsurface=self.font.render('Standby FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),False,(0,0,0))
+			#print("wall.standby.draw: here 3")
+			self.io.screen_2d.fill((0,0,255))
+			#print("wall.standby.draw: here 4")
+			self.io.screen_2d.blit(textsurface,(0,0))
+			self.io.pygame.display.flip()
+			#print("wall.standby.draw: here 2")
 		except:
 			pass

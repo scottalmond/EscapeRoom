@@ -41,7 +41,6 @@ import chapters.wall.Tutorial
 import chapters.wall.Snake
 import chapters.wall.Hyperspace
 import chapters.wall.Credits
-import chapters.wall.CorporateLogo
 
 #Helm Chapters
 import chapters.helm.Standby
@@ -102,7 +101,7 @@ class Book:
 	def dispose(self):
 		self.__disposeSlaves()
 		for chapter in self._chapter_list:
-			chapter.dispose()
+			chapter.dispose(True)
 		# master_listener will self-dispose when book.is_alive becomes False
 		self._resource_manager.dispose()
 		self._io_manager.dispose()
@@ -115,7 +114,7 @@ class Book:
 			chapter_done=False if chapter_empty_or_error else self._visible_chapter.is_done
 			if(chapter_empty_or_error or chapter_done):
 				if(chapter_done):
-					self._visible_chapter.is_visible=False
+					self._visible_chapter.exitChapter()
 				if(self._index_next_chapter<0 or self._index_next_chapter>=len(self._chapter_list)):
 					self._index_next_chapter=0#prevent illegal values from being used as indexes
 				#if proceeding to first chapter, clean all chapters
@@ -126,21 +125,23 @@ class Book:
 				self._visible_chapter=self._chapter_list[self._index_next_chapter]
 				#Queue the next chapter now
 				self._index_next_chapter=self._index_next_chapter+1
-				self._visible_chapter.is_visible=True
-				frame_number=0
-				seconds_since_last_frame=0
+				this_frame_number=0
+				first_frame_unix_seconds=time.time()
+				self._visible_chapter.enterChapter(first_frame_unix_seconds)
 				while(self.is_alive and not self._visible_chapter.is_done):
-					this_frame_unix_seconds=time.time()
-					if(frame_number==0): last_frame_unix_seconds=this_frame_unix_seconds
-					seconds_since_last_frame=this_frame_unix_seconds-last_frame_unix_seconds
-					last_frame_unix_seconds=this_frame_unix_seconds
-					self._visible_chapter.update(frame_number,seconds_since_last_frame)
+					if(this_frame_number==0):
+						this_frame_elapsed_seconds=0
+						last_frame_elapsed_seconds=this_frame_elapsed_seconds
+					else:
+						this_frame_elapsed_seconds=time.time()-first_frame_unix_seconds
+					self._visible_chapter.update(this_frame_number,this_frame_elapsed_seconds,last_frame_elapsed_seconds)
 					#only draw if book is alive and chapter is not done
 					if(self.is_alive and not self._visible_chapter.is_done):
-						self._visible_chapter.draw(frame_number,seconds_since_last_frame)
+						self._visible_chapter.draw()
 						#self.overlay_draw()
-					frame_number=frame_number+1
-			print("Book: Playthrough number "+str(self.playthrough_index)+" complete")
+					this_frame_number+=1
+					last_frame_elapsed_seconds=this_frame_elapsed_seconds
+			print("Book: Playthrough "+str(self.playthrough_index)+" complete")
 			self.playthrough_index+=1
 					
 
@@ -149,22 +150,20 @@ class Book:
 		#only create if not already initialized
 		if(this_book_type==BOOK_TYPE.WALL):
 			return [
-				chapters.wall.Standby.Standby(self,resource_manager,io_manager), #chapter 0
-				chapters.wall.LightPuzzle.LightPuzzle(self,resource_manager,io_manager), #chapter 1
+				chapters.wall.Standby.Standby(self), #chapter 0
+				#chapters.wall.LightPuzzle.LightPuzzle(self), #chapter 1
 				#chapters.wall.Tutorial.Tutorial(self),
 				#chapters.wall.Snake.Snake(self),
 				#chapters.wall.Hyperspace.Hyperspace(self),
-				#chapters.wall.Credits.Credits(self),
-				#chapters.wall.CorporateLogo.CorporateLogo(self)
+				#chapters.wall.Credits.Credits(self)
 			]
 		elif(this_book_type==BOOK_TYPE.HELM):
 			return [ #Wall book assumes the sane number of chapters exist in the Helm book
 				chapters.helm.Standby.Standby(self), #chapter 0
-				chapters.helm.MorseCode.MorseCode(self), #chapter 1
-				chapters.helm.BlackScreen.BlackScreen(self),
+				#chapters.helm.MorseCode.MorseCode(self), #chapter 1
+				#chapters.helm.BlackScreen.BlackScreen(self),
 				#chapters.helm.BlackScreen.BlackScreen(self),
 				#chapters.helm.Map.Map(self),
-				#chapters.helm.BlackScreen.BlackScreen(self),
 				#chapters.helm.BlackScreen.BlackScreen(self)
 			]
 		raise ValueError("Book chapters have not been specified for book_type: "+str(this_book_type))
@@ -207,4 +206,18 @@ class Book:
 	@book_type.setter
 	def book_type(self,value):
 		raise ValueError("Changing book_type after initialization is not supported: "+str(value))
+	
+	@property
+	def io_manager(self): return self._io_manager
+	
+	@io_manager.setter
+	def io_manager(self,value):
+		raise ValueError("Changing io_manager after initialization is not supported: "+str(value))
 		
+	@property
+	def resource_manager(self): return self._resource_manager
+	
+	@resource_manager.setter
+	def iresource_manager(self,value):
+		raise ValueError("Changing resource_manager after initialization is not supported: "+str(value))
+	

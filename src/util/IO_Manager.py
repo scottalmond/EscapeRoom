@@ -36,6 +36,9 @@ import pi3d
 import sys
 sys.path.insert(1, '/home/pi/pi3d')
 
+#Video
+from omxplayer.player import OMXPlayer
+
 class IO_Manager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only
 	
@@ -76,3 +79,31 @@ class IO_Manager:
 	def __dispose3Dgraphics(self):
 		if(not self.display_3d is None):
 			self.display_3d.destroy()
+	
+	#loads a video from a file, pauses the video, hides the video
+	#and returns the reference, to the video player	
+	def loadVideo(self,video_path,is_loop=False):
+		video_args=['--no-osd','-o','local','--layer','-100']
+		if(is_loop):
+			video_args.append('--loop')
+		print("IO_Manager.loadVideo, video args: "+str(video_args))
+		video_player=OMXPlayer(video_path,args=video_args)
+		#-100 places the video player visually above the desktop and pygame, but behind pi3d
+		#-o directs any any audio output out the local audio jack rather than hdmi
+		#no-osd turns off on-screen displays like "play" when starting a video
+		video_player.pause()
+		#video_player.set_aspect_mode('stretch')
+		video_player.set_alpha(255)
+	
+	#unhides the video and plays it
+	def playVideo(self,video_player):
+		video_player.set_alpha(0)
+		video_player.play()
+	
+	#change the location of the video with respoct to the screen displayed to players
+	def setVideoPosition(self,video_player,top_left_x,top_left_y,bottom_right_x,bottom_right_y):
+		video_player.set_video_pos(top_left_x,top_left_y,bottom_right_x,bottom_right_y)
+	
+	#cleanly exits the current video player instance
+	def disposeVideo(self,video_player):
+		video_player.quit()

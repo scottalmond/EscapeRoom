@@ -31,7 +31,7 @@ for playthrough=1:inf
 			chapter.draw() #one frame rendered
 		exitChapter() #chapter no longer has control of the screen
 for chapter in book
-	chapter.dispose() #chapter releases all resources, assets, threads, etc
+	chapter.dispose(True) #chapter releases all resources, assets, threads, etc
 
 """
 
@@ -40,27 +40,32 @@ from abc import ABC, abstractmethod
 class Chapter():
 	
 	@abstractmethod
-	def __init__(self,this_book,this_resource_manager,this_io_manager):
+	def __init__(self,this_book):
 		print("Chapter: Hello World")
 		self._this_book=this_book
-		self._resource_manager=this_resource_manager
-		self._io_manager=this_io_manager
+		print("Chapter.rm: "+str(this_book.resource_manager))
+		self._resource_manager=this_book.resource_manager
+		print("Chapter.io: "+str(this_book.io_manager))
+		self._io_manager=this_book.io_manager
 
 	#called immmediately prior to updating/drawing frames
-	def enterChapter(self): pass
+	#method should execute very quickly, ~<30 ms (no asset loads)
+	def enterChapter(self,unix_time_seconds):
+		self._is_visible=True
 	
 	#called every frame by the Book to update the chapter state
 	#prior to calling draw()
 	@abstractmethod
-	def update(self,frame_number,seconds_since_last_frame): pass
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds): pass
 	
 	#called to render one frame
 	@abstractmethod
-	def draw(self,frame_number,seconds_since_last_frame): pass
+	def draw(self): pass
 	
 	#called after last frame draw for this chapter in this playthrough
-	#method should execute very quickly (no asset loads/dumps)
-	def exitChapter(self): pass
+	#method should execute very quickly, ~<30 ms (no asset loads/dumps)
+	def exitChapter(self):
+		self._is_visible=False
 
 	#called between play-throughs and prior to first play through
 	#method run time is not a limitation
@@ -69,30 +74,21 @@ class Chapter():
 		
 	#discontinue asset use, stop threads and async processes in preparation
 	#for a clean exit to the terminal
-	def dispose(self): pass
-
-	#called between chapters in a normal play-through
-	#intended as a fast-response method to set variables
-	#(run time may lag the graphics displayed to users)
-	#not load assets - for asset loads, use clean()	
-	#during a single chapter run
-	@property
-	def is_visible(self): return self._is_visible
-	
-	#overload to re-define behavior
-	@is_visible.setter
-	def is_visible(self, value):
-		if(bool(value)):
-			self.enterChapter()
-		else:
-			self.exitChapter()
+	def dispose(self,is_final_call): pass
 		
 	#during a single chapter run
 	@property
-	def is_done(self):
-		return self._is_done
+	def is_done(self): return self._is_done
 
 	@is_done.setter
 	def is_done(self, value):
 		self._is_done = bool(value)
+		
+	#during a single chapter run
+	@property
+	def io(self): return self._io_manager
+
+	@io.setter
+	def io(self, value):
+		raise ValueError("Changing io_manager after initialization is not supported: "+str(value))
 		
