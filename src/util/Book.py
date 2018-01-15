@@ -99,6 +99,7 @@ class Book:
 		self._master_listener.clean()
 	
 	def dispose(self):
+		print("book.dipose()")
 		self.__disposeSlaves()
 		for chapter in self._chapter_list:
 			chapter.dispose(True)
@@ -141,6 +142,8 @@ class Book:
 						#self.overlay_draw()
 					this_frame_number+=1
 					last_frame_elapsed_seconds=this_frame_elapsed_seconds
+				if(not self.is_alive): #dirty exit
+					self._visible_chapter.exitChapter()
 			print("Book: Playthrough "+str(self.playthrough_index)+" complete")
 			self.playthrough_index+=1
 					

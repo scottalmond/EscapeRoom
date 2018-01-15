@@ -37,7 +37,7 @@ import sys
 sys.path.insert(1, '/home/pi/pi3d')
 
 #Video
-from omxplayer.player import OMXPlayer
+#from omxplayer.player import OMXPlayer
 
 class IO_Manager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only
