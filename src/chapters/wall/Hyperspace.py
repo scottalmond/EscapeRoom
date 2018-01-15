@@ -29,7 +29,7 @@ import numpy as np
 import math
 
 class Hyperspace(Chapter):
-	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/hyperspace_background.mp4'
+	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)

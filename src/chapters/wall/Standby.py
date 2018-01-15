@@ -56,8 +56,10 @@ class Standby(Chapter):
 		self.screen_width=1920#self._io_manager.display_3d.width
 		self.screen_height=1080#self._io_manager.display_3d.height
 		
-		if(False):
-			video_file3='/home/pi/Documents/aux/FIBER OPTICAL (loop).mp4'
+		if(True):
+			#video_file3='/home/pi/Documents/aux/FIBER_OPTICAL_loop.mp4'
+			video_file3='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
+			#video_file3='/home/pi/Documents/aux/out.mp4'
 			self.vid_back=OMXPlayer(video_file3,args=['--no-osd','-o','local','--layer','-100'])
 			#time.sleep(2)
 			#vid_back.pause()
