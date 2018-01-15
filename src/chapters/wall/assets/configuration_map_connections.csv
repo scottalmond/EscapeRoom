@@ -1,5 +1,5 @@
-In,Node,Out,Color
-100,91,80,
+In,Node,Out,One-way
+100,91,80,TRUE
 100,91,92,
 91,92,81,
 91,92,93,
