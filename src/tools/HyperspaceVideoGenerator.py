@@ -18,9 +18,9 @@ This class reads a mural image, polar projects the image into a sequence of fram
 and then compiles those frames together into a video
 
 Usage:
-
-
-
+python3 HyperspaceVideoGenerator.py
+in the output print out is an ffmpeg command; execute this command 
+to consolidate individual frames into a movie
 
 """
 
