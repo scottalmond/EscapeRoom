@@ -162,11 +162,11 @@ class Book:
 			]
 		elif(this_book_type==BOOK_TYPE.HELM):
 			return [ #Wall book assumes the sane number of chapters exist in the Helm book
-				chapters.helm.Standby.Standby(self), #chapter 0
+				#chapters.helm.Standby.Standby(self), #chapter 0
 				#chapters.helm.MorseCode.MorseCode(self), #chapter 1
 				#chapters.helm.BlackScreen.BlackScreen(self),
 				#chapters.helm.BlackScreen.BlackScreen(self),
-				#chapters.helm.Map.Map(self),
+				chapters.helm.Map.Map(self),
 				#chapters.helm.BlackScreen.BlackScreen(self)
 			]
 		raise ValueError("Book chapters have not been specified for book_type: "+str(this_book_type))

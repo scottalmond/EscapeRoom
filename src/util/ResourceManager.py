@@ -21,6 +21,9 @@ Usage:
 
 """
 
+#supporting libraries
+import csv #for reading csv config files
+
 class ResourceManager:
 	def __init__(self):
 		pass
@@ -30,3 +33,19 @@ class ResourceManager:
 		
 	def dispose(self):
 		pass
+
+	"""
+	given a filename, fetch the contents into an array or dictionaries
+	with dictionary keys as the column titles
+	ex: [{'key1':'value1','key2':'value2'},{'key1':'value3','key2':'value4'}]
+	ref: https://www.reddit.com/r/learnpython/comments/2l07bz/help_reading_csv_file_and_putting_data_into_arrays/
+	"""
+	@staticmethod
+	def loadCSV(filename):
+		data=[]
+		with open(filename) as file_obj:
+			reader = csv.DictReader(file_obj, delimiter=',')
+			for row in reader:
+				data.append(row)
+		return data
+				

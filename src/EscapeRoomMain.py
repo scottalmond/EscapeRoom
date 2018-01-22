@@ -24,6 +24,7 @@ time.sleep(5)
 my_main.is_live=False
 """
 
+import sys
 import time
 import threading
 from util.Book import Book, BOOK_TYPE
@@ -51,14 +52,25 @@ class Main(threading.Thread):
 	"""
 	def dispose(self):
 		self.my_book.is_alive=False
-	
-print("Main: START")
-my_main=Main(0)
-my_main.start()
-for iter in range(4):
-	time.sleep(1)
-	print("Main: "+str(iter))
-my_main.dispose()
-print("Main: DONE")
-#time.sleep(3)#allow time for async threads to close before existing Python env
+
+if __name__ == "__main__":
+	print("Main: START")
+	book_type=int(sys.argv[1])
+	chapter_index=int(sys.argv[2])
+	my_main=Main(book_type)
+	for iter in range(4):
+		time.sleep(1)
+		print("Main: "+str(iter))
+	my_main.dispose()
+	print("Main: DONE")
+
+#print("Main: START")
+#my_main=Main(0)
+#my_main.start()
+#for iter in range(4):
+#	time.sleep(1)
+#	print("Main: "+str(iter))
+#my_main.dispose()
+#print("Main: DONE")
+
 
