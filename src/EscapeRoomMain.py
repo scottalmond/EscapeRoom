@@ -21,23 +21,30 @@ Usage:
 my_main=Main(0)
 my_main.start() #creates a DEBUG BOOK_TYPE per the ENUM definition in Book
 time.sleep(5)
-my_main.is_live=False
+my_main.dispose() #or press ESCAPE key instead
+
+python3 EscapeRoomMain.py False WALL Hyperspace
+is_debug = False
+book_type = WALL
+chapter_name = Hyperspace
 """
 
+import json
 import sys
 import time
 import threading
 from util.Book import Book, BOOK_TYPE
+import distutils.util
 
 class Main(threading.Thread):
 	
-	def __init__(self,this_book_type):
+	def __init__(self,this_book_type,is_debug_enabled):
 		threading.Thread.__init__(self)
 		print("Main.__init__: Hello World")
 		#configure constants
 		
 		#configure lists and objects
-		self.my_book=Book(BOOK_TYPE(this_book_type))
+		self.my_book=Book(BOOK_TYPE(this_book_type),is_debug_enabled)
 		
 	"""
 	Extends Thread
@@ -46,31 +53,30 @@ class Main(threading.Thread):
 		self.my_book.start()
 		#self.__dispose()
 	
+	def go_to_chapter_by_name(self,chapter_name):
+		json_cmd={"go_to_chapter_by_name":chapter_name}
+		self.my_book.execute_command(json_cmd)
+	
 	"""
 	Close references to open environmental variables
 	Do so in reverse order from init()
 	"""
 	def dispose(self):
-		self.my_book.is_alive=False
+		self.my_book.py_is_alive=False
 
 if __name__ == "__main__":
 	print("Main: START")
-	book_type=int(sys.argv[1])
-	chapter_index=int(sys.argv[2])
-	my_main=Main(book_type)
-	for iter in range(4):
-		time.sleep(1)
-		print("Main: "+str(iter))
-	my_main.dispose()
+	is_debug_enabled=bool(distutils.util.strtobool(sys.argv[1]))
+	book_type=int(sys.argv[2])
+	chapter_name=str(sys.argv[3])
+	my_main=Main(book_type,is_debug_enabled)
+	my_main.start()
+	my_main.go_to_chapter_by_name(chapter_name)
+	#for iter in range(4):
+	#	time.sleep(1)
+	#	print("Main: "+str(iter))
+	#my_main.dispose()
 	print("Main: DONE")
 
-#print("Main: START")
-#my_main=Main(0)
-#my_main.start()
-#for iter in range(4):
-#	time.sleep(1)
-#	print("Main: "+str(iter))
-#my_main.dispose()
-#print("Main: DONE")
 
 

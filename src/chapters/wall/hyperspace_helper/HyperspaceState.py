@@ -105,7 +105,7 @@ class HyperspaceState:
 	def deserialize(self,data_stream):
 		pass
 
-if __name__ == "__main__"
+if __name__ == "__main__":
 	hs=HyperspaceState()
 	out=hs.file_load(HYPERSPACE_SERIAL_TYPE.MAP_CONNECTIONS,HyperspaceState.MAP_CONNECTIONS_FILE_PATH)
 	print(out)

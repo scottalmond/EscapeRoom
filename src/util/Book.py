@@ -27,6 +27,7 @@ book.dispose()
 #supporting libraries
 from enum import Enum #for Enum references like book type
 import time
+import json
 
 #custom support assets
 from util.IO_Manager import IO_Manager #interface for reading button state
@@ -60,7 +61,7 @@ class Book:
 	#CONSTRUCTOR
 	
 	# this_book_type - an ENUM defining 
-	def __init__(self,this_book_type):
+	def __init__(self,this_book_type,is_debug_enabled):
 		print("Book.__init__: Hello World")
 		#configure variables
 		self._is_alive=True
@@ -68,25 +69,27 @@ class Book:
 		self._is_running=False
 		self.playthrough_index=0 #this is the number of playthroughs completed
 		self._index_next_chapter=0 #next chapter to play after the current one completes
+		self.is_debug_enabled=is_debug_enabled
 		
 		#configure lists and object consuctors
 		self._visible_chapter=None #pointer to currently running chapter
 		self._resource_manager=ResourceManager()
-		self._io_manager=IO_Manager(self.book_type)
+		self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
 		self._chapter_list=self.__get_all_chapters(self.book_type,self._resource_manager,self._io_manager)
 		self._master_listener=MasterListener(self)
 		
 	#METHODS
-	
-	
 	"""
 	kicks off threads and other resource/time-heavy tasks
+	wrapper for run() in case Book needs to extrend Thread later
 	"""
 	def start(self):
-		#initialize objects
-		#self.clean()
 		self.run()
 	
+	"""
+	dispose of old assets (if any)
+	initialize all resource-intensive assets
+	"""
 	def clean(self):
 		self._index_next_chapter=0 #index of the next chapter within _chapter_list
 		self._playthrough_start_unix_seconds=0 #cont time from a specific Proctor-commanded epoc
@@ -98,18 +101,23 @@ class Book:
 			chapter.clean()
 		self._master_listener.clean()
 	
+	"""
+	external operators should call py_is_alive=False to ensure a clean exit
+	from run()
+	"""
 	def dispose(self):
 		print("book.dipose()")
+		self.py_is_alive=False
 		self.__disposeSlaves()
 		for chapter in self._chapter_list:
 			chapter.dispose(True)
-		# master_listener will self-dispose when book.is_alive becomes False
+		# master_listener will self-dispose when book.py_is_alive becomes False
 		self._resource_manager.dispose()
 		self._io_manager.dispose()
 	
 	def run(self):	
 		self._is_running=True
-		while(self.is_alive): #for each playthrough
+		while(self.py_is_alive): #for each playthrough
 			#step out of current chapter and into next chapter when ready
 			chapter_empty_or_error=self._visible_chapter is None or not isinstance(self._visible_chapter,Chapter)
 			chapter_done=False if chapter_empty_or_error else self._visible_chapter.is_done
@@ -129,7 +137,9 @@ class Book:
 				this_frame_number=0
 				first_frame_unix_seconds=time.time()
 				self._visible_chapter.enterChapter(first_frame_unix_seconds)
-				while(self.is_alive and not self._visible_chapter.is_done):
+				while(self.py_is_alive and not self._visible_chapter.is_done):
+					if(self._io_manager.isStopped()):
+						self.py_is_alive=False
 					if(this_frame_number==0):
 						this_frame_elapsed_seconds=0
 						last_frame_elapsed_seconds=this_frame_elapsed_seconds
@@ -137,17 +147,32 @@ class Book:
 						this_frame_elapsed_seconds=time.time()-first_frame_unix_seconds
 					self._visible_chapter.update(this_frame_number,this_frame_elapsed_seconds,last_frame_elapsed_seconds)
 					#only draw if book is alive and chapter is not done
-					if(self.is_alive and not self._visible_chapter.is_done):
+					if(self.py_is_alive and not self._visible_chapter.is_done):
 						self._visible_chapter.draw()
 						#self.overlay_draw()
 					this_frame_number+=1
 					last_frame_elapsed_seconds=this_frame_elapsed_seconds
-				if(not self.is_alive): #dirty exit
+				if(not self.py_is_alive): #dirty exit
 					self._visible_chapter.exitChapter()
 			print("Book: Playthrough "+str(self.playthrough_index)+" complete")
 			self.playthrough_index+=1
-					
-
+		self._is_running=False
+		self.dispose()
+	
+	"""
+	executes the external command
+	DEBUG calls this method directly
+	MASTER sends a command to MasterListener, which then executes this method
+	
+	Used for the following:
+	to set the next chapter
+	to move to the next chapter
+	to change the time remaining to solve the room
+	to change the state of a chapter
+	"""
+	def execute_command(self,json_cmd):
+		pass
+	
 	#list of chapters in order as they will be played in the book
 	def __get_all_chapters(self,this_book_type,resource_manager,io_manager):
 		#only create if not already initialized
@@ -190,14 +215,17 @@ class Book:
 	
 	#GET/SET
 	
+	"""
+	is_alive is prepended with "py_" to avoid unintended interaction with Threading.py
+	"""
 	@property
-	def is_alive(self): return self._is_alive
+	def py_is_alive(self): return self._is_alive
 
-	@is_alive.setter
-	def is_alive(self, value):
+	@py_is_alive.setter
+	def py_is_alive(self, value):
 		if(not value):
 			self._is_alive = False
-			self.dispose()
+			#self.dispose() #need to allow natural shut down sequence order to run after life is terminated
 		else:
 			#only allow external actors to set is_alive to False to
 			#avoid conflicting access/revival in multi-threaded environment

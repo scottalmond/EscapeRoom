@@ -42,9 +42,10 @@ sys.path.insert(1, '/home/pi/pi3d')
 class IO_Manager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only
 	
-	def __init__(self,this_book_type):
+	def __init__(self,this_book_type,is_debug_enabled=False):
 		self.pygame=pygame
 		self.display_3d=None
+		self.is_windowed=is_debug_enabled
 		pass
 
 	def clean(self):
@@ -64,7 +65,10 @@ class IO_Manager:
 		self.pygame.font.init()
 		self.pygame.mouse.set_visible(False)
 		display_info=pygame.display.Info()
-		self.screen_2d=pygame.display.set_mode((display_info.current_w,display_info.current_h),pygame.FULLSCREEN)
+		if(self.is_windowed):
+			self.screen_2d=pygame.display.set_mode((int(display_info.current_w),int(display_info.current_h)))
+		else:
+			self.screen_2d=pygame.display.set_mode((display_info.current_w,display_info.current_h),pygame.FULLSCREEN)
 		self.pygame.display.flip()
 		
 	def __dispose2Dgraphics(self):
@@ -107,3 +111,15 @@ class IO_Manager:
 	#cleanly exits the current video player instance
 	def disposeVideo(self,video_player):
 		video_player.quit()
+		
+	#query user and programmer inputs to determine if a STOP command has been placed
+	def isStopped(self):
+		for event in self.pygame.event.get():
+			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_ESCAPE):
+				return True
+		return False
+
+if __name__ == "__main__":
+	io=IO_Manager(None)
+	io.clean()
+	print("stopped: "+str(io.isStopped()))
