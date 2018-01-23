@@ -40,17 +40,19 @@ from abc import ABC, abstractmethod
 class Chapter():
 	
 	@abstractmethod
-	def __init__(self,this_book):
+	def __init__(self,this_book,book_title=None):
 		print("Chapter: Hello World")
 		self._this_book=this_book
 		print("Chapter.rm: "+str(this_book.resource_manager))
 		self._resource_manager=this_book.resource_manager
 		print("Chapter.io: "+str(this_book.io_manager))
 		self._io_manager=this_book.io_manager
+		self.my_title=book_title
 
 	#called immmediately prior to updating/drawing frames
 	#method should execute very quickly, ~<30 ms (no asset loads)
 	def enterChapter(self,unix_time_seconds):
+		print("Book."+str(self.getTitle())+".enterChapter()")
 		self._is_visible=True
 	
 	#called every frame by the Book to update the chapter state
@@ -70,18 +72,31 @@ class Chapter():
 	#called between play-throughs and prior to first play through
 	#method run time is not a limitation
 	def clean(self):
-		self.is_done=False
+		self._is_done=False
 		
 	#discontinue asset use, stop threads and async processes in preparation
 	#for a clean exit to the terminal
 	def dispose(self,is_final_call): pass
 		
+	#Multiple chapters of the same class may exist (ex. Standby)
+	#Differentiate them using a unique title string in the constructor
+	#Default value is class name
+	def getTitle(self):
+		if(self.my_title is None):
+			return self.__class__.__name__
+		return self.my_title
+		
 	#during a single chapter run
 	@property
 	def is_done(self): return self._is_done
 
+	#is_done is reset within clean() only to allow external actors to stop chapter asyncronously
 	@is_done.setter
 	def is_done(self, value):
+		if(not value):
+			pass #silently ignore attempts to clear is_done
+			#is_done can only be set to True by the Chapter or Book (asyncronously)
+			#clearing of is_done occurs in super().clean()
 		self._is_done = bool(value)
 		
 	#during a single chapter run

@@ -28,6 +28,7 @@ book.dispose()
 from enum import Enum #for Enum references like book type
 import time
 import json
+import threading
 
 #custom support assets
 from util.IO_Manager import IO_Manager #interface for reading button state
@@ -66,12 +67,13 @@ class Book:
 		#configure variables
 		self._is_alive=True
 		self._book_type=this_book_type
-		self._is_running=False
 		self.playthrough_index=0 #this is the number of playthroughs completed
 		self._index_next_chapter=0 #next chapter to play after the current one completes
 		self.is_debug_enabled=is_debug_enabled
 		
 		#configure lists and object consuctors
+		self._is_ready=threading.Event()
+		self._is_ready.clear()
 		self._visible_chapter=None #pointer to currently running chapter
 		self._resource_manager=ResourceManager()
 		self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
@@ -102,22 +104,21 @@ class Book:
 		self._master_listener.clean()
 	
 	"""
-	external operators should call py_is_alive=False to ensure a clean exit
+	external operators should call is_alive=False to ensure a clean exit
 	from run()
 	"""
 	def dispose(self):
 		print("book.dipose()")
-		self.py_is_alive=False
+		self.is_alive=False
 		self.__disposeSlaves()
 		for chapter in self._chapter_list:
 			chapter.dispose(True)
-		# master_listener will self-dispose when book.py_is_alive becomes False
+		# master_listener will self-dispose when book.is_alive becomes False
 		self._resource_manager.dispose()
 		self._io_manager.dispose()
 	
-	def run(self):	
-		self._is_running=True
-		while(self.py_is_alive): #for each playthrough
+	def run(self):
+		while(self.is_alive): #for each playthrough
 			#step out of current chapter and into next chapter when ready
 			chapter_empty_or_error=self._visible_chapter is None or not isinstance(self._visible_chapter,Chapter)
 			chapter_done=False if chapter_empty_or_error else self._visible_chapter.is_done
@@ -137,9 +138,10 @@ class Book:
 				this_frame_number=0
 				first_frame_unix_seconds=time.time()
 				self._visible_chapter.enterChapter(first_frame_unix_seconds)
-				while(self.py_is_alive and not self._visible_chapter.is_done):
+				self._is_ready.set()
+				while(self.is_alive and not self._visible_chapter.is_done):
 					if(self._io_manager.isStopped()):
-						self.py_is_alive=False
+						self.is_alive=False
 					if(this_frame_number==0):
 						this_frame_elapsed_seconds=0
 						last_frame_elapsed_seconds=this_frame_elapsed_seconds
@@ -147,16 +149,15 @@ class Book:
 						this_frame_elapsed_seconds=time.time()-first_frame_unix_seconds
 					self._visible_chapter.update(this_frame_number,this_frame_elapsed_seconds,last_frame_elapsed_seconds)
 					#only draw if book is alive and chapter is not done
-					if(self.py_is_alive and not self._visible_chapter.is_done):
+					if(self.is_alive and not self._visible_chapter.is_done):
 						self._visible_chapter.draw()
 						#self.overlay_draw()
 					this_frame_number+=1
 					last_frame_elapsed_seconds=this_frame_elapsed_seconds
-				if(not self.py_is_alive): #dirty exit
+				if(not self.is_alive): #dirty exit
 					self._visible_chapter.exitChapter()
 			print("Book: Playthrough "+str(self.playthrough_index)+" complete")
 			self.playthrough_index+=1
-		self._is_running=False
 		self.dispose()
 	
 	"""
@@ -169,9 +170,55 @@ class Book:
 	to move to the next chapter
 	to change the time remaining to solve the room
 	to change the state of a chapter
+	
+	expecting JSON with the following format (parameters are optional based on command):
+	{"command":"COMMAND","parameters":{"PARAMETERS"}}
+	
+	Set the next chapter that will play after the current one is done
+	Note: the current chapter will continue running as-is
+	{"command":"set_next_chapter","parameters":{"by_title":"CHAPTER_STRING"}}
+	
+	Advance to the next queued chapter:
+	{"command":"go_to_next_chapter"}
 	"""
 	def execute_command(self,json_cmd):
-		pass
+		json_dict=json.loads(json_cmd)
+		if(not "command" in json_dict):
+			raise ValueError("Command is malformed, missing 'command' key: "+str(json_cmd))
+		command=json_dict["command"]
+		parameters=None
+		if("parameters" in json_dict):
+			parameters=json_dict["parameters"]
+		#begin switch statement
+		if(command=="set_next_chapter"):
+			chapter_index=None
+			if("by_title" in parameters):
+				seek_chapter_name=str(parameters["by_title"])
+				for chapter_index_iter in range(len(self._chapter_list)):
+					this_chapter=self._chapter_list[chapter_index_iter]
+					if(this_chapter.getTitle() == seek_chapter_name):
+						chapter_index=chapter_index_iter
+						break #use the first matching chapter
+				if(chapter_index is None):
+					raise ValueError("Chapter title not found for command: "+str(json_cmd))
+			elif("by_index" in parameters):
+				chapter_index_iter=int(parameters["by_index"])
+				if(chapter_index_iter<0 or chapter_index_iter>=len(elf._chapter_list)):
+					raise ValueError("Chapter index out of range for command: "+str(json_cmd))
+				chapter_index=chapter_index_iter
+			else:
+				raise ValueError("Insufficient parameters supplied for next chapter command: "+str(json_cmd))
+			self._index_next_chapter=chapter_index
+			print("Next chapter index set: "+str(chapter_index))
+		elif(command=="go_to_next_chapter"):
+			self._visible_chapter.is_done=True
+			print("Next chapter go")
+		
+		# ... add new commands here ...
+		
+		else:
+			ValueError("Command not implemented: "+str(json_cmd))
+		
 	
 	#list of chapters in order as they will be played in the book
 	def __get_all_chapters(self,this_book_type,resource_manager,io_manager):
@@ -213,16 +260,21 @@ class Book:
 		if(self._tcp_listener is None):
 			pass
 	
+	#delay single-threaded operations until the book is ready to receive commands
+	#advise using this only for debugging
+	def wait_until_ready(self):
+		self._is_ready.wait() #I would prefer this also check if is_alive is still True...
+	
 	#GET/SET
 	
 	"""
 	is_alive is prepended with "py_" to avoid unintended interaction with Threading.py
 	"""
 	@property
-	def py_is_alive(self): return self._is_alive
+	def is_alive(self): return self._is_alive
 
-	@py_is_alive.setter
-	def py_is_alive(self, value):
+	@is_alive.setter
+	def is_alive(self, value):
 		if(not value):
 			self._is_alive = False
 			#self.dispose() #need to allow natural shut down sequence order to run after life is terminated
@@ -249,6 +301,6 @@ class Book:
 	def resource_manager(self): return self._resource_manager
 	
 	@resource_manager.setter
-	def iresource_manager(self,value):
+	def resource_manager(self,value):
 		raise ValueError("Changing resource_manager after initialization is not supported: "+str(value))
 	

@@ -25,7 +25,7 @@ my_main.dispose() #or press ESCAPE key instead
 
 python3 EscapeRoomMain.py False WALL Hyperspace
 is_debug = False
-book_type = WALL
+book_type = Wall
 chapter_name = Hyperspace
 """
 
@@ -53,24 +53,39 @@ class Main(threading.Thread):
 		self.my_book.start()
 		#self.__dispose()
 	
+	def wait_for_book(self):
+		self.my_book.wait_until_ready()
+	
 	def go_to_chapter_by_name(self,chapter_name):
-		json_cmd={"go_to_chapter_by_name":chapter_name}
-		self.my_book.execute_command(json_cmd)
+		json_cmd={"command":"set_next_chapter","parameters":{"by_title":chapter_name}}
+		self.my_book.execute_command(json.dumps(json_cmd))
+		json_cmd={"command":"go_to_next_chapter"}
+		self.my_book.execute_command(json.dumps(json_cmd))
+		pass
 	
 	"""
 	Close references to open environmental variables
 	Do so in reverse order from init()
 	"""
 	def dispose(self):
-		self.my_book.py_is_alive=False
+		self.my_book.is_alive=False
 
 if __name__ == "__main__":
 	print("Main: START")
 	is_debug_enabled=bool(distutils.util.strtobool(sys.argv[1]))
-	book_type=int(sys.argv[2])
+	book_type=str(sys.argv[2])
+	if(book_type=="Wall"):
+		book_type=0
+	elif(book_type=="Helm"):
+		book_type=1
+	else:
+		raise ValueError("Book type not defined: "+book_tye)
 	chapter_name=str(sys.argv[3])
 	my_main=Main(book_type,is_debug_enabled)
 	my_main.start()
+	my_main.wait_for_book()
+	time.sleep(1) #if first chapter plays video, the video load/unload will take time
+	#trying to change chapters shortly after entering will cause a segmentation fault
 	my_main.go_to_chapter_by_name(chapter_name)
 	#for iter in range(4):
 	#	time.sleep(1)

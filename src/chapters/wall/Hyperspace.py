@@ -41,7 +41,7 @@ class Hyperspace(Chapter):
 		#that plays the background hyperspace video
 
 	def clean(self):
-		super().clean(self)
+		super().clean()
 		self.dispose(False)
 		self.background_video_player=loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO)
 		

@@ -104,13 +104,16 @@ class IO_Manager:
 		video_player.set_alpha(0)
 		video_player.play()
 	
-	#change the location of the video with respoct to the screen displayed to players
-	def setVideoPosition(self,video_player,top_left_x,top_left_y,bottom_right_x,bottom_right_y):
+	#change the location of the video with respect to the screen displayed to players
+	def setVideoLocation(self,video_player,top_left_x,top_left_y,bottom_right_x,bottom_right_y):
 		video_player.set_video_pos(top_left_x,top_left_y,bottom_right_x,bottom_right_y)
 	
 	#cleanly exits the current video player instance
 	def disposeVideo(self,video_player):
-		video_player.quit()
+		try:
+			video_player.quit()
+		except OMXPlayerDeadError:
+			pass #silence errors about player already being closed
 		
 	#query user and programmer inputs to determine if a STOP command has been placed
 	def isStopped(self):
