@@ -1,6 +1,6 @@
 ﻿# Overview
 
-This project contains six sequences, including interactive puzzles and games, which form a portion of an [Escape Room](https://en.wikipedia.org/wiki/Escape_room).  These sequences are written in Python3 and run on two Raspberry Pi 3's.  A Proctor provides manual oversight via a third Raspberry Pi 3 connected to the other computers via an Ethernet switch.
+This project contains six interactive sequences, including video games and puzzles, which form a portion of a multi-player [Escape Room](https://en.wikipedia.org/wiki/Escape_room).  These sequences are written in Python3 and run on two Raspberry Pi 3's.  A Proctor oversees players and provides manual oversight via a third Raspberry Pi 3 connected to the other computers via an Ethernet switch.
 
 TODO: video of deployed build
 
