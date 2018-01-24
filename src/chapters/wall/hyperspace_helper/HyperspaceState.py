@@ -104,6 +104,8 @@ class HyperspaceState:
 	def deserialize(self,data_stream):
 		pass
 
+#cd /Documents/EscapeRoom/src/
+#python3 -m chapters.wall.hyperspace_helper.HyperspaceState
 if __name__ == "__main__":
 	hs=HyperspaceState()
 	out=hs.file_load(HYPERSPACE_SERIAL_TYPE.MAP_CONNECTIONS,HyperspaceState.MAP_CONNECTIONS_FILE_PATH)
