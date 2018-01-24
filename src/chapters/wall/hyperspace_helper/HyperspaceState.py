@@ -40,7 +40,6 @@ class HYPERSPACE_SERIAL_TYPE(Enum):
 	MAP_CONNECTIONS=1
 	NODE_TYPE=2
 	NODE_RELATIONSHIP=3
-	
 
 class HyperspaceState:
 	#JSON keys
