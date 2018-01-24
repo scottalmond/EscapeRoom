@@ -1,4 +1,4 @@
-Start node,End Node,Direction,Distance (pixels),Start X,Start Y
+This Node,Next Node,Direction,Distance (pixels),Node X (pixels),Node Y (pixels)
 100,91,N,50,lower,left
 91,80,N,50,,
 91,92,NE,50,,
