@@ -55,6 +55,11 @@ class Main(threading.Thread):
 	
 	def wait_for_book(self):
 		self.my_book.wait_until_ready()
+		
+	#if True, use keyboard inputs for player controls
+	#if False, use DI/O inputs for player controls
+	def setKeyboard(self,value):
+		self.my_book.setKeyboard(value)
 	
 	def go_to_chapter_by_name(self,chapter_name):
 		json_cmd={"command":"set_next_chapter","parameters":{"by_title":chapter_name}}
@@ -80,17 +85,18 @@ if __name__ == "__main__":
 		book_type=1
 	else:
 		raise ValueError("Book type not defined: "+book_tye)
-	chapter_name=str(sys.argv[3])
+	go_to_chapter=False
+	if(len(sys.argv)>3):
+		go_to_chapter=True
+		chapter_name=str(sys.argv[3])
 	my_main=Main(book_type,is_debug_enabled)
 	my_main.start()
 	my_main.wait_for_book()
-	time.sleep(1) #if first chapter plays video, the video load/unload will take time
-	#trying to change chapters shortly after entering will cause a segmentation fault
-	my_main.go_to_chapter_by_name(chapter_name)
-	#for iter in range(4):
-	#	time.sleep(1)
-	#	print("Main: "+str(iter))
-	#my_main.dispose()
+	my_main.setKeyboard(True)
+	if(go_to_chapter):
+		time.sleep(1) #if first chapter plays video, the video load/unload will take time
+		#trying to change chapters shortly after entering will cause a segmentation fault
+		my_main.go_to_chapter_by_name(chapter_name)
 	print("Main: DONE")
 
 

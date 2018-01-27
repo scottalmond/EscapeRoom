@@ -40,14 +40,15 @@ from abc import ABC, abstractmethod
 class Chapter():
 	
 	@abstractmethod
-	def __init__(self,this_book,book_title=None):
+	def __init__(self,this_book,is_debug=False,book_title=None):
 		print("Chapter: Hello World")
-		self._this_book=this_book
+		self._book=this_book
 		print("Chapter.rm: "+str(this_book.resource_manager))
 		self._resource_manager=this_book.resource_manager
 		print("Chapter.io: "+str(this_book.io_manager))
 		self._io_manager=this_book.io_manager
 		self.my_title=book_title
+		self.is_debug=is_debug
 
 	#called immmediately prior to updating/drawing frames
 	#method should execute very quickly, ~<30 ms (no asset loads)

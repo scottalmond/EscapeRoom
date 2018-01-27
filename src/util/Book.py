@@ -140,6 +140,7 @@ class Book:
 				self._visible_chapter.enterChapter(first_frame_unix_seconds)
 				self._is_ready.set()
 				while(self.is_alive and not self._visible_chapter.is_done):
+					self._io_manager.update() #used to look for things like the programmer hitting the tab key
 					if(self._io_manager.isStopped()):
 						self.is_alive=False
 					if(this_frame_number==0):
@@ -225,21 +226,21 @@ class Book:
 		#only create if not already initialized
 		if(this_book_type==BOOK_TYPE.WALL):
 			return [
-				chapters.wall.Standby.Standby(self), #chapter 0
-				#chapters.wall.LightPuzzle.LightPuzzle(self), #chapter 1
-				#chapters.wall.Tutorial.Tutorial(self),
+				chapters.wall.Standby.Standby(self),
+				#chapters.wall.LightPuzzle.LightPuzzle(self),
+				chapters.wall.Tutorial.Tutorial(self),
 				#chapters.wall.Snake.Snake(self),
 				#chapters.wall.Hyperspace.Hyperspace(self),
 				#chapters.wall.Credits.Credits(self)
 			]
 		elif(this_book_type==BOOK_TYPE.HELM):
 			return [ #Wall book assumes the sane number of chapters exist in the Helm book
-				#chapters.helm.Standby.Standby(self), #chapter 0
-				#chapters.helm.MorseCode.MorseCode(self), #chapter 1
-				#chapters.helm.BlackScreen.BlackScreen(self),
-				#chapters.helm.BlackScreen.BlackScreen(self),
+				#chapters.helm.Standby.Standby(self),
+				#chapters.helm.MorseCode.MorseCode(self),
+				#chapters.helm.BlackScreen.BlackScreen(self,"Tutorial"),
+				#chapters.helm.BlackScreen.BlackScreen(self, "Snake"),
 				chapters.helm.Map.Map(self),
-				#chapters.helm.BlackScreen.BlackScreen(self)
+				#chapters.helm.BlackScreen.BlackScreen(self, "Credits")
 			]
 		raise ValueError("Book chapters have not been specified for book_type: "+str(this_book_type))
 	
@@ -267,9 +268,15 @@ class Book:
 	
 	#GET/SET
 	
-	"""
-	is_alive is prepended with "py_" to avoid unintended interaction with Threading.py
-	"""
+	def getTitle(self):
+		return self._book_type.name
+		
+	#if True, then keyboard inputs are used for player inputs
+	#if False, DI/O inputs are used for player inputs
+	#can be toggled anytime by pressing the TAB key
+	def setKeyboard(self,value):
+		self.io_manager.is_keyboard=value
+		
 	@property
 	def is_alive(self): return self._is_alive
 

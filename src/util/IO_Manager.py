@@ -24,6 +24,7 @@ Usage:
 #General Support Libraries
 import time
 import numpy as np
+from enum import Enum
 
 #Physical Interfaces
 import wiringpi as wp
@@ -39,15 +40,53 @@ sys.path.insert(1, '/home/pi/pi3d')
 #Video
 #from omxplayer.player import OMXPlayer
 
+#joystick directions
+class DIRECTION(Enum):
+	#NONE=0
+	NORTH=1
+	#NORTH_EAST=2
+	EAST=3
+	#SOUTH_EAST=4
+	SOUTH=5
+	#SOUTH_WEST=6
+	WEST=7
+	#NORTH_WEST=8
+
+#id for each joystick (2 pysical joysticks from the singular DIRECTIOn joystick)
+class JOYSTICK(Enum):
+	DIRECTION=0
+	CAMERA=1
+	LASER=2
+
 class IO_Manager:
-	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only
+	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only - higher values used to reduce pixelation in 3D graphics
 	
-	def __init__(self,this_book_type,is_debug_enabled=False):
+	def __init__(self,this_book_type,is_windowed=False):
 		self.pygame=pygame
 		self.display_3d=None
-		self.is_windowed=is_debug_enabled
-		pass
-
+		self.is_windowed=is_windowed
+		self.is_keyboard=False
+		self.was_keyboard_toggle=False #retain previous state of keyboard_toggle key state
+		self.pygame_event=[]
+		self.pygame_keys_pressed=[]
+		self.morse_sequence=[] #list of True, False the represent Morse Code sequence
+		self.morse_cleared_seconds=0 #last time that the morse code sequence was cleared
+		
+	def update(self):
+		#pygame insists on removing all events with a single method call,
+		#so there is only one oportunity to fetch the keys that are pressed
+		#do so here every frame
+		self.pygame_event=self.pygame.event.get()
+		self.pygame_keys_pressed=pygame.key.get_pressed()
+		#when programmer hits the tab key, toggle between listening to keyboard inputs and DI/O inputs
+		for event in self.pygame_event:
+			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_TAB):
+				if(not self.was_keyboard_toggle):
+					self.is_keyboard=not self.is_keyboard
+				self.was_keyboard_toggle=True
+		self.was_keyboard_toggle=False
+		self.updateMorse()
+		
 	def clean(self):
 		print("IO_Manager clean()")
 		self.dispose()
@@ -56,6 +95,9 @@ class IO_Manager:
 		self.__create2Dgraphics()
 		
 	def dispose(self):
+		self.pygame_event=[]
+		self.morse_sequence=[]
+		self.morse_cleared_seconds=0
 		self.__dispose3Dgraphics()
 		self.__dispose2Dgraphics()
 
@@ -117,10 +159,113 @@ class IO_Manager:
 		
 	#query user and programmer inputs to determine if a STOP command has been placed
 	def isStopped(self):
-		for event in self.pygame.event.get():
+		for event in self.pygame_event:
 			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_ESCAPE):
 				return True
 		return False
+		
+	def isDotPressed(self,is_keyboard=None):
+		if(is_keyboard is None): is_keyboard=self.is_keyboard
+		if(is_keyboard):
+			if(self.pygame_keys_pressed[self.pygame.K_PERIOD]): return True
+		else:
+			pass
+		return False
+			
+	def isDashPressed(self,is_keyboard=None):
+		if(is_keyboard is None): is_keyboard=self.is_keyboard
+		if(is_keyboard):
+			if(self.pygame_keys_pressed[self.pygame.K_MINUS]): return True
+		else:
+			pass
+		return False
+		
+	#returns a list of 0, 1 or 2 elements.  List of two are orthogonal directions.  ex:
+	#[] #no direction selected
+	#[IO_Manager.NORTH] #only north selected
+	#[IO_Manager.SOUTH,IO_Manager.WEST] #southwest
+	#when using is_keyboard, then the following keys are assigned:
+	#DIRECTION: numpad 8,4,5,6 for up, left, down, right
+	#LASER: w,a,s,d,space for up, left, down, right, fire
+	#CAMERA: arrow keys up, left, down, right
+	def getJoystickDirection(self,joystick,is_keyboard=None):
+		if(is_keyboard is None): is_keyboard=self.is_keyboard
+		directions=[]
+		if(is_keyboard):
+			if(joystick==JOYSTICK.DIRECTION):
+				if(self.pygame_keys_pressed[self.pygame.K_KP8]): directions.append(DIRECTION.NORTH)
+				if(self.pygame_keys_pressed[self.pygame.K_KP5]): directions.append(DIRECTION.SOUTH)
+				if(self.pygame_keys_pressed[self.pygame.K_KP6]): directions.append(DIRECTION.EAST)
+				if(self.pygame_keys_pressed[self.pygame.K_KP4]): directions.append(DIRECTION.WEST)
+			elif(joystick==JOYSTICK.CAMERA):
+				if(self.pygame_keys_pressed[self.pygame.K_UP]): directions.append(DIRECTION.NORTH)
+				if(self.pygame_keys_pressed[self.pygame.K_DOWN]): directions.append(DIRECTION.SOUTH)
+				if(self.pygame_keys_pressed[self.pygame.K_RIGHT]): directions.append(DIRECTION.EAST)
+				if(self.pygame_keys_pressed[self.pygame.K_LEFT]): directions.append(DIRECTION.WEST)
+			elif(joystick==JOYSTICK.LASER):
+				if(self.pygame_keys_pressed[self.pygame.K_w]): directions.append(DIRECTION.NORTH)
+				if(self.pygame_keys_pressed[self.pygame.K_s]): directions.append(DIRECTION.SOUTH)
+				if(self.pygame_keys_pressed[self.pygame.K_d]): directions.append(DIRECTION.EAST)
+				if(self.pygame_keys_pressed[self.pygame.K_a]): directions.append(DIRECTION.WEST)
+			else:
+				return ValueError("Invalid joystick enum: "+str(joystick))
+		else:
+			if(joystick==JOYSTICK.DIRECTION):
+				pass #TODO
+			elif(joystick==JOYSTICK.CAMERA):
+				pass #TODO
+			elif(joystick==JOYSTICK.LASER):
+				pass #TODO
+			else:
+				return ValueError("Invalid joystick enum: "+str(joystick))
+		if(DIRECTION.NORTH in directions and DIRECTION.SOUTH in directions):
+			directions.remove(DIRECTION.NORTH)
+			directions.remove(DIRECTION.SOUTH)
+		if(DIRECTION.EAST in directions and DIRECTION.WEST in directions):
+			directions.remove(DIRECTION.EAST)
+			directions.remove(DIRECTION.WEST)
+		return directions
+		
+	#return true of the joystick has the fire button depressed
+	def isFirePressed(self,joystick,is_keyboard=None):
+		if(is_keyboard is None): is_keyboard=self.is_keyboard
+		if(is_keyboard):
+			if(joystick==JOYSTICK.DIRECTION):
+				pass
+			elif(joystick==JOYSTICK.CAMERA):
+				pass
+			elif(joystick==JOYSTICK.LASER):
+				if(self.pygame_keys_pressed[self.pygame.K_SPACE]): return True
+			else:
+				return ValueError("Invalid joystick enum: "+str(joystick))
+		else:
+			if(joystick==JOYSTICK.DIRECTION):
+				pass
+			elif(joystick==JOYSTICK.CAMERA):
+				pass
+			elif(joystick==JOYSTICK.LASER):
+				pass #TODO
+			else:
+				return ValueError("Invalid joystick enum: "+str(joystick))
+		return False
+	
+	#a list of morse code key presses are maintained internally
+	#update the list here based on user inputs
+	def updateMorse(self):
+		is_dot=self.isDotPressed()
+		is_dash=self.isDashPressed()
+		if(is_dot and is_dash):
+			self.morse_sequence=[] #if both keys are down, clear entry
+			self.morse_cleared_seconds=time.time()
+		else:
+			pass
+			# -- TO DO --
+		
+	def getMorse(self):
+		return self.morse_sequence
+		
+	#indicates whether IO_Manager is listening for inputs from the keyboard or from DI/O pins
+	def isKeyboard(self): return self.is_keyboard
 
 if __name__ == "__main__":
 	io=IO_Manager(None)
