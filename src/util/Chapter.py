@@ -45,8 +45,8 @@ class Chapter():
 		self._book=this_book
 		print("Chapter.rm: "+str(this_book.resource_manager))
 		self._resource_manager=this_book.resource_manager
-		print("Chapter.io: "+str(this_book.io_manager))
-		self._io_manager=this_book.io_manager
+		#print("Chapter.io: "+str(this_book.io_manager))
+		#self._io_manager=this_book.io_manager
 		self.my_title=book_title
 		self.is_debug=is_debug
 
@@ -100,11 +100,10 @@ class Chapter():
 			#clearing of is_done occurs in super().clean()
 		self._is_done = bool(value)
 		
-	#during a single chapter run
 	@property
-	def io(self): return self._io_manager
+	def rm(self): return self._resource_manager
 
-	@io.setter
-	def io(self, value):
-		raise ValueError("Changing io_manager after initialization is not supported: "+str(value))
+	@rm.setter
+	def rm(self, value):
+		raise ValueError("Changing resource_manager after initialization is not supported: "+str(value))
 		

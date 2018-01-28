@@ -49,10 +49,13 @@ class Standby(Chapter):
 		self.background_color=(0,0,0)
 			
 		if(self.is_debug):
+			print("Wall."+self.getTitle()+": create debug strings")
 			print("Wall."+self.getTitle()+": enterChapter()")
 			self.background_color=(0,0,255)
-			self.font=self.io.pygame.font.SysFont('Comic Sans MS',100)
+			print("Wall."+self.getTitle()+": create font")
+			self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
 			self.font_color=(0,255,0)
+			print("Wall."+self.getTitle()+": get string height")
 			self.font_line_height_px=self.font.get_height()
 			
 	def exitChapter(self):
@@ -76,13 +79,13 @@ class Standby(Chapter):
 	def draw(self):
 		super().draw()
 		
-		self.io.screen_2d.fill(self.background_color)
+		self.rm.screen_2d.fill(self.background_color)
 		
 		if(self.is_debug): #display debug text
 			for this_string_index in range(len(self.debug_strings)):
 				this_string=self.debug_strings[this_string_index]
 				this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
 				rendered_string=self.font.render(this_string,False,self.font_color)
-				self.io.screen_2d.blit(rendered_string,(0,this_y_px))
+				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
 		
-		self.io.pygame.display.flip()
+		self.rm.pygame.display.flip()

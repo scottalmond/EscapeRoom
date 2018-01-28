@@ -27,6 +27,16 @@ python3 EscapeRoomMain.py False WALL Hyperspace
 is_debug = False
 book_type = Wall
 chapter_name = Hyperspace
+
+python3 EscapeRoomMain.py WINDOWED OVERLAY KEYBOARD WALL Hyperspace
+
+ESC - EXIT
+ENTER - Next chapter
+TAB - Toggle between using keyboard inputs and DI/O inputs
+WASD, SPACE - Laser keyboad controls
+up,left,down,right - Camera keyboard controls
+Numpad 8,4,5,6 - Position keyboard controls
+period (.), dash (-) - dot & dash morse code keyboard inputs
 """
 
 import json
@@ -94,7 +104,7 @@ if __name__ == "__main__":
 	my_main.wait_for_book()
 	my_main.setKeyboard(True)
 	if(go_to_chapter):
-		time.sleep(1) #if first chapter plays video, the video load/unload will take time
+		#time.sleep(2) #if first chapter plays video, the video load/unload will take time
 		#trying to change chapters shortly after entering will cause a segmentation fault
 		my_main.go_to_chapter_by_name(chapter_name)
 	print("Main: DONE")

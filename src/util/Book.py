@@ -31,7 +31,7 @@ import json
 import threading
 
 #custom support assets
-from util.IO_Manager import IO_Manager #interface for reading button state
+#from util.IO_Manager import IO_Manager #interface for reading button state
 from util.ResourceManager import ResourceManager #wrapper for fetching art assets
 from util.MasterListener import MasterListener#interface for receiving external commands from Proctor or Wall computer
 from util.Chapter import Chapter
@@ -75,9 +75,9 @@ class Book:
 		self._is_ready=threading.Event()
 		self._is_ready.clear()
 		self._visible_chapter=None #pointer to currently running chapter
-		self._resource_manager=ResourceManager()
-		self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
-		self._chapter_list=self.__get_all_chapters(self.book_type,self._resource_manager,self._io_manager)
+		self._resource_manager=ResourceManager(self.book_type,is_debug_enabled)
+		#self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
+		self._chapter_list=self.__get_all_chapters(self.book_type,self.resource_manager)
 		self._master_listener=MasterListener(self)
 		
 	#METHODS
@@ -97,8 +97,8 @@ class Book:
 		self._playthrough_start_unix_seconds=0 #cont time from a specific Proctor-commanded epoc
 		self._playthrough_time_offset_seconds=0 #allow for proctor to add/subtract time
 		self.__cleanSlaves()
-		self._io_manager.clean()
-		self._resource_manager.clean()
+		#self._io_manager.clean()
+		self.resource_manager.clean()
 		for chapter in self._chapter_list:
 			chapter.clean()
 		self._master_listener.clean()
@@ -114,8 +114,8 @@ class Book:
 		for chapter in self._chapter_list:
 			chapter.dispose(True)
 		# master_listener will self-dispose when book.is_alive becomes False
-		self._resource_manager.dispose()
-		self._io_manager.dispose()
+		self.resource_manager.dispose()
+		#self._io_manager.dispose()
 	
 	def run(self):
 		while(self.is_alive): #for each playthrough
@@ -140,12 +140,15 @@ class Book:
 				self._visible_chapter.enterChapter(first_frame_unix_seconds)
 				self._is_ready.set()
 				while(self.is_alive and not self._visible_chapter.is_done):
-					self._io_manager.update() #used to look for things like the programmer hitting the tab key
-					if(self._io_manager.isStopped()):
+					self.resource_manager.update() #used to look for things like the programmer hitting the tab key
+					if(self.resource_manager.isStopped()):
 						self.is_alive=False
+					if(self.resource_manager.isNextChapter()):
+						self._visible_chapter.is_done=True
 					if(this_frame_number==0):
 						this_frame_elapsed_seconds=0
 						last_frame_elapsed_seconds=this_frame_elapsed_seconds
+						print("Book.run: frame 0")
 					else:
 						this_frame_elapsed_seconds=time.time()-first_frame_unix_seconds
 					self._visible_chapter.update(this_frame_number,this_frame_elapsed_seconds,last_frame_elapsed_seconds)
@@ -157,8 +160,9 @@ class Book:
 					last_frame_elapsed_seconds=this_frame_elapsed_seconds
 				if(not self.is_alive): #dirty exit
 					self._visible_chapter.exitChapter()
-			print("Book: Playthrough "+str(self.playthrough_index)+" complete")
-			self.playthrough_index+=1
+			if(self._index_next_chapter>=len(self._chapter_list)): 
+				print("Book: Playthrough "+str(self.playthrough_index)+" complete")
+				self.playthrough_index+=1
 		self.dispose()
 	
 	"""
@@ -222,7 +226,7 @@ class Book:
 		
 	
 	#list of chapters in order as they will be played in the book
-	def __get_all_chapters(self,this_book_type,resource_manager,io_manager):
+	def __get_all_chapters(self,this_book_type,resource_manager):
 		#only create if not already initialized
 		if(this_book_type==BOOK_TYPE.WALL):
 			return [
@@ -275,7 +279,7 @@ class Book:
 	#if False, DI/O inputs are used for player inputs
 	#can be toggled anytime by pressing the TAB key
 	def setKeyboard(self,value):
-		self.io_manager.is_keyboard=value
+		self.resource_manager.is_keyboard=value
 		
 	@property
 	def is_alive(self): return self._is_alive
@@ -297,12 +301,12 @@ class Book:
 	def book_type(self,value):
 		raise ValueError("Changing book_type after initialization is not supported: "+str(value))
 	
-	@property
-	def io_manager(self): return self._io_manager
+	#@property
+	#def io_manager(self): return self._io_manager
 	
-	@io_manager.setter
-	def io_manager(self,value):
-		raise ValueError("Changing io_manager after initialization is not supported: "+str(value))
+	#@io_manager.setter
+	#def io_manager(self,value):
+	#	raise ValueError("Changing io_manager after initialization is not supported: "+str(value))
 		
 	@property
 	def resource_manager(self): return self._resource_manager
