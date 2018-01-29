@@ -1,6 +1,10 @@
 #display rings, allow free camera movement, display FPS, display GUI
 
-
+#notes on backgrounds:
+#using Pi3D rendering into a ellipsoid with texture on the inside (and rendering foreground objects): 17 FPS
+#using code to polar transform a 2k x 2k image (and nothing else): ~2FPS
+#using OpenCV to polar transform a 2k x 2k image (and nothing else): ~5 FPS
+0#playing a video using omxplayer-wrapper behind pi3d (and rendering foreground objects): 25 FPS
 
 import sys
 sys.path.insert(1, '/home/pi/pi3d')
@@ -19,8 +23,9 @@ logger.info('''START''')
 display = pi3d.Display.create(samples=4)#layer=4,frames_per_second=30)#samples=4
 background_rgba=(0.3,0.3,0.7,1.0)
 #background_rgba=(0.0,0.0,0.0,1.0)
+#background_rgba=(0.0,0.0,0.0,0.0) #transparent
 display.set_background(background_rgba[0],background_rgba[1],background_rgba[2],background_rgba[3])
-lights = pi3d.Light(lightamb=(0.8,0.8,0.9))
+#lights = pi3d.Light(lightamb=(0.8,0.8,0.9))
 
 HWIDTH, HHEIGHT = display.width / 2.0, display.height / 2.0
 QWIDTH = HWIDTH/2 # quarter width
@@ -173,6 +178,32 @@ cross_hairs=[0,0]
 cross_hair_step=30.0;
 
 keys_pressed=[]
+
+import os
+import subprocess
+from omxplayer.player import OMXPlayer
+play_video=False
+video_file='/home/pi/Documents/aux/star_tours_intro.mp4'
+video_file2='/home/pi/Documents/aux/corporate_logo.mp4'
+video_file3='/home/pi/Documents/aux/FIBER OPTICAL (loop).mp4'
+play_audio=True
+audio_file='/home/pi/Documents/aux/Daft Punk - End of Line HQ.mp3'
+pygame.mixer.init()
+pygame.mixer.music.load(audio_file)
+#vid2=OMXPlayer(video_file2,args=['--no-osd'])
+#vid2.pause()
+play_background_video=False
+if(play_background_video):
+	#vid_back=OMXPlayer(video_file3,args=['--no-osd','-o','local'])
+	vid_back=OMXPlayer(video_file3,args=['--no-osd','-o','local','--layer','-100'])
+	time.sleep(2)
+	vid_back.pause()
+	vid_back.set_aspect_mode('stretch')
+	vid_back_width=1920*2
+	vid_back_height=1080*2
+	vid_back.set_video_pos(-vid_back_width/2+HWIDTH,-vid_back_height/2+HHEIGHT,vid_back_width/2+HWIDTH, vid_back_height/2+HHEIGHT)
+	vid_back.play()
+
 while display.loop_running():
 	#GPIO section:
 	#print("FRAME: %d" % frame_id);
@@ -194,18 +225,56 @@ while display.loop_running():
 		#print("DEBUG 5: %d" % len(this_led_truple))
 		for this_led in range(len(this_led_truple)):
 			wp.digitalWrite(GPIO_IN_NUMBERS[2+this_led],1-this_led_truple[this_led])
+		if(play_video and led_toggle_index==1):
+                    vid1=OMXPlayer(video_file,args=['--no-osd','-o','local'])
+                    vid1.pause()
+                    #vid1.set_alpha(200)
+		if(play_video and led_toggle_index==2):
+                    #vid1.set_alpha(255)
+                    vid1.play()
+                    #os.system('mkfifo t cat t | omxplayer --no-osd -b '+video_file+' &')
+                    #myprocess=subprocess.Popen(['omxplayer','-b',video_file],stdin=subprocess.PIPE)
+                    #sleep(10)
+                    #myprocess.stdin.write('q')
+		if(play_video and led_toggle_index==3):
+                    vid1.quit()
+                    #vid1.pause()
+		if(play_video and led_toggle_index==4):
+                    #vid2=OMXPlayer(video_file2)
+                    #vid2=OMXPlayer(video_file2)
+                    vid2=OMXPlayer(video_file2,args=['--no-osd'])
+                    vid2.play()
+                    #os.system('echo p > t rm t')
+                    #myprocess.stdin.write('q')
+		if(play_video and led_toggle_index==5):
+                    vid2.quit()
+		if(play_audio and led_toggle_index==6):
+                    pygame.mixer.music.play(loops=-1,start=0.0)
+		if(play_video and led_toggle_index==7):
+                    vid3=OMXPlayer(video_file3,args=['--no-osd','--loop'])
+                    vid3.mute()
+		if(play_video and led_toggle_index==0):
+                    vid3.quit()
+		if(play_audio and led_toggle_index==0):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.rewind()
 	led_toggle_state=this_led_toggle
 	#print("LED_STATE: %d" % led_toggle_index)
 	
+	joystick_moved=False
 	#update cross hairs
 	if(joy_state[3]):#left, -x
 		cross_hairs[0]=cross_hairs[0]-cross_hair_step
+		joystick_moved=True
 	elif(joy_state[1]):#right, +x
 		cross_hairs[0]=cross_hairs[0]+cross_hair_step
+		joystick_moved=True
 	if(joy_state[2]):#up, +y
 		cross_hairs[1]=cross_hairs[1]+cross_hair_step
+		joystick_moved=True
 	elif(joy_state[4]):#down, -y
 		cross_hairs[1]=cross_hairs[1]-cross_hair_step
+		joystick_moved=True
 		
 	cross_hairs[0]=np.clip(cross_hairs[0],-450,450)#x limit
 	cross_hairs[1]=np.clip(cross_hairs[1],-350,350)#y limit
@@ -239,11 +308,19 @@ while display.loop_running():
 	stars.update(number_sprite_id)
 	if(joy_state[0]): stars.draw()
 	
-	u1=((number_sprite_id/10)%40)/40.0
+	u1=0#((number_sprite_id/10)%40)/40.0
 	v1=(number_sprite_id%40)/40.0
 	
 	background_sphere.set_offset((u1,v1))
-	background_sphere.draw(shader,[sphere_texture])
+	if(play_background_video):
+		if(joystick_moved):
+			#vid_back.set_video_pos(cross_hairs[0]+400, cross_hairs[1]+400, cross_hairs[0]+200+400, cross_hairs[1]+200+400)
+			vid_back.set_video_pos(-vid_back_width/2+cross_hairs[0]*2+HWIDTH,
+								   -vid_back_height/2-cross_hairs[1]*2+HHEIGHT,
+								   vid_back_width/2+cross_hairs[0]*2+HWIDTH,
+								   vid_back_height/2-cross_hairs[1]*2+HHEIGHT)
+	else:
+		background_sphere.draw(shader,[sphere_texture])
 	#background_sphere.scale(background_mult,background_mult*4,background_mult)
 	
 	for model in model_list:
