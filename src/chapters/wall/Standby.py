@@ -28,14 +28,14 @@ import time
 import numpy as np
 import math
 
-from omxplayer.player import OMXPlayer
-
 class Standby(Chapter):
 	def __init__(self,this_book):
 		super().__init__(this_book)
-		print("Wall Standby: Hello World")
 		
-		self.vid_back=None
+		self.is_debug=True
+		
+		if(self.is_debug):
+			print("Wall."+self.getTitle()+": Create Chapter Object")
 		
 	def clean(self):
 		super().clean()
@@ -45,64 +45,47 @@ class Standby(Chapter):
 		
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
-		print("wall.standby.enterChapter")
-		#set 2D layer to top
-		self.chapter_start_unix_seconds=unix_time_seconds
-		try:
-			self.font=self.io.pygame.font.SysFont('Comic Sans MS',300)
-		except:
-			pass
-			
-		self.screen_width=1920#self._io_manager.display_3d.width
-		self.screen_height=1080#self._io_manager.display_3d.height
 		
-		if(True):
-			#video_file3='/home/pi/Documents/aux/FIBER_OPTICAL_loop.mp4'
-			video_file3='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
-			#video_file3='/home/pi/Documents/aux/out.mp4'
-			self.vid_back=OMXPlayer(video_file3,args=['--no-osd','-o','local','--layer','-100'])
-			#time.sleep(2)
-			#vid_back.pause()
-			#self.vid_back.set_aspect_mode('stretch')
-			vid_back_width=1920*2
-			vid_back_height=1080*2
-			HWIDTH=self.screen_width/2
-			HHEIGHT=self.screen_height/2
-			#vid_back.set_video_pos(-vid_back_width/2+HWIDTH,-vid_back_height/2+HHEIGHT,vid_back_width/2+HWIDTH, vid_back_height/2+HHEIGHT)
+		self.background_color=(0,0,0)
+			
+		if(self.is_debug):
+			print("Wall."+self.getTitle()+": create debug strings")
+			print("Wall."+self.getTitle()+": enterChapter()")
+			self.background_color=(0,0,255)
+			print("Wall."+self.getTitle()+": create font")
+			self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
+			self.font_color=(0,255,0)
+			print("Wall."+self.getTitle()+": get string height")
+			self.font_line_height_px=self.font.get_height()
 			
 	def exitChapter(self):
 		super().exitChapter()
-		print("wall.Standby: exitChapter()")
 		
-		if(not self.vid_back is None):
-			print("T1: "+str(time.time()-self.chapter_start_unix_seconds))
-			self.vid_back.stop()
-			print("T2: "+str(time.time()-self.chapter_start_unix_seconds))
-			self.vid_back.quit()
-			print("T3: "+str(time.time()-self.chapter_start_unix_seconds))
+		if(self.is_debug):
+			print("wall."+self.getTitle()+": exitChapter()")
 		
 		
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):#perhaps include total time elapsed in chapter... and playthrough number...
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
-		#print("wall.standby.update, frame: "+str(frame_number))
-		#pass #frame number, time since last frame, time of start of frame
+		
 		self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
-		#if(self.chapter_start_unix_seconds+3<time.time()):
-		#	self.is_done=True
+		self.this_frame_number=this_frame_number
+		
+		if(self.is_debug):
+			self.debug_strings=[self._book.getTitle()+"."+self.getTitle(),
+								'FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),
+								'Frame: '+str(self.this_frame_number)]
 		
 	def draw(self):
 		super().draw()
-		#fill screen with black
-		#draw standby...
-		#print("wall.standby.draw, frame: "+str(frame_number))#observing ~100 FPS on home PC, ~30 FPS on RPi 3
-		try:
-			#print("wall.standby.draw: "+str(self.font))
-			textsurface=self.font.render('Standby FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),False,(0,0,0))
-			#print("wall.standby.draw: here 3")
-			self.io.screen_2d.fill((0,0,255))
-			#print("wall.standby.draw: here 4")
-			self.io.screen_2d.blit(textsurface,(0,0))
-			self.io.pygame.display.flip()
-			#print("wall.standby.draw: here 2")
-		except:
-			pass
+		
+		self.rm.screen_2d.fill(self.background_color)
+		
+		if(self.is_debug): #display debug text
+			for this_string_index in range(len(self.debug_strings)):
+				this_string=self.debug_strings[this_string_index]
+				this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
+				rendered_string=self.font.render(this_string,False,self.font_color)
+				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+		
+		self.rm.pygame.display.flip()

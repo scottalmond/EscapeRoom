@@ -113,6 +113,17 @@ TODO: 10-20 second demo video
 - Sound
 	- Command: _amixer cset numid=3 1_
 		- Change the audio to come out over the headphone jack [source](https://www.raspberrypi.org/documentation/configuration/audio-config.md)
+- Sockets
+	- Command: _sudo apt-get install socket_
+		- allow communication ebtween raspberry pi's
+		- https://www.youtube.com/watch?v=l0p-NvmoeUA
+		- https://www.raspberrypi.org/forums/viewtopic.php?f=36&t=81505
+	- xxx
+		- https://www.modmypi.com/blog/how-to-give-your-raspberry-pi-a-static-ip-address-update
+		- Used to set the static IP address of the raspberry pi
+			- PROCTOR: 192.168.0.170
+			- WALL: 192.168.0.160
+			- HELM: 192.168.0.150
 - Reboot
 	- Command: _sudo reboot_
 		- Clean all installs and settings changes

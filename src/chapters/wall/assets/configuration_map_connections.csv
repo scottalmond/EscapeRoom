@@ -1,4 +1,4 @@
-In,Node,Out,One-way
+In,Node,Out,Two-way
 100,91,80,TRUE
 100,91,92,TRUE
 91,92,81,TRUE
@@ -6,4 +6,4 @@ In,Node,Out,One-way
 92,81,60,TRUE
 92,81,70,TRUE
 92,93,94,TRUE
-92,93,102,TRUE
+92,93,102,FALSE
