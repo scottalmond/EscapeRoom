@@ -118,6 +118,7 @@ TODO: 10-20 second demo video
 		- allow communication ebtween raspberry pi's
 		- https://www.youtube.com/watch?v=l0p-NvmoeUA
 		- https://www.raspberrypi.org/forums/viewtopic.php?f=36&t=81505
+	- Command: _sudo apt-get install nmap_
 	- xxx
 		- https://www.modmypi.com/blog/how-to-give-your-raspberry-pi-a-static-ip-address-update
 		- Used to set the static IP address of the raspberry pi
