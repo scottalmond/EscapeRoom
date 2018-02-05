@@ -174,6 +174,7 @@ class NodeThread(threading.Thread):
 		print("input received: "+in_str)
 		ack_str=in_str+" ACK"
 		if(not self.my_client_socket is None): self.my_client_socket.send(ack_str.encode()) #BrokenPipeError
+		print("num clients: "+str(len(self.clients)))
 		for conn in self.clients:
 			conn.send(in_str.encode())
 		
