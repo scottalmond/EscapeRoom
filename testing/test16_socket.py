@@ -1,3 +1,5 @@
+#test16_socket shows that computers can talk to one another
+
 #open the server first.  Server and client can be run on the same computer
 #HOST is the ip address of the server
 
