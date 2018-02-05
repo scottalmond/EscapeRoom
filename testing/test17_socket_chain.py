@@ -46,6 +46,7 @@ def getAllAddresses():
 		this_ip=regex.findall(ip_hr_str)
 		if(not this_ip is None and len(this_ip)>0):
 			ip_list.append(this_ip[-1])
+		ip_list.append(getOwnAddress()) #for testing, allow server to connect to SELF
 	return ip_list
 
 #create and open a server.  Return None if unable to, else return socket
@@ -172,7 +173,7 @@ class NodeThread(threading.Thread):
 		in_str=self.my_name+": "+in_str
 		print("input received: "+in_str)
 		ack_str=in_str+" ACK"
-		if(not self.my_client_socket is None): self.my_client_socket.send(ack_str.encode())
+		if(not self.my_client_socket is None): self.my_client_socket.send(ack_str.encode()) #BrokenPipeError
 		for conn in self.clients:
 			conn.send(in_str.encode())
 		
