@@ -127,6 +127,8 @@ def getOwnAddress():
 #when data is supplied by clients, respond with a capitalized version of the String
 #when data is supplied by the programmer, terminate if 'q', else
 # send to clients
+
+#BrokenPipeError
 class NodeThread(threading.Thread):
 	def __init__(self,my_name,client_socket=None,server_socket=None):
 		threading.Thread.__init__(self)
@@ -163,6 +165,7 @@ class NodeThread(threading.Thread):
 				
 	
 	def ext_input(self,in_str):
+		in_str=str(in_str)
 		if(in_str=='q'):
 			self.is_alive=False
 			return
