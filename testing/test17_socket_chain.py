@@ -142,13 +142,14 @@ class NodeThread(threading.Thread):
 			if(not self.my_server_socket is None): #connection from self to children
 				try:
 					conn, addr=self.my_server_socket.accept()
+					print("New client joined: "+str(conn)+", "+str(addr))
 					self.clients.append(conn)
 				except socket.timeout:
 					pass#looking for new clients, if none found, move on
 				for conn in self.clients:
 					try:
 						data=conn.recv(1024).decode()
-						acknowledge(data) #this is input from the children sent back up the chain to the server
+						self.acknowledge(data) #this is input from the children sent back up the chain to the server
 						#data=data.upper()
 						#conn.send(data.encode())
 					except socket.timeout:
@@ -157,7 +158,7 @@ class NodeThread(threading.Thread):
 				try:
 					data=self.my_client_socket.recv(1024).decode()
 					self.ext_input(data)
-				except socket.timout:
+				except socket.timeout:
 					pass
 				
 	
