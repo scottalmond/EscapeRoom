@@ -174,7 +174,7 @@ class NodeThread(threading.Thread):
 		ack_str=in_str+" ACK"
 		if(not self.my_client_socket is None): self.my_client_socket.send(ack_str.encode())
 		for conn in self.clients:
-			conn.send(in_str)
+			conn.send(in_str.encode())
 		
 	#input from children sent in response to input
 	def acknowledge(self,in_str):
