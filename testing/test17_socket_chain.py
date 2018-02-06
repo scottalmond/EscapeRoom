@@ -22,6 +22,14 @@ import sys
 import threading
 import time
 
+#would prefer automatic detection of IP addresses rather than hard-coding
+# and needing to troubleshoot connection issues months/years later
+#however, this package appears limited to RPi platforms and not
+# portable to other linux distros (Unix, Linaro)
+#import nmap #pip3 install python-nmap
+#rather, using nmap call directly through terminal is more mobile
+# if needing to use other PCs as Proctor
+
 class NODE(Enum):
 	PROCTOR={"port":7070}
 	WALL={"port":6060}
@@ -32,21 +40,28 @@ CONNECTION_TIMEOUT_SECONDS=0.01
 
 #fetch the ip addresses of all PCs in network and return as a list of Strings
 def getAllAddresses():
-	ip_raw = subprocess.Popen(['arp','-a'], stdout=subprocess.PIPE)
-	ip_hr=ip_raw.communicate()[0]#human readable ip address listing
-	ip_hr_list=str(ip_hr).split('\\n')
-	#regular expression: get last text between brackets()
-	#https://stackoverflow.com/questions/10459455/regex-for-getting-text-between-the-last-brackets
+	use_arp=False
 	ip_list=[]
-	for ip_hr_str in ip_hr_list:
-		#no idea why regex needs to be so involved within Python
-		#used the following to get an output from match:
-		#https://stackoverflow.com/questions/5319571/python-regex-doesnt-work-as-expected
-		regex=re.compile(r"""\(([^)]*)\)[^(]*$""")
-		this_ip=regex.findall(ip_hr_str)
-		if(not this_ip is None and len(this_ip)>0):
-			ip_list.append(this_ip[-1])
+	if(use_arp): #have found that arp command tends to return stale or incomplete ip address listing, also not mobile across linux platforms (Unix, Linaro)
+		ip_raw = subprocess.Popen(['arp','-a'], stdout=subprocess.PIPE)
+		ip_hr=ip_raw.communicate()[0]#human readable ip address listing
+		ip_hr_list=str(ip_hr).split('\\n')
+		#regular expression: get last text between brackets()
+		#https://stackoverflow.com/questions/10459455/regex-for-getting-text-between-the-last-brackets
+		for ip_hr_str in ip_hr_list:
+			#no idea why regex needs to be so involved within Python
+			#used the following to get an output from match:
+			#https://stackoverflow.com/questions/5319571/python-regex-doesnt-work-as-expected
+			regex=re.compile(r"""\(([^)]*)\)[^(]*$""")
+			this_ip=regex.findall(ip_hr_str)
+			if(not this_ip is None and len(this_ip)>0):
+				ip_list.append(this_ip[-1])
 		ip_list.append(getOwnAddress()) #for testing, allow server to connect to SELF
+	else:#use nmap
+		ip_raw = subprocess.check_output(["nmap", "-sP", "192.168.1.0/24"])
+		ip_raw=str(ip_raw)
+		regex=re.compile(r"""\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}""")
+		ip_list=regex.findall(ip_raw)
 	return ip_list
 
 #create and open a server.  Return None if unable to, else return socket
@@ -146,12 +161,13 @@ class NodeThread(threading.Thread):
 				try:
 					conn, addr=self.my_server_socket.accept()
 					print("New client joined: "+str(conn)+", "+str(addr))
+					conn.settimeout(CONNECTION_TIMEOUT_SECONDS)
 					self.clients.append(conn)
 				except socket.timeout:
 					pass#looking for new clients, if none found, move on
 				for conn in self.clients:
 					try:
-						data=conn.recv(1024).decode()
+						data=conn.recv(1024).decode() #locking... when a client is present... --> put in a timeout for the conn, fixed issue
 						self.acknowledge(data) #this is input from the children sent back up the chain to the server
 						#data=data.upper()
 						#conn.send(data.encode())

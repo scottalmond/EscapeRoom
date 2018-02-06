@@ -158,8 +158,8 @@ class Book:
 						#self.overlay_draw()
 					this_frame_number+=1
 					last_frame_elapsed_seconds=this_frame_elapsed_seconds
-				if(not self.is_alive): #dirty exit
-					self._visible_chapter.exitChapter()
+				#if(not self.is_alive): #dirty exit
+				self._visible_chapter.exitChapter()
 			if(self._index_next_chapter>=len(self._chapter_list)): 
 				print("Book: Playthrough "+str(self.playthrough_index)+" complete")
 				self.playthrough_index+=1

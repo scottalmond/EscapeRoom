@@ -28,7 +28,11 @@ is_debug = False
 book_type = Wall
 chapter_name = Hyperspace
 
-python3 EscapeRoomMain.py WINDOWED OVERLAY KEYBOARD WALL Hyperspace
+python3 EscapeRoomMain.py WALL Hyperspace WINDOWED OSD KEYBOARD
+
+OSD is on-screen-display (text debugging)
+WINDOWED allows 2D pygame window to be moved around to see terminal errors
+KEYBOARD uses the keyboard as an input device rather than DI/O
 
 ESC - EXIT
 ENTER - Next chapter
@@ -87,8 +91,20 @@ class Main(threading.Thread):
 
 if __name__ == "__main__":
 	print("Main: START")
-	is_debug_enabled=bool(distutils.util.strtobool(sys.argv[1]))
-	book_type=str(sys.argv[2])
+	args=sys.argv
+	is_windowed=False
+	if("WINDOWED" in args):
+		is_windowed=True
+		args.remove("WINDOWED")
+	is_osd=False
+	if("OSD" in args):
+		is_osd=True
+		args.remove("OSD")
+	is_keyboard=False
+	if("KEYBOARD" in args):
+		is_keyboard=True
+		args.remove("KEYBOARD")
+	book_type=args[1]
 	if(book_type=="Wall"):
 		book_type=0
 	elif(book_type=="Helm"):
@@ -96,13 +112,14 @@ if __name__ == "__main__":
 	else:
 		raise ValueError("Book type not defined: "+book_tye)
 	go_to_chapter=False
-	if(len(sys.argv)>3):
+	if(len(args)>2):
 		go_to_chapter=True
-		chapter_name=str(sys.argv[3])
-	my_main=Main(book_type,is_debug_enabled)
+		chapter_name=sys.argv[2]
+	my_main=Main(book_type,is_windowed)
 	my_main.start()
 	my_main.wait_for_book()
-	my_main.setKeyboard(True)
+	my_main.setKeyboard(is_keyboard)
+	my_main.setOSD(is_osd)
 	if(go_to_chapter):
 		#time.sleep(2) #if first chapter plays video, the video load/unload will take time
 		#trying to change chapters shortly after entering will cause a segmentation fault
