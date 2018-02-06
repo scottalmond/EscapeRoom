@@ -119,9 +119,7 @@ TODO: 10-20 second demo video
 		- https://www.youtube.com/watch?v=l0p-NvmoeUA
 		- https://www.raspberrypi.org/forums/viewtopic.php?f=36&t=81505
 	- Command: _sudo apt-get install nmap_
-	- Command: _pip3 install python-nmap_
-		- Python3 wrapper for nmap command
-		- https://pypi.python.org/pypi/python-nmap
+		- supports automatic detection of other devices in the local network
 	- xxx
 		- https://www.modmypi.com/blog/how-to-give-your-raspberry-pi-a-static-ip-address-update
 		- Used to set the static IP address of the raspberry pi
