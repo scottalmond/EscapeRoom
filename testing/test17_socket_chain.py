@@ -186,7 +186,7 @@ class NodeThread(threading.Thread):
 		if(in_str=='q'):
 			self.is_alive=False
 			return
-		in_str=self.my_name+": "+in_str
+		in_str=self.my_name+": "+in_str+" "+str(time.time())
 		print("input received: "+in_str)
 		ack_str=in_str+" ACK"
 		if(not self.my_client_socket is None): self.my_client_socket.send(ack_str.encode()) #BrokenPipeError
