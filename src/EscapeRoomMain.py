@@ -52,13 +52,13 @@ import distutils.util
 
 class Main(threading.Thread):
 	
-	def __init__(self,this_book_type,is_debug_enabled):
+	def __init__(self,this_book_type,is_debug,is_windowed,is_keyboard):
 		threading.Thread.__init__(self)
 		print("Main.__init__: Hello World")
 		#configure constants
 		
 		#configure lists and objects
-		self.my_book=Book(BOOK_TYPE(this_book_type),is_debug_enabled)
+		self.my_book=Book(BOOK_TYPE(this_book_type),is_debug,is_windowed,is_keyboard)
 		
 	"""
 	Extends Thread
@@ -90,41 +90,61 @@ class Main(threading.Thread):
 		self.my_book.is_alive=False
 
 if __name__ == "__main__":
-	print("Main: START")
 	args=sys.argv
-	is_windowed=False
-	if("WINDOWED" in args):
-		is_windowed=True
-		args.remove("WINDOWED")
-	is_osd=False
-	if("OSD" in args):
-		is_osd=True
-		args.remove("OSD")
-	is_keyboard=False
-	if("KEYBOARD" in args):
-		is_keyboard=True
-		args.remove("KEYBOARD")
-	book_type=args[1]
-	if(book_type=="Wall"):
-		book_type=0
-	elif(book_type=="Helm"):
-		book_type=1
-	else:
-		raise ValueError("Book type not defined: "+book_tye)
-	go_to_chapter=False
-	if(len(args)>2):
-		go_to_chapter=True
-		chapter_name=sys.argv[2]
-	my_main=Main(book_type,is_windowed)
-	my_main.start()
-	my_main.wait_for_book()
-	my_main.setKeyboard(is_keyboard)
-	my_main.setOSD(is_osd)
-	if(go_to_chapter):
-		#time.sleep(2) #if first chapter plays video, the video load/unload will take time
-		#trying to change chapters shortly after entering will cause a segmentation fault
-		my_main.go_to_chapter_by_name(chapter_name)
-	print("Main: DONE")
+	if(len(args)==0): #print help
+		print("No arguments provided, printing help...")
+		print("")
+		print("python3 EscapeRoomMain.py (Proctor/Wall/Helm) [CHAPTER_NAME] [WINDOWED] [DEBUG] [KEYBOARD]")
+		print("")
+		print("Arguments:")
+		print("Proctor/Wall/Main: specifies which book is being emulated")
+		print("CHAPTER_NAME: specifies which chapter to jump to at program start")
+		print("WINDOWED: specifies whether pygame should be run in a windowed mode, useful if the program locks up and terminal access is needed")
+		print("DEBUG: specifies whetehr on-screen-displays and otehr debugging tools/graphics are to be used within each chapter")
+		print("KEYBOARD: specifies if inputs are to be pulled from the keyboard or not")
+		print("")
+		print("Keyboard commands:")
+		print("  ENTER: jump to next chapter")
+		print("  TAB: toggle between using KEYBOARD inputs and discrete inputs")
+		print("  F1: toggle DEBUG flag")
+		print("  WASD, SPACE: the five controls representing the joystick, plus fire button, from the cpatain's chair.  Requires KEYBOARD flag to be True to be active.")
+		print("  UP,LEFT,DOWN,RIGHT: the joystick controls for the helm.  Requires KEYBOARD flag to be True to be active.")
+		print("  NUM_8,NUM_4,NUM_5,NUM_6: numpad keys for the joystick controls for the wing stations.  Requires KEYBOARD flag to be True to be active.")
+		print("  PERIOD,HYPHEN: the dot and dash inputs: . -")
+	else: # run program
+		print("Main: START")
+		is_windowed=False
+		if("WINDOWED" in args):
+			is_windowed=True
+			args.remove("WINDOWED")
+		is_debug=False
+		if("DEBUG" in args):
+			is_debug=True
+			args.remove("DEBUG")
+		is_keyboard=False
+		if("KEYBOARD" in args):
+			is_keyboard=True
+			args.remove("KEYBOARD")
+		book_type=args[1]
+		if(book_type=="Wall"):
+			book_type=0
+		elif(book_type=="Helm"):
+			book_type=1
+		else:
+			raise ValueError("Book type not defined: "+book_tye)
+		go_to_chapter=False
+		if(len(args)>2):
+			go_to_chapter=True
+			chapter_name=sys.argv[2]
+		my_main=Main(book_type,is_debug,is_windowed,is_keyboard)
+		my_main.start()
+		my_main.wait_for_book() #wait for book to be booted and past variable initialization so variables can be changed
+		#my_main.setKeyboard(is_keyboard)
+		if(go_to_chapter):
+			#time.sleep(2) #if first chapter plays video, the video load/unload will take time
+			#trying to change chapters shortly after entering will cause a segmentation fault
+			my_main.go_to_chapter_by_name(chapter_name)
+		print("Main: DONE")
 
 
 

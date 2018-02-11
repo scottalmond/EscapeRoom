@@ -144,6 +144,15 @@ def getOwnAddress():
 #when data is supplied by the programmer, terminate if 'q', else
 # send to clients
 
+#2/9/18 architecture decision:
+#packets are queued
+#chapter pushes packet to queue
+
+#to deal with Python *bug* where programmers cannot peek at elements in
+#queues, use separate queues for each target within the client
+#ie, the ConnectionManager pulls packets from the input and pipes either 
+#to a book FIFO or a chapter FIFO...
+
 #BrokenPipeError
 class NodeThread(threading.Thread):
 	def __init__(self,my_name,client_socket=None,server_socket=None):
@@ -180,7 +189,7 @@ class NodeThread(threading.Thread):
 				except socket.timeout:
 					pass
 				
-	
+	#have found about 3 ms latency one-way for packets with ~100 characters
 	def ext_input(self,in_str):
 		in_str=str(in_str)
 		if(in_str=='q'):

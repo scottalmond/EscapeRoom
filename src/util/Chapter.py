@@ -40,15 +40,14 @@ from abc import ABC, abstractmethod
 class Chapter():
 	
 	@abstractmethod
-	def __init__(self,this_book,is_debug=False,book_title=None):
-		print("Chapter: Hello World")
+	def __init__(self,this_book,book_title=None):
+		#print("Chapter: Hello World")
+		self._is_done=False
 		self._book=this_book
-		print("Chapter.rm: "+str(this_book.resource_manager))
 		self._resource_manager=this_book.resource_manager
 		#print("Chapter.io: "+str(this_book.io_manager))
 		#self._io_manager=this_book.io_manager
 		self.my_title=book_title
-		self.is_debug=is_debug
 
 	#called immmediately prior to updating/drawing frames
 	#method should execute very quickly, ~<30 ms (no asset loads)
@@ -99,6 +98,20 @@ class Chapter():
 			#is_done can only be set to True by the Chapter or Book (asyncronously)
 			#clearing of is_done occurs in super().clean()
 		self._is_done = bool(value)
+		
+	@property
+	def is_debug(self):
+		return self.rm.is_debug
+	
+	@is_debug.setter
+	def is_debug(self, value): self.rm.is_debug=value
+		
+	@property
+	def book(self): return self._book
+	
+	@book.setter
+	def book(self, value):
+		raise ValueError("Book pointer cannot be set except within the Chapter contrustor")
 		
 	@property
 	def rm(self): return self._resource_manager

@@ -62,23 +62,24 @@ class Book:
 	#CONSTRUCTOR
 	
 	# this_book_type - an ENUM defining 
-	def __init__(self,this_book_type,is_debug_enabled):
+	def __init__(self,this_book_type,is_debug,is_windowed,is_keyboard):
 		print("Book.__init__: Hello World")
 		#configure variables
 		self._is_alive=True
 		self._book_type=this_book_type
 		self.playthrough_index=0 #this is the number of playthroughs completed
 		self._index_next_chapter=0 #next chapter to play after the current one completes
-		self.is_debug_enabled=is_debug_enabled
 		
 		#configure lists and object consuctors
 		self._is_ready=threading.Event()
 		self._is_ready.clear()
 		self._visible_chapter=None #pointer to currently running chapter
-		self._resource_manager=ResourceManager(self.book_type,is_debug_enabled)
+		self._resource_manager=ResourceManager(self.book_type,is_debug,is_windowed,is_keyboard)
 		#self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
 		self._chapter_list=self.__get_all_chapters(self.book_type,self.resource_manager)
 		self._master_listener=MasterListener(self)
+		
+		print("Wall.init: DEBUG: "+str(self.is_debug))
 		
 	#METHODS
 	"""
@@ -231,9 +232,9 @@ class Book:
 		if(this_book_type==BOOK_TYPE.WALL):
 			return [
 				chapters.wall.Standby.Standby(self),
-				#chapters.wall.LightPuzzle.LightPuzzle(self),
+				chapters.wall.LightPuzzle.LightPuzzle(self),
 				chapters.wall.Tutorial.Tutorial(self),
-				#chapters.wall.Snake.Snake(self),
+				chapters.wall.Snake.Snake(self),
 				#chapters.wall.Hyperspace.Hyperspace(self),
 				#chapters.wall.Credits.Credits(self)
 			]
@@ -280,6 +281,16 @@ class Book:
 	#can be toggled anytime by pressing the TAB key
 	def setKeyboard(self,value):
 		self.resource_manager.is_keyboard=value
+		
+	#debug includes on-screen-displays
+	@property
+	def is_debug(self):
+		temp=self.resource_manager.is_debug
+		print("Wall.is_debug(): debug: "+str(temp))
+		return temp
+		
+	@is_debug.setter
+	def is_debug(self,value): self.resource_manager.is_debug=value
 		
 	@property
 	def is_alive(self): return self._is_alive

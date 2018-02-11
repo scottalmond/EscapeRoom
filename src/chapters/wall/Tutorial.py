@@ -42,8 +42,6 @@ class Tutorial(Chapter):
 	def __init__(self,this_book):
 		super().__init__(this_book)
 		
-		self.is_debug=True #enable additional text displays
-		
 		if(self.is_debug):
 			print("Wall."+self.getTitle()+": Create Chapter Object")
 		

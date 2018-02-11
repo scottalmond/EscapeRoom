@@ -32,7 +32,9 @@ class Standby(Chapter):
 	def __init__(self,this_book):
 		super().__init__(this_book)
 		
-		self.is_debug=True
+		#self.is_debug=True
+		
+		print("Wall."+self.getTitle()+".init: DEBUG: "+str(self.is_debug))
 		
 		if(self.is_debug):
 			print("Wall."+self.getTitle()+": Create Chapter Object")
@@ -49,14 +51,12 @@ class Standby(Chapter):
 		self.background_color=(0,0,0)
 			
 		if(self.is_debug):
-			print("Wall."+self.getTitle()+": create debug strings")
-			print("Wall."+self.getTitle()+": enterChapter()")
-			self.background_color=(0,0,255)
 			print("Wall."+self.getTitle()+": create font")
-			self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
-			self.font_color=(0,255,0)
-			print("Wall."+self.getTitle()+": get string height")
-			self.font_line_height_px=self.font.get_height()
+		self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
+		self.font_color=(0,255,0)
+		self.font_line_height_px=self.font.get_height()
+		if(self.is_debug):
+			self.background_color=(0,0,255)
 			
 	def exitChapter(self):
 		super().exitChapter()

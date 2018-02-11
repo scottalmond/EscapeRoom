@@ -65,17 +65,19 @@ class DEVICE(Enum):
 class ResourceManager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only - higher values used to reduce pixelation in 3D graphics
 	
-	def __init__(self,this_book_type,is_windowed=False):
+	def __init__(self,this_book_type,is_debug=False,is_windowed=False,is_keyboard=False):
 		self.pygame_init=False
 		self.pygame=pygame
 		self.display_3d=None
 		self.is_windowed=is_windowed
-		self.is_keyboard=False
-		self.was_keyboard_toggle=False #retain previous state of keyboard_toggle key state
+		self.is_keyboard=is_keyboard
+		self.was_keyboard_toggle=False #retain previous state of keyboard_toggle key state (2/10/18, why was this needed...?)
 		self.pygame_event=[]
 		self.pygame_keys_pressed=[]
 		self.morse_sequence=[] #list of True, False the represent Morse Code sequence
 		self.morse_cleared_seconds=0 #last time that the morse code sequence was cleared
+		print("RM.init: set debug: "+str(is_debug))
+		self._is_debug=is_debug
 		
 	def update(self):
 		#pygame insists on removing all events with a single method call,
@@ -85,6 +87,8 @@ class ResourceManager:
 		self.pygame_keys_pressed=pygame.key.get_pressed()
 		#when programmer hits the tab key, toggle between listening to keyboard inputs and DI/O inputs
 		for event in self.pygame_event:
+			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_F1):
+				self._is_debug=not self._is_debug
 			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_TAB):
 				if(not self.was_keyboard_toggle):
 					self.is_keyboard=not self.is_keyboard
@@ -280,6 +284,23 @@ class ResourceManager:
 			else:
 				raise ValueError("Invalid joystick enum: "+str(joystick))
 		return False
+		
+	
+	def isLightPuzzleInputActive(self,input_index,is_keyboard=None):
+		if(is_keyboard is None): is_keyboard=self.is_keyboard
+		if(is_keyboard):
+			if(input_index==0):
+				return self.pygame_keys_pressed[self.pygame.K_1]
+			elif(input_index==1):
+				return self.pygame_keys_pressed[self.pygame.K_2]
+			elif(input_index==2):
+				return self.pygame_keys_pressed[self.pygame.K_3]
+			elif(input_index==3):
+				return self.pygame_keys_pressed[self.pygame.K_4]
+			else:
+				raise ValueError("Invalid input queried, light puzzle index: "+str(input_index))
+		else:
+			raise ValueError("Light puzzle input not yet implemented: "+str(input_index))
 	
 	#a list of morse code key presses are maintained internally
 	#update the list here based on user inputs
@@ -303,6 +324,14 @@ class ResourceManager:
 	def getScreenDimensions(self):
 		display_info=pygame.display.Info()
 		return (int(display_info.current_w),int(display_info.current_h))
+
+	#debug includes on-screen-displays
+	@property
+	def is_debug(self): return self._is_debug
+		
+	@is_debug.setter
+	def is_debug(self,value): self._is_debug=value
+		#raise ValueError("Debug mode cannot be set except by the book in response to an external command: either as TCP, within the terminal command, or in response to the F1 key")
 
 if __name__ == "__main__":
 	io=IO_Manager(None)
