@@ -91,17 +91,17 @@ class Main(threading.Thread):
 
 if __name__ == "__main__":
 	args=sys.argv
-	if(len(args)==0): #print help
+	if(len(args)<=1): #print help
 		print("No arguments provided, printing help...")
 		print("")
-		print("python3 EscapeRoomMain.py (Proctor/Wall/Helm) [CHAPTER_NAME] [WINDOWED] [DEBUG] [KEYBOARD]")
+		print("python3 EscapeRoomMain.py (Proctor | Wall | Helm) [CHAPTER_NAME] [WINDOWED] [DEBUG] [KEYBOARD]")
 		print("")
 		print("Arguments:")
-		print("Proctor/Wall/Main: specifies which book is being emulated")
-		print("CHAPTER_NAME: specifies which chapter to jump to at program start")
-		print("WINDOWED: specifies whether pygame should be run in a windowed mode, useful if the program locks up and terminal access is needed")
-		print("DEBUG: specifies whetehr on-screen-displays and otehr debugging tools/graphics are to be used within each chapter")
-		print("KEYBOARD: specifies if inputs are to be pulled from the keyboard or not")
+		print("  Proctor/Wall/Main: specifies which book is being emulated")
+		print("  CHAPTER_NAME: specifies which chapter to jump to at program start")
+		print("  WINDOWED: specifies whether pygame should be run in a windowed mode, useful when a program lock-up is anticipated and terminal access is needed")
+		print("  DEBUG: specifies whether on-screen-displays and otehr debugging tools/graphics are to be used within each chapter")
+		print("  KEYBOARD: specifies if inputs are to be pulled from the keyboard or from external discretes")
 		print("")
 		print("Keyboard commands:")
 		print("  ENTER: jump to next chapter")
@@ -111,6 +111,7 @@ if __name__ == "__main__":
 		print("  UP,LEFT,DOWN,RIGHT: the joystick controls for the helm.  Requires KEYBOARD flag to be True to be active.")
 		print("  NUM_8,NUM_4,NUM_5,NUM_6: numpad keys for the joystick controls for the wing stations.  Requires KEYBOARD flag to be True to be active.")
 		print("  PERIOD,HYPHEN: the dot and dash inputs: . -")
+		print("  1,2,3,4: the numbers above the home row provide the four discrete inputs from the light puzzle")
 	else: # run program
 		print("Main: START")
 		is_windowed=False

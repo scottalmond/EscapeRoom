@@ -29,15 +29,19 @@ Usage:
 
 from util.Chapter import Chapter
 from chapters.wall.snake_helper.SnakePlayer import SnakePlayer
+import numpy as np
+import math
+from random import randint
 
 class Snake(Chapter):
 	NUMBER_OF_PLAYERS=3
-	WINNING_LEGNTH=8 #number of blocks behind snake, including head, needed to have a full-length snake
-	GRID_ROWS=20
-	GRID_COLS=40
-	GRID_CELL_PX=40 #number of pixels on a side of a grid cell
+	WINNING_PLAYER_LENGTH=8 #number of blocks behind snake, including head, needed to have a full-length snake
+	GRID_ROWS=10
+	GRID_COLS=21
+	GRID_CELL_PX=80 #number of pixels on a side of a grid cell
 	CELL_COLOR_1=(255,255,255) #white
 	CELL_COLOR_2=(162,152,138) #brown
+	MIN_VISIBLE_PELLETS_PER_PLAYER=2 #number of pellets that must be on screen for players to eat
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -50,19 +54,24 @@ class Snake(Chapter):
 			
 	def clean(self):
 		super().clean()
-		self.pellets=[] #pellets (row,col,type)
+		self.pellets=[] #pellets (row,col,graphic_id,player_index)
 		for player_index in range(len(self.players)):
 			self.players[player_index]=SnakePlayer(self,player_index)
+		self.__updatePellets() #populate playing field with pellets to eat
 		
 	def dispose(self,is_final_call):
 		super().dispose(is_final_call)
 		
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
-		self.background_color=(0,93,170)
+		self.background_color=(0,0,0)
 		if(self.is_debug):
 			print("Wall."+self.getTitle()+": set debug background color")
-			self.background_color=(0,0,255)
+			self.background_color=(0,93,170)
+			
+		self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
+		self.font_color=(0,255,0)
+		self.font_line_height_px=self.font.get_height()
 		
 	def exitChapter(self):
 		super().exitChapter()
@@ -70,14 +79,21 @@ class Snake(Chapter):
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		
-		self.__updatePellets()
 		self.__updatePlayers(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+		self.__updatePellets() #if pellet eaten, add another
 		
 		if(this_frame_number==0 and self.is_debug):
 			top_left=self.RC2XY(0,0)["absolute"]
 			bottom_right=self.RC2XY(self.GRID_ROWS,self.GRID_COLS)["absolute"]
 			#print("top left: "+str(top_left[0])+","+str(top_left[1]))
 			#print("bottom right: "+str(bottom_right[0])+","+str(bottom_right[1]))
+			
+		#debug info
+		self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
+		self.this_frame_number=this_frame_number
+		self.debug_strings=[self._book.getTitle()+"."+self.getTitle(),
+							'FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),
+							'Frame: '+str(self.this_frame_number)]
 		
 	def draw(self):
 		super().draw()
@@ -87,25 +103,59 @@ class Snake(Chapter):
 		self.__drawPlayers()
 		self.__drawGoals()
 		self.__drawGUI()
+		self.__drawDebug()
 		
 		self.rm.pygame.display.flip()
 		
 	#initalize new pellets as needed
 	def __updatePellets(self):
-		pass
-		
+		#for each player type, ensure there are two pellets on screen
+		for player_index in range(len(self.players)):
+			player=self.players[player_index]
+			player_pellet_count=0
+			while(True): #no do-while in Python... so use infinite while and break
+				for pellet in self.pellets:
+					if(pellet[3]==player_index):
+						player_pellet_count=player_pellet_count+1
+				if(player_pellet_count>=self.MIN_VISIBLE_PELLETS_PER_PLAYER):
+					break
+				#insufficient visible pellets, so attempt to add one
+				min_graphic_ID=player.graphicID("pellet")[0]
+				max_graphic_ID=player.graphicID("pellet")[1]
+				candidate_pellet=[randint(0,self.GRID_ROWS-1),
+								  randint(0,self.GRID_COLS-1),
+								  randint(min_graphic_ID,max_graphic_ID-1),
+								  player_index]
+				viable_pellet=True
+				for blocking_player in self.players:
+					if(blocking_player.intersects(candidate_pellet[0],
+												  candidate_pellet[1])):
+						viable_pellet=False #cannot place pellet on top of players
+						break
+				for existing_pellet in self.pellets:
+					if(existing_pellet[0]==candidate_pellet[0] and
+					   existing_pellet[1]==candidate_pellet[1]):
+						viable_pellet=False #cannot place pellet on top of other pellet
+						break
+				if(viable_pellet):
+					self.pellets.append(candidate_pellet)
+					
 	#destroy pellets when collect
 	#destroy player tail when collided
 	#use player input to select new direction of head
 	def __updatePlayers(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		for player in self.players:
 			player.update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
-		#TO DO: collissions
+		for player in self.players:
+			for opponent in self.players:
+				player.collide(opponent)
 		
 	def __drawBackground(self):
 		self.rm.screen_2d.fill(self.background_color)
 		
 	#draw background grid in the center of the screen
+	#note: draw several rectangles appears to use a significnat amount of
+	# pygame resources (20 FPS rather than 40 FPS when no grid is drawn)
 	def __drawGrid(self):
 		top_left=self.RC2XY(0,0)["absolute"]
 		#top-left corner of cell just outside playing area is bottom
@@ -123,7 +173,14 @@ class Snake(Chapter):
 						(cell_top_left[0],cell_top_left[1],cell_bottom_right[0]-cell_top_left[0],cell_bottom_right[1]-cell_top_left[1]),0)
 		
 	def __drawPellets(self):
-		pass
+		for pellet in self.pellets:
+			player_color=(255,0,0)
+			player_index=pellet[3]
+			if(player_index==1): player_color=(0,255,0)
+			if(player_index==2): player_color=(0,0,255)
+			pellet_xy=self.RC2XY(pellet[0],pellet[1])["absolute"]
+			self.rm.pygame.draw.ellipse(self.rm.screen_2d,player_color,
+				(pellet_xy[0],pellet_xy[1],self.GRID_CELL_PX,self.GRID_CELL_PX),0)
 		
 	def __drawPlayers(self):
 		for player in self.players:
@@ -134,6 +191,27 @@ class Snake(Chapter):
 		
 	def __drawGUI(self):
 		pass
+		
+	def __drawDebug(self):
+		if(self.is_debug): #display debug text
+			for this_string_index in range(len(self.debug_strings)):
+				this_string=self.debug_strings[this_string_index]
+				this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
+				rendered_string=self.font.render(this_string,False,self.font_color)
+				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+		
+		
+	#if there is a pellet at the specified (row,col)
+	# and it matches the current player color
+	# then remove it from the pellet fabric and return it
+	def eatPellet(self,row,col,player_index):
+		for pellet in self.pellets:
+			#print("Snake.eatPellet(): IN: "+str([row,col,player_index]))
+			#print("Snake.eatPellet(): HIT: "+str(pellet))
+			if(pellet[0]==row and pellet[1]==col and pellet[3]==player_index):
+				self.pellets.remove(pellet)
+				return pellet
+		return None
 		
 	#return the absolute (x,y) touple of the top-left corner of the given cell (row,col)
 	# in a dictionary under key "absolute"
@@ -184,5 +262,6 @@ class Snake(Chapter):
 		if((self.GRID_COLS-1) < unaliased_rc[1] < self.GRID_COLS): #if heading off the right screen edge
 			alias.append((playable[0]-play_field_x_px,playable[1]))
 		return {"absolute":absolute,
-				"alias":alias}
+				"alias":alias,
+				"unaliased_row_col":unaliased_rc}
 		

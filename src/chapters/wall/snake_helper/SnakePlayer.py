@@ -43,12 +43,16 @@ class SnakePlayer:
 		if(player_index==0):
 			self.tail_list.append([5,10,0])
 			self.tail_list.append([5,9,0])
+			self.tail_list.append([5,8,0])
+			self.tail_list.append([5,7,0])
+			self.tail_list.append([5,6,0])
+			self.tail_list.append([5,5,0])
 		elif(player_index==1):
 			self.tail_list.append([10,19,0])
 			self.tail_list.append([10,20,0])
 		elif(player_index==2):
-			self.tail_list.append([14,20,0])
-			self.tail_list.append([15,20,0])
+			self.tail_list.append([21,10,0])
+			self.tail_list.append([22,10,0])
 		else:
 			raise ValueError("Player number "+str(player_index)+" not implemented in SnakePlayer")
 		
@@ -83,6 +87,8 @@ class SnakePlayer:
 			#		  next_node_loc[1]*self.partial_step+this_node_loc[1]*(1-self.partial_step)]
 				this_rect=(node_loc[0],node_loc[1],self.snake_game.GRID_CELL_PX,self.snake_game.GRID_CELL_PX)#x,y,width,height
 				self.snake_game.rm.pygame.draw.rect(self.snake_game.rm.screen_2d,player_color,this_rect,0)
+				if(this_node[2]==1):
+					self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(255,255,255),this_rect,0)
 		
 	#return the current direction the snake head is headed
 	#also return the direction the tail is from the head (opposite of heading direction)
@@ -126,6 +132,10 @@ class SnakePlayer:
 	#move the snake forward one cell
 	#eat pellet if present
 	def __step(self):
+		
+		head_unwrapped=self.snake_game.RC2XY(self.tail_list[0][0],self.tail_list[0][1])["unaliased_row_col"]
+		pellet=self.snake_game.eatPellet(head_unwrapped[0],head_unwrapped[1],self.player_index)
+		
 		#determine commanded direction (may be many)
 		next_direction,previous_direction=self.__getValidCommand()
 		next_direction=self.last_valid_command
@@ -155,9 +165,40 @@ class SnakePlayer:
 		#if pellet in head, then update last tail node with pellet type
 		#else, delete last node
 		# -- TO DO --
-		if(False):
-			pass
+		if(not pellet is None):
+			self.tail_list[-1][2]=pellet[2] #preseve pellet type by adding to end of snake
 		else:
 			self.tail_list=self.tail_list[:-1] #delete last node
 		
 		self.last_valid_command=[]
+		
+	#given a player, check to see if the opponent's head is intersecting
+	# my tail, and if so remove the downstream portion of my tail
+	#allows for self-collision
+	def collide(self,opponent):
+		opponent_head=opponent.tail_list[0]
+		opponent_head_unaliased=self.snake_game.RC2XY(opponent_head[0],opponent_head[1])["unaliased_row_col"]
+		for my_tail_index in range(len(self.tail_list)):
+			my_tail=self.tail_list[my_tail_index]
+			my_tail_unaliased=self.snake_game.RC2XY(my_tail[0],my_tail[1])["unaliased_row_col"]
+			if(my_tail_unaliased[0]==opponent_head_unaliased[0] and 
+			   my_tail_unaliased[1]==opponent_head_unaliased[1]):
+					if(my_tail_index==0 and opponent.player_index==self.player_index):
+						pass #if intersecting with self, don't count own head self-intersecting
+					else:
+						self.tail_list=self.tail_list[0:max(2,my_tail_index)]
+						break
+						
+	#query if a given row and col intersects any portion of the current snake
+	def intersects(self,row,col):
+		for node in self.tail_list:
+			node_unwrapped=self.snake_game.RC2XY(node[0],node[1])["unaliased_row_col"]
+			if(node_unwrapped[0]==row and node_unwrapped[1]==col):
+				return True
+		return False
+		
+	#get the [min,max] range of graphic IDs for the current player
+	# each pellet (and corresponding snake component) has a graphic representation
+	# used by the draw() method
+	def graphicID(self,graphic_type):
+		return [1,3]
