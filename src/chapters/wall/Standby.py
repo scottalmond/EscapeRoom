@@ -32,9 +32,7 @@ class Standby(Chapter):
 	def __init__(self,this_book):
 		super().__init__(this_book)
 		
-		#self.is_debug=True
-		
-		print("Wall."+self.getTitle()+".init: DEBUG: "+str(self.is_debug))
+		print("Wall."+self.getTitle()+".init: is_debug: "+str(self.is_debug))
 		
 		if(self.is_debug):
 			print("Wall."+self.getTitle()+": Create Chapter Object")
@@ -48,6 +46,9 @@ class Standby(Chapter):
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
 		
+		if(self.is_debug):
+			print("wall."+self.getTitle()+": enterChapter()")
+			
 		self.background_color=(0,0,0)
 			
 		if(self.is_debug):

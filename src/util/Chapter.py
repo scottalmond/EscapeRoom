@@ -44,7 +44,7 @@ class Chapter():
 		#print("Chapter: Hello World")
 		self._is_done=False
 		self._book=this_book
-		self._resource_manager=this_book.resource_manager
+		self._resource_manager=None if this_book is None else this_book.resource_manager
 		#print("Chapter.io: "+str(this_book.io_manager))
 		#self._io_manager=this_book.io_manager
 		self.my_title=book_title
@@ -101,7 +101,7 @@ class Chapter():
 		
 	@property
 	def is_debug(self):
-		return self.rm.is_debug
+		return True if self.rm is None else self.rm.is_debug
 	
 	@is_debug.setter
 	def is_debug(self, value): self.rm.is_debug=value

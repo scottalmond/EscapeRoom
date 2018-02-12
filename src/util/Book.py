@@ -79,8 +79,6 @@ class Book:
 		self._chapter_list=self.__get_all_chapters(self.book_type,self.resource_manager)
 		self._master_listener=MasterListener(self)
 		
-		print("Wall.init: DEBUG: "+str(self.is_debug))
-		
 	#METHODS
 	"""
 	kicks off threads and other resource/time-heavy tasks
@@ -124,8 +122,8 @@ class Book:
 			chapter_empty_or_error=self._visible_chapter is None or not isinstance(self._visible_chapter,Chapter)
 			chapter_done=False if chapter_empty_or_error else self._visible_chapter.is_done
 			if(chapter_empty_or_error or chapter_done):
-				if(chapter_done):
-					self._visible_chapter.exitChapter()
+				#if(chapter_done):
+				#	self._visible_chapter.exitChapter() #only called after the end of a chpater
 				if(self._index_next_chapter<0 or self._index_next_chapter>=len(self._chapter_list)):
 					self._index_next_chapter=0#prevent illegal values from being used as indexes
 				#if proceeding to first chapter, clean all chapters
@@ -284,10 +282,7 @@ class Book:
 		
 	#debug includes on-screen-displays
 	@property
-	def is_debug(self):
-		temp=self.resource_manager.is_debug
-		print("Wall.is_debug(): debug: "+str(temp))
-		return temp
+	def is_debug(self): return self.resource_manager.is_debug
 		
 	@is_debug.setter
 	def is_debug(self,value): self.resource_manager.is_debug=value
