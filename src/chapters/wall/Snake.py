@@ -29,6 +29,7 @@ Usage:
 
 from util.Chapter import Chapter
 from chapters.wall.snake_helper.SnakePlayer import SnakePlayer
+from util.ResourceManager import DIRECTION,DEVICE
 import numpy as np
 import math
 from random import randint
@@ -41,7 +42,8 @@ class Snake(Chapter):
 	GRID_CELL_PX=80 #number of pixels on a side of a grid cell
 	CELL_COLOR_1=(255,255,255) #white
 	CELL_COLOR_2=(162,152,138) #brown
-	MIN_VISIBLE_PELLETS_PER_PLAYER=2 #number of pellets that must be on screen for players to eat
+	MIN_VISIBLE_PELLETS_PER_PLAYER=2 #number of pellets that must be on screen for players to eat (unless they are already at max length)
+	GOAL_WIDTH_CELLS=3
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -81,6 +83,7 @@ class Snake(Chapter):
 		
 		self.__updatePlayers(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		self.__updatePellets() #if pellet eaten, add another
+		self.__updateGoals(this_frame_elapsed_seconds)
 		
 		if(this_frame_number==0 and self.is_debug):
 			top_left=self.RC2XY(0,0)["absolute"]
@@ -117,7 +120,11 @@ class Snake(Chapter):
 				for pellet in self.pellets:
 					if(pellet[3]==player_index):
 						player_pellet_count=player_pellet_count+1
-				if(player_pellet_count>=self.MIN_VISIBLE_PELLETS_PER_PLAYER):
+				player_length=player.length()
+				max_player_length=self.WINNING_PLAYER_LENGTH
+				#if the payer is too long, don't give any more pellets
+				if(player_pellet_count>=min(max_player_length-player_length,
+											self.MIN_VISIBLE_PELLETS_PER_PLAYER)):
 					break
 				#insufficient visible pellets, so attempt to add one
 				min_graphic_ID=player.graphicID("pellet")[0]
@@ -146,9 +153,18 @@ class Snake(Chapter):
 	def __updatePlayers(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		for player in self.players:
 			player.update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+		#collide players, also check to see if all are dead, and if so, exit the game
+		any_alive=False
 		for player in self.players:
 			for opponent in self.players:
 				player.collide(opponent)
+			if(player.isAlive()): any_alive=True
+		if(not any_alive):
+			self.is_done=True
+		
+	def __updateGoals(self,this_frame_elapsed_seconds):
+		rate_hz=1
+		self.is_goal_blink=this_frame_elapsed_seconds%rate_hz<(rate_hz/2)
 		
 	def __drawBackground(self):
 		self.rm.screen_2d.fill(self.background_color)
@@ -187,10 +203,77 @@ class Snake(Chapter):
 			player.draw()
 		
 	def __drawGoals(self):
-		pass
+		#goal_length_total=self.NUMBER_OF_PLAYERS*self.GOAL_WIDTH_CELLS
+		#spacing_length_total=self.GRID_COLS-goal_length_total
+		#spacing_between_goals=spacing_length_total/self.NUMBER_OF_PLAYERS #1x between players, 2x xhalf on edges
+		for player_index in range(len(self.players)):
+			player=self.players[player_index]
+			if(not player.isAlive()): continue#don't draw goal for dead player
+			#goal_start_col=self.GOAL_WIDTH_CELLS*player_index+(0.5+player_index)*spacing_between_goals
+			#goal_start_col=int(goal_start_col)
+			goal_start_col,goal_last_col=self.getGoalRangeCol(player_index)
+			goal_start_xy=self.RC2XY(self.GRID_ROWS,goal_start_col)["absolute"]
+			goal_end_xy=self.RC2XY(self.GRID_ROWS+1,goal_start_col+self.GOAL_WIDTH_CELLS)["absolute"]
+			rect_background=(goal_start_xy[0],goal_start_xy[1],
+							 goal_end_xy[0]-goal_start_xy[0],goal_end_xy[1]-goal_start_xy[1])#x,y,w,h
+			player_color=(200,0,0)
+			if(player_index==1): player_color=(0,200,0)
+			if(player_index==2): player_color=(0,0,200)
+			rect_background_color=(player_color[0]/2,player_color[1]/2,player_color[2]/2)
+			self.rm.pygame.draw.rect(self.rm.screen_2d,rect_background_color,rect_background,0)
+			#now render progress
+			ratio=min(self.players[player_index].length(),self.WINNING_PLAYER_LENGTH)/self.WINNING_PLAYER_LENGTH
+			rect_progress=(rect_background[0],
+						   rect_background[1],
+						   rect_background[2]*ratio,
+						   rect_background[3])
+			self.rm.pygame.draw.rect(self.rm.screen_2d,player_color,rect_progress,0)
+			if(self.isGoalActive(self.players[player_index]) and self.is_goal_blink):
+				for col in np.arange(goal_start_col,goal_last_col+1):
+					triangle_color=(255,255,255)
+					self.__drawTriangle(self.GRID_ROWS,col,triangle_color)
 		
+	#given a player index, return the corresponding DEVICE Enum the controls that Snake
+	def deviceForPlayerIndex(self,player_index):
+		if(player_index==0): return DEVICE.LASER
+		elif(player_index==1): return DEVICE.CAMERA
+		elif(player_index==2): return DEVICE.DIRECTION
+		raise ValueError("Invalid player_index, controls not implemented: "+str(player_index))
+		
+	#draw the live states of the GUI controls
 	def __drawGUI(self):
-		pass
+		screen_dim=(1920,1080) if self.rm is None else self.rm.getScreenDimensions()
+		gui_cell_dim=(50,50)
+		edge=(100,100) #x,y offset from edge of screen to draw controls
+		for player_index in range(self.NUMBER_OF_PLAYERS):
+			player_color=(255,0,0)
+			control_center=(edge[0],edge[1]) #settings for player 0
+			if(player_index==1):
+				player_color=(0,255,0)
+				control_center=(screen_dim[0]-edge[0],edge[1])
+			elif(player_index==2):
+				player_color=(0,0,255)
+				control_center=(screen_dim[0]-edge[0],screen_dim[1]-edge[1])
+			player_commands=self.rm.getJoystickDirection(self.deviceForPlayerIndex(player_index))	
+			for direction in [DIRECTION.NORTH,DIRECTION.WEST,DIRECTION.SOUTH,DIRECTION.EAST]:
+				direction_color=(player_color[0]/2,player_color[1]/2,player_color[2]/2) #if not active, dim the input color
+				if(direction in player_commands):
+					direction_color=player_color #when active, highlight
+				if(direction==DIRECTION.NORTH): #switch statement for direction-based offset (top left corner of input cell)
+					command_offset=(-gui_cell_dim[0]/2,-gui_cell_dim[1]*3/2)
+				elif(direction==DIRECTION.EAST):
+					command_offset=(gui_cell_dim[0]/2,-gui_cell_dim[1]/2)
+				elif(direction==DIRECTION.SOUTH):
+					command_offset=(-gui_cell_dim[0]/2,gui_cell_dim[1]/2)
+				elif(direction==DIRECTION.WEST):
+					command_offset=(-gui_cell_dim[0]*3/2,-gui_cell_dim[1]/2)
+				rect_dims=(control_center[0]+command_offset[0],
+						   control_center[1]+command_offset[1],
+						   edge[0]/2,
+						   edge[1]/2)#x,y,w,h
+				self.rm.pygame.draw.rect(self.rm.screen_2d,direction_color,rect_dims,0)
+		
+			
 		
 	def __drawDebug(self):
 		if(self.is_debug): #display debug text
@@ -264,4 +347,28 @@ class Snake(Chapter):
 		return {"absolute":absolute,
 				"alias":alias,
 				"unaliased_row_col":unaliased_rc}
-		
+	
+	#used to determine whether Snake should start exiting the playing field	
+	def isGoalActive(self,player):
+		return player.length()>=self.WINNING_PLAYER_LENGTH and player.isAlive()
+
+	#determine the extent of the goal, inclusive
+	#returns: start_col,last_col
+	def getGoalRangeCol(self,player_index):
+		goal_length_total=self.NUMBER_OF_PLAYERS*self.GOAL_WIDTH_CELLS
+		spacing_length_total=self.GRID_COLS-goal_length_total
+		spacing_between_goals=spacing_length_total/self.NUMBER_OF_PLAYERS #1x between players, 2x xhalf on edges
+		goal_start_col=self.GOAL_WIDTH_CELLS*player_index+(0.5+player_index)*spacing_between_goals
+		goal_start_col=int(goal_start_col)
+		return goal_start_col,(goal_start_col+self.GOAL_WIDTH_CELLS-1)
+
+	#draw a downward pointing graphic
+	# (directing players to exit the field when the snake is full length)
+	def __drawTriangle(self,row,col,color):
+		xy=self.RC2XY(row,col)["absolute"]
+		triangle=[]
+		pad=0.1
+		triangle.append([xy[0]+pad*self.GRID_CELL_PX,xy[1]+pad*self.GRID_CELL_PX]) #top left
+		triangle.append([xy[0]+(1-pad)*self.GRID_CELL_PX,xy[1]+pad*self.GRID_CELL_PX])
+		triangle.append([xy[0]+0.5*self.GRID_CELL_PX,xy[1]+(1-pad)*self.GRID_CELL_PX])
+		self.rm.pygame.draw.polygon(self.rm.screen_2d,color,triangle,0)

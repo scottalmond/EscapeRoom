@@ -37,22 +37,24 @@ class SnakePlayer:
 		self.player_index=player_index #defines color of the given snake
 		self.snake_game=snake_game #pointer back to parent game
 		self.partial_step=0
-		self.tail_list=[]
+		self.tail_list=[] #row,col,graphic_id,is_visible
 		self.last_valid_command=[] #last command received from player
 		self.is_exiting=False #is the player exiting the playing field?
 		if(player_index==0):
-			self.tail_list.append([5,10,0])
-			self.tail_list.append([5,9,0])
-			self.tail_list.append([5,8,0])
-			self.tail_list.append([5,7,0])
-			self.tail_list.append([5,6,0])
-			self.tail_list.append([5,5,0])
+			self.tail_list.append([5,10,0,True])
+			self.tail_list.append([5,9,0,True])
+			self.tail_list.append([5,8,0,True])
+			self.tail_list.append([5,7,0,True])
+			self.tail_list.append([5,6,0,True])
+			self.tail_list.append([5,5,0,True])
+			self.tail_list.append([5,4,0,True])
+			self.tail_list.append([5,3,0,True])
 		elif(player_index==1):
-			self.tail_list.append([10,19,0])
-			self.tail_list.append([10,20,0])
+			self.tail_list.append([10,19,0,True])
+			self.tail_list.append([10,20,0,True])
 		elif(player_index==2):
-			self.tail_list.append([21,10,0])
-			self.tail_list.append([22,10,0])
+			self.tail_list.append([21,10,0,True])
+			self.tail_list.append([22,10,0,True])
 		else:
 			raise ValueError("Player number "+str(player_index)+" not implemented in SnakePlayer")
 		
@@ -76,19 +78,23 @@ class SnakePlayer:
 		for node_index in range(len(self.tail_list)-1):
 			this_node=self.tail_list[node_index+1]
 			next_node=self.tail_list[node_index]
-			partial_node=[this_node[0]*(1-self.partial_step)+next_node[0]*self.partial_step,
-						  this_node[1]*(1-self.partial_step)+next_node[1]*self.partial_step]
-			node_loc_full=self.snake_game.RC2XY(partial_node[0],partial_node[1])
-			node_loc_aliases=node_loc_full["alias"]
-			for node_loc in node_loc_aliases:
-			#this_node_loc=self.snake_game.RC2XY(this_node[0],this_node[1])
-			#next_node_loc=self.snake_game.RC2XY(next_node[0],next_node[1])
-			#node_loc=[next_node_loc[0]*self.partial_step+this_node_loc[0]*(1-self.partial_step),
-			#		  next_node_loc[1]*self.partial_step+this_node_loc[1]*(1-self.partial_step)]
-				this_rect=(node_loc[0],node_loc[1],self.snake_game.GRID_CELL_PX,self.snake_game.GRID_CELL_PX)#x,y,width,height
-				self.snake_game.rm.pygame.draw.rect(self.snake_game.rm.screen_2d,player_color,this_rect,0)
-				if(this_node[2]==1):
-					self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(255,255,255),this_rect,0)
+			if(this_node[3]): #if my node is not visible, then don't draw anything
+				partial_node=[this_node[0]*(1-self.partial_step)+next_node[0]*self.partial_step,
+							  this_node[1]*(1-self.partial_step)+next_node[1]*self.partial_step]
+				node_loc_full=self.snake_game.RC2XY(partial_node[0],partial_node[1])
+				node_loc_aliases=node_loc_full["alias"]
+				render_alias=True
+				if(not next_node[3]): #if my node is visible, but node in front is not, then don't draw aliases
+					render_alias=False
+				for node_loc_index in range(len(node_loc_aliases)):
+					node_loc=node_loc_aliases[node_loc_index]
+					if(render_alias or node_loc_index==0):
+						this_rect=(node_loc[0],node_loc[1],self.snake_game.GRID_CELL_PX,self.snake_game.GRID_CELL_PX)#x,y,width,height
+						self.snake_game.rm.pygame.draw.rect(self.snake_game.rm.screen_2d,player_color,this_rect,0)
+						if(this_node[2]==1): #placeholder for actual graphics
+							self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(255,255,255),this_rect,0)
+						elif(this_node[2]==2):
+							self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(0,0,0),this_rect,0)
 		
 	#return the current direction the snake head is headed
 	#also return the direction the tail is from the head (opposite of heading direction)
@@ -118,9 +124,10 @@ class SnakePlayer:
 		previous_direction,previous_direction_opposite=self.getHeadDirection()
 		
 		#get commanded direction
-		if(self.player_index==0): joystick_id=DEVICE.LASER
-		elif(self.player_index==1): joystick_id=DEVICE.CAMERA
-		elif(self.player_index==2): joystick_id=DEVICE.DIRECTION
+		#if(self.player_index==0): joystick_id=DEVICE.LASER
+		#elif(self.player_index==1): joystick_id=DEVICE.CAMERA
+		#elif(self.player_index==2): joystick_id=DEVICE.DIRECTION
+		joystick_id=self.snake_game.deviceForPlayerIndex(self.player_index)
 		next_direction=self.snake_game.rm.getJoystickDirection(joystick_id)
 		
 		#remove ability to go backwards (ignore command to do so)
@@ -172,11 +179,29 @@ class SnakePlayer:
 		
 		self.last_valid_command=[]
 		
+		if(not self.is_exiting and self.canExit()):
+			self.is_exiting=True
+			self.tail_list[0][3]=False #set forehead visibility to False
+			
+		#if exiting, then mark the node at the top of the screen invisible,
+		# if it's following an invisible node
+		if(self.is_exiting):
+			for node_index in range(len(self.tail_list)-1):
+				this_node=self.tail_list[node_index+1]
+				next_node=self.tail_list[node_index]
+				this_node_loc=self.snake_game.RC2XY(this_node[0],this_node[1])["unaliased_row_col"]
+				if(this_node_loc[0]==0 and not next_node[3]):
+					this_node[3]=False
+					break
+		
 	#given a player, check to see if the opponent's head is intersecting
 	# my tail, and if so remove the downstream portion of my tail
+	# ignore collision if I am exiting through a goal post (immortal during exit for simplicity)
 	#allows for self-collision
 	def collide(self,opponent):
+		if(self.is_exiting): return
 		opponent_head=opponent.tail_list[0]
+		if(not opponent_head[3]): return #if opponent is not visible, then don't be affected by an intersection
 		opponent_head_unaliased=self.snake_game.RC2XY(opponent_head[0],opponent_head[1])["unaliased_row_col"]
 		for my_tail_index in range(len(self.tail_list)):
 			my_tail=self.tail_list[my_tail_index]
@@ -197,8 +222,29 @@ class SnakePlayer:
 				return True
 		return False
 		
+	#number of visible nodes in snake
+	def length(self):
+		return len(self.tail_list)-1
+		
 	#get the [min,max] range of graphic IDs for the current player
 	# each pellet (and corresponding snake component) has a graphic representation
 	# used by the draw() method
 	def graphicID(self,graphic_type):
 		return [1,3]
+
+	#if I am in a position that I can exit, then return True
+	def canExit(self):
+		if(not self.snake_game.isGoalActive(self)): return False #can't exit if goal is not available
+		#if moving south through the bottom of the play area, then it's possible to exit
+		#ie, when forehead is in first row and head is in bottom row
+		forehead=self.snake_game.RC2XY(self.tail_list[0][0],self.tail_list[0][1])["unaliased_row_col"]
+		head=self.snake_game.RC2XY(self.tail_list[1][0],self.tail_list[1][1])["unaliased_row_col"]
+		goal_range_col_inclusive=self.snake_game.getGoalRangeCol(self.player_index)
+		return forehead[0]==0 and head[0]==(self.snake_game.GRID_ROWS-1) and (goal_range_col_inclusive[0] <= forehead[1] <= goal_range_col_inclusive[1])
+		
+	#if any part of the player is visible, then continue rendering
+	# (when all snakes are dead, proceed to next Chapter)	
+	def isAlive(self):
+		for node in self.tail_list:
+			if(node[3]): return True #if any part of the snake is alive, then player is alive
+		return False #snake is not visible, therefore dead
