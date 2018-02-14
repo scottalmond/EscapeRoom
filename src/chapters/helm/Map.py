@@ -24,7 +24,7 @@ Usage:
 """
 
 from util.Chapter import Chapter
-from chapters.wall.hyperspace_helper import HyperspaceState
+from chapters.wall.hyperspace_helper import Maze
 
 class Map(Chapter):
 	def __init__(self,this_book):

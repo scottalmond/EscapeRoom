@@ -27,9 +27,11 @@ from util.Chapter import Chapter
 import time
 import numpy as np
 import math
+from chapters.wall.hyperspace_helper import *
 
 class Hyperspace(Chapter):
 	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
+	VIDEO_ENABLED=False #if 
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -42,8 +44,10 @@ class Hyperspace(Chapter):
 
 	def clean(self):
 		super().clean()
-		self.dispose(False)
-		self.background_video_player=loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO)
+		if(not self.background_video_player is None):
+			self.io.disposeVideo(self.background_video_player)
+		if(self.VIDEO_ENABLED):
+			self.background_video_player=loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO)
 		
 	def dipose(self,is_final_call):
 		super().dipose(self,is_final_call)
@@ -52,7 +56,8 @@ class Hyperspace(Chapter):
 		
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
-		self.io.playVideo(self.background_video_player)
+		if(self.VIDEO_ENABLED):
+			self.io.playVideo(self.background_video_player)
 		
 	def exitChapter(self):
 		super().exitChapter()

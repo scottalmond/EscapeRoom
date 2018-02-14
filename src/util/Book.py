@@ -233,7 +233,7 @@ class Book:
 				chapters.wall.LightPuzzle.LightPuzzle(self),
 				chapters.wall.Tutorial.Tutorial(self),
 				chapters.wall.Snake.Snake(self),
-				#chapters.wall.Hyperspace.Hyperspace(self),
+				chapters.wall.Hyperspace.Hyperspace(self),
 				#chapters.wall.Credits.Credits(self)
 			]
 		elif(this_book_type==BOOK_TYPE.HELM):

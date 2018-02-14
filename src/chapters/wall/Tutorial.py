@@ -48,9 +48,9 @@ class Tutorial(Chapter):
 	def clean(self):
 		super().clean()
 		
-		self.image_input_standby=self.rm.pygame.image.load('./chapters/wall/assets/tutorial_button_idle.png').convert_alpha() #players have not activate input yet
-		self.image_input_active=self.rm.pygame.image.load('./chapters/wall/assets/tutorial_button_active.png').convert_alpha() #players are currently actuating this input
-		self.image_input_done=self.rm.pygame.image.load('./chapters/wall/assets/tutorial_button_done.png').convert_alpha() #players previously stimulated this input
+		self.image_input_standby=self.rm.pygame.image.load('./chapters/wall/assets/tutorial/tutorial_button_idle.png').convert_alpha() #players have not activate input yet
+		self.image_input_active=self.rm.pygame.image.load('./chapters/wall/assets/tutorial/tutorial_button_active.png').convert_alpha() #players are currently actuating this input
+		self.image_input_done=self.rm.pygame.image.load('./chapters/wall/assets/tutorial/tutorial_button_done.png').convert_alpha() #players previously stimulated this input
 		
 		#the status of device inputs are clustered around a central point on screen, offset by this much from that point
 		self.image_offset_x_px=100
