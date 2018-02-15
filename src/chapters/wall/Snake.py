@@ -74,9 +74,9 @@ class Snake(Chapter):
 			self.background_color=(0,93,170)
 			
 		#on-screen graphics debug tools
-		self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
-		self.font_color=(0,255,0)
-		self.font_line_height_px=self.font.get_height()
+		#self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
+		#self.font_color=(0,255,0)
+		#self.font_line_height_px=self.font.get_height()
 		
 	def exitChapter(self):
 		super().exitChapter()
@@ -89,11 +89,12 @@ class Snake(Chapter):
 		self.__updateGoals(this_frame_elapsed_seconds) 
 			
 		#debug string to show on screen
-		self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
-		self.this_frame_number=this_frame_number
-		self.debug_strings=[self._book.getTitle()+"."+self.getTitle(),
-							'FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),
-							'Frame: '+str(self.this_frame_number)]
+		#self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
+		#self.this_frame_number=this_frame_number
+		#self.debug_strings=[self._book.getTitle()+"."+self.getTitle(),
+		#					'FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),
+		#					'Frame: '+str(self.this_frame_number)]
+		self.setDebugStringList([],this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		
 	def draw(self):
 		super().draw()
@@ -103,7 +104,7 @@ class Snake(Chapter):
 		self.__drawPlayers()
 		self.__drawGoals()
 		self.__drawGUI()
-		self.__drawDebug()
+		self.displayDebugStringList()
 		
 		self.rm.pygame.display.flip()
 		
@@ -274,14 +275,6 @@ class Snake(Chapter):
 						   edge[0]/2,
 						   edge[1]/2)#x,y,w,h
 				self.rm.pygame.draw.rect(self.rm.screen_2d,direction_color,rect_dims,0)
-		
-	def __drawDebug(self):
-		if(self.is_debug): #display debug text
-			for this_string_index in range(len(self.debug_strings)):
-				this_string=self.debug_strings[this_string_index]
-				this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
-				rendered_string=self.font.render(this_string,False,self.font_color)
-				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
 		
 	#if there is a pellet at the specified (row,col)
 	# and it matches the current player color

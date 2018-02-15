@@ -68,7 +68,7 @@ class Main(threading.Thread):
 		#self.__dispose()
 	
 	def wait_for_book(self):
-		self.my_book.wait_until_ready()
+		self.my_book.waitUntilReady()
 		
 	#if True, use keyboard inputs for player controls
 	#if False, use DI/O inputs for player controls
@@ -76,11 +76,8 @@ class Main(threading.Thread):
 		self.my_book.setKeyboard(value)
 	
 	def go_to_chapter_by_name(self,chapter_name):
-		json_cmd={"command":"set_next_chapter","parameters":{"by_title":chapter_name}}
-		self.my_book.execute_command(json.dumps(json_cmd))
-		json_cmd={"command":"go_to_next_chapter"}
-		self.my_book.execute_command(json.dumps(json_cmd))
-		pass
+		self.my_book.setNextChapterByTitle(chapter_name)
+		self.my_book.goToNextChapter()
 	
 	"""
 	Close references to open environmental variables

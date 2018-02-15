@@ -56,6 +56,12 @@ class BOOK_TYPE(Enum):
 
 class Book:
 	#CONSTANTS
+	DEFAULT_COUNTDOWN_DURATION_SECONDS=65*60
+	MAX_COUNTDOWN_DURATION_FOR_SUCCESS_SECONDS=60*60 #if playing longer than this, playthrough is a failure
+	#note: timer is only active within the Wall Book
+	#timer is started by the Wall.Standby chapter exiting()
+	#timer is ended by Credits entering()
+	#all other timer interactions are managed by the Wall Book, not chapters
 	
 	#VARIABLES
 	
@@ -92,6 +98,8 @@ class Book:
 	initialize all resource-intensive assets
 	"""
 	def clean(self):
+		#variables to track the state of the countdown timer
+		self.cleanCountdown()
 		self._index_next_chapter=0 #index of the next chapter within _chapter_list
 		self._playthrough_start_unix_seconds=0 #cont time from a specific Proctor-commanded epoc
 		self._playthrough_time_offset_seconds=0 #allow for proctor to add/subtract time
@@ -155,6 +163,8 @@ class Book:
 					if(self.is_alive and not self._visible_chapter.is_done):
 						self._visible_chapter.draw()
 						#self.overlay_draw()
+					if(self.isCountdownExpired()):
+						self.goToPlaythroughEnd()
 					this_frame_number+=1
 					last_frame_elapsed_seconds=this_frame_elapsed_seconds
 				#if(not self.is_alive): #dirty exit
@@ -185,7 +195,7 @@ class Book:
 	Advance to the next queued chapter:
 	{"command":"go_to_next_chapter"}
 	"""
-	def execute_command(self,json_cmd):
+	def executeCommand(self,json_cmd):
 		json_dict=json.loads(json_cmd)
 		if(not "command" in json_dict):
 			raise ValueError("Command is malformed, missing 'command' key: "+str(json_cmd))
@@ -198,12 +208,13 @@ class Book:
 			chapter_index=None
 			if("by_title" in parameters):
 				seek_chapter_name=str(parameters["by_title"])
-				for chapter_index_iter in range(len(self._chapter_list)):
-					this_chapter=self._chapter_list[chapter_index_iter]
-					if(this_chapter.getTitle() == seek_chapter_name):
-						chapter_index=chapter_index_iter
-						break #use the first matching chapter
-				if(chapter_index is None):
+				chapter_index=self.__getChapterIndexByTitle(seek_chapter_name)
+				#for chapter_index_iter in range(len(self._chapter_list)):
+				#	this_chapter=self._chapter_list[chapter_index_iter]
+				#	if(this_chapter.getTitle() == seek_chapter_name):
+				#		chapter_index=chapter_index_iter
+				#		break #use the first matching chapter
+				if(chapter_index<0):
 					raise ValueError("Chapter title not found for command: "+str(json_cmd))
 			elif("by_index" in parameters):
 				chapter_index_iter=int(parameters["by_index"])
@@ -223,6 +234,24 @@ class Book:
 		else:
 			ValueError("Command not implemented: "+str(json_cmd))
 		
+	#given a Chapter title string, return the index within theis books' chapter list
+	# return -1 if not found
+	def __getChapterIndexByTitle(self,seek_chapter_name):
+		chapter_index=-1
+		for chapter_index_iter in range(len(self._chapter_list)):
+			this_chapter=self._chapter_list[chapter_index_iter]
+			if(this_chapter.getTitle() == seek_chapter_name):
+				chapter_index=chapter_index_iter
+				break #use the first matching chapter
+		return chapter_index
+		
+	def setNextChapterByTitle(self,chapter_name):
+		json_cmd={"command":"set_next_chapter","parameters":{"by_title":chapter_name}}
+		self.executeCommand(json.dumps(json_cmd))
+	
+	def goToNextChapter(self):
+		json_cmd={"command":"go_to_next_chapter"}
+		self.executeCommand(json.dumps(json_cmd))
 	
 	#list of chapters in order as they will be played in the book
 	def __get_all_chapters(self,this_book_type,resource_manager):
@@ -234,7 +263,7 @@ class Book:
 				chapters.wall.Tutorial.Tutorial(self),
 				chapters.wall.Snake.Snake(self),
 				chapters.wall.Hyperspace.Hyperspace(self),
-				#chapters.wall.Credits.Credits(self)
+				chapters.wall.Credits.Credits(self)
 			]
 		elif(this_book_type==BOOK_TYPE.HELM):
 			return [ #Wall book assumes the sane number of chapters exist in the Helm book
@@ -266,8 +295,72 @@ class Book:
 	
 	#delay single-threaded operations until the book is ready to receive commands
 	#advise using this only for debugging
-	def wait_until_ready(self):
+	def waitUntilReady(self):
 		self._is_ready.wait() #I would prefer this also check if is_alive is still True...
+	
+	#reset timer state to default
+	def cleanCountdown(self):
+		self.countdown_start_seconds=0
+		self.countdown_end_seconds=0
+		self.max_countdown_seconds=self.DEFAULT_COUNTDOWN_DURATION_SECONDS
+	
+	#begin the 60-ish minute countdown
+	def startCountdown(self,start_time_seconds=None):
+		if(start_time_seconds is None): start_time_seconds=time.time()
+		if(self.countdown_start_seconds>0): return #only start if not already started
+		self.countdown_start_seconds=start_time_seconds
+		
+	#command the timer to stop counting down
+	def endCountdown(self,end_time_seconds=None):
+		if(end_time_seconds is None): end_time_seconds=time.time()
+		if(self.countdown_end_seconds>0): return #only end if not already ended
+		self.countdown_end_seconds=end_time_seconds
+	
+	#extend the countdown timer (seconds) so the playthrough is longer before auto-exiting
+	def extendPlaythrough(self,seconds):
+		self.max_countdown_seconds=self.max_countdown_seconds+seconds
+	
+	#if countdown is expired, return True, else return False
+	def isCountdownExpired(self):
+		if(not self._book_type==BOOK_TYPE.WALL): return False
+		if(self.countdown_start_seconds<=0): return False
+		if(self.countdown_end_seconds>0): return False
+		return self.getCountdownElapsed()>=self.max_countdown_seconds
+		
+	#get the time used to complete the room in seconds
+	def getCountdownElapsed(self):
+		if(self.countdown_start_seconds==0): return 0
+		latest_time=time.time()
+		if(self.countdown_end_seconds>0):
+			latest_time=self.countdown_end_seconds
+		return max(0,min(self.max_countdown_seconds,latest_time-self.countdown_start_seconds))
+	
+	#get the time remining to complete the playthrough in seconds
+	def getCountdownRemaining(self):
+		return self.max_countdown_seconds-self.getCountdownElapsed()
+	
+	#return True if the playthrough was completed within the max window (successful run) 
+	def isSuccessfulPlaythrough(self):
+		return self.getCountdownElapsed()<self.MAX_COUNTDOWN_DURATION_FOR_SUCCESS_SECONDS
+	
+	#if not already on Credits, jump to credits
+	def goToPlaythroughEnd(self):
+		if(not self.isAtPlaythroughEnd()):
+			self.setNextChapterByTitle("Credits")
+			self.goToNextChapter()
+		
+	#return True if book is at or beyond the Credits
+	def isAtPlaythroughEnd(self):
+		current_chapter_index=self._chapter_list.index(self._visible_chapter)
+		#credits_index=-1
+		#for chapter_index in range(len(self._chapter_list)):
+		#	if(self._chapter_list[chapter_index].getTitle()=="Credits"):
+		#		credits_index=chapter_index
+		#		break
+		credits_index=self.__getChapterIndexByTitle("Credits")
+		if(credits_index<0):
+			raise ValueError("Unable to find index of Credits Chapter within this Book")
+		return current_chapter_index>=credits_index
 	
 	#GET/SET
 	

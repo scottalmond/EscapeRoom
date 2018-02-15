@@ -36,6 +36,8 @@ for chapter in book
 """
 
 from abc import ABC, abstractmethod
+import math
+import numpy as np
 
 class Chapter():
 	
@@ -73,6 +75,12 @@ class Chapter():
 	#method run time is not a limitation
 	def clean(self):
 		self._is_done=False
+		self._osd_debug_strings=[]
+		
+		#on-screen graphics debug tools
+		self._debug_font=self.rm.pygame.font.SysFont('Comic Sans MS',70)
+		self._debug_font_color=(0,255,0)
+		self._debug_font_line_height_px=self._debug_font.get_height()
 		
 	#discontinue asset use, stop threads and async processes in preparation
 	#for a clean exit to the terminal
@@ -85,6 +93,27 @@ class Chapter():
 		if(self.my_title is None):
 			return self.__class__.__name__
 		return self.my_title
+		
+	#list of strings to be shown on screen
+	def setDebugStringList(self,string_list,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
+		seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
+		remaining_time_seconds=self.book.getCountdownRemaining()
+		remaining_minutes=int(remaining_time_seconds/60)
+		remaining_seconds=int(remaining_time_seconds%60)
+		string_list.insert(0,self.book.getTitle()+"."+self.getTitle())
+		string_list.insert(1,"FPS: "+str(math.floor(1/np.max((0.00001,seconds_since_last_frame)))))
+		string_list.insert(2,"Frame: "+str(this_frame_number))
+		string_list.insert(3,"Remaining: "+str(remaining_minutes)+" m "+str(remaining_seconds)+" s")
+		self._osd_debug_strings=string_list
+	
+	#if debug is enabled, show debug strings on screen
+	def displayDebugStringList(self):
+		if(self.is_debug): #display debug text
+			for this_string_index in range(len(self._osd_debug_strings)):
+				this_string=self._osd_debug_strings[this_string_index]
+				this_y_px=this_string_index*self._debug_font_line_height_px #vertically offset each line of text
+				rendered_string=self._debug_font.render(this_string,False,self._debug_font_color)
+				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
 		
 	#during a single chapter run
 	@property

@@ -45,6 +45,7 @@ class Credits(Chapter):
 	PRIMARY_DIRECTOR='/home/pi/Documents/corporate_credits/'
 	BACKUP_DIRECTORY='/home/pi/Documents/EscapeRoom/src/chapters/wall/assets/credits/'
 	MUSIC_PATH='./chapters/wall/assets/credits/escaperoom01_pre01_0.mp3'
+	MUSIC_ENABLED=False
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -61,12 +62,28 @@ class Credits(Chapter):
 
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
-		self.rm.pygame.mixer.music.load(MUSIC_PATH)
-		self.rm.pygame.mixer.music.play()
+		self.book.endCountdown() #end timer if not already done
+		if(self.MUSIC_ENABLED):
+			self.rm.pygame.mixer.music.load(MUSIC_PATH)
+			self.rm.pygame.mixer.music.play()
+		self.background_color=(0,0,255)
 
 	def exitChapter(self):
 		super().exitChapter()
-		self.rm.pygame.mixer.music.stop()
+		if(self.MUSIC_ENABLED):
+			self.rm.pygame.mixer.music.stop()
 
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+		elapsed_time_seconds=self.book.getCountdownElapsed()
+		elapsed_minutes=int(elapsed_time_seconds/60)
+		elapsed_seconds=int(elapsed_time_seconds%60)
+		debug_strings=["Successful: "+str(self.book.isSuccessfulPlaythrough()),
+					   "Elapsed: "+str(elapsed_minutes)+" m "+str(elapsed_seconds)+" s"]
+		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+
+	def draw(self):
+		super().draw()
+		self.rm.screen_2d.fill(self.background_color)
+		self.displayDebugStringList()
+		self.rm.pygame.display.flip()

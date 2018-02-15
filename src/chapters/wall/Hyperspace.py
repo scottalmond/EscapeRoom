@@ -31,7 +31,9 @@ from chapters.wall.hyperspace_helper import *
 
 class Hyperspace(Chapter):
 	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
-	VIDEO_ENABLED=False #if 
+	VIDEO_ENABLED=False #if True, play looping video
+	MUSIC_PATH='./chapters/wall/assets/hyperspace/escaperoom01_pre01_0.mp3'
+	MUSIC_ENABLED=False #if True, play looping music
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -58,13 +60,19 @@ class Hyperspace(Chapter):
 		super().enterChapter(unix_time_seconds)
 		if(self.VIDEO_ENABLED):
 			self.io.playVideo(self.background_video_player)
+		self.background_color=(0,0,255)
 		
 	def exitChapter(self):
 		super().exitChapter()
 	
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
-		
+		debug_strings=[]
+		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+				
 	def draw(self):
 		super().draw()
+		self.rm.screen_2d.fill(self.background_color)
+		self.displayDebugStringList()
+		self.rm.pygame.display.flip()
 

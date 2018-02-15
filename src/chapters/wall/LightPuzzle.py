@@ -45,10 +45,10 @@ class LightPuzzle(Chapter):
 		self.input_activated=[False]*self.NUMBER_OF_INPUTS
 		if(self.is_debug):
 				print("Wall."+self.getTitle()+": create font")
-		self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
-		self.font_line_height_px=self.font.get_height()
+		#self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
+		#self.font_line_height_px=self.font.get_height()
 		self.background_color=(0,0,0)
-		self.font_color=(0,255,0)
+		#self.font_color=(0,255,0)
 		if(self.is_debug):
 			print("Wall."+self.getTitle()+": set debug background color")
 			self.background_color=(0,0,255)
@@ -56,25 +56,27 @@ class LightPuzzle(Chapter):
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		all_done=True
-		self.debug_strings=[]
+		debug_strings=[]
 		for input_index in range(self.NUMBER_OF_INPUTS):
 			if(self.rm.isLightPuzzleInputActive(input_index)):
 				self.input_activated[input_index]=True
 			if(not self.input_activated[input_index]): all_done=False
-			self.debug_strings.append("INPUT_"+str(input_index)+": "+str(self.input_activated[input_index])+", now: "+str(self.rm.isLightPuzzleInputActive(input_index)))
-		self.debug_strings.append("is_done: "+str(all_done))
+			debug_strings.append("INPUT_"+str(input_index)+": "+str(self.input_activated[input_index])+", now: "+str(self.rm.isLightPuzzleInputActive(input_index)))
+		debug_strings.append("is_done: "+str(all_done))
+		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		if(all_done): self.is_done=True
 			
 		
 	def draw(self):
 		super().draw()
 		self.rm.screen_2d.fill(self.background_color)
-		if(self.is_debug):
-			for this_string_index in range(len(self.debug_strings)):
-				this_string=self.debug_strings[this_string_index]
-				this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
-				rendered_string=self.font.render(this_string,False,self.font_color)
-				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+		#if(self.is_debug):
+		#	for this_string_index in range(len(self.debug_strings)):
+		#		this_string=self.debug_strings[this_string_index]
+		#		this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
+		#		rendered_string=self.font.render(this_string,False,self.font_color)
+		#		self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+		self.displayDebugStringList()
 		self.rm.pygame.display.flip()
 				
 			

@@ -53,14 +53,15 @@ class Standby(Chapter):
 			
 		if(self.is_debug):
 			print("Wall."+self.getTitle()+": create font")
-		self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
-		self.font_color=(0,255,0)
-		self.font_line_height_px=self.font.get_height()
+		#self.font=self.rm.pygame.font.SysFont('Comic Sans MS',100)
+		#self.font_color=(0,255,0)
+		#self.font_line_height_px=self.font.get_height()
 		if(self.is_debug):
 			self.background_color=(0,0,255)
 			
 	def exitChapter(self):
 		super().exitChapter()
+		self.book.startCountdown() #once Proctor commands book out of Standby, begin timer
 		
 		if(self.is_debug):
 			print("wall."+self.getTitle()+": exitChapter()")
@@ -72,21 +73,23 @@ class Standby(Chapter):
 		self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
 		self.this_frame_number=this_frame_number
 		
-		if(self.is_debug):
-			self.debug_strings=[self._book.getTitle()+"."+self.getTitle(),
-								'FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),
-								'Frame: '+str(self.this_frame_number)]
+		#if(self.is_debug):
+		#	self.debug_strings=[self._book.getTitle()+"."+self.getTitle(),
+		#						'FPS: '+str(math.floor(1/np.max((0.00001,self.seconds_since_last_frame)))),
+		#						'Frame: '+str(self.this_frame_number)]
+		self.setDebugStringList([],this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		
 	def draw(self):
 		super().draw()
 		
 		self.rm.screen_2d.fill(self.background_color)
 		
-		if(self.is_debug): #display debug text
-			for this_string_index in range(len(self.debug_strings)):
-				this_string=self.debug_strings[this_string_index]
-				this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
-				rendered_string=self.font.render(this_string,False,self.font_color)
-				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+		#if(self.is_debug): #display debug text
+		#	for this_string_index in range(len(self.debug_strings)):
+		#		this_string=self.debug_strings[this_string_index]
+		#		this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
+		#		rendered_string=self.font.render(this_string,False,self.font_color)
+		#		self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+		self.displayDebugStringList()
 		
 		self.rm.pygame.display.flip()
