@@ -48,18 +48,18 @@ class SnakePlayer:
 		self.last_valid_command=[] #last command received from joystick
 		self.is_exiting=False #is the player exiting the playing field?
 		if(player_index==0):
-			self.tail_list.append([5,10,0,True]) #placeholder values
+			self.tail_list.append([21,10,0,True]) #placeholder values
+			self.tail_list.append([22,10,0,True])
+		elif(player_index==1):
+			self.tail_list.append([10,19,0,True])
+			self.tail_list.append([10,20,0,True])
+		elif(player_index==2):
+			self.tail_list.append([5,10,0,True])
 			self.tail_list.append([5,9,0,True])
 			self.tail_list.append([5,8,0,True])
 			self.tail_list.append([5,7,0,True])
 			self.tail_list.append([5,6,0,True])
 			self.tail_list.append([5,5,0,True])
-		elif(player_index==1):
-			self.tail_list.append([10,19,0,True])
-			self.tail_list.append([10,20,0,True])
-		elif(player_index==2):
-			self.tail_list.append([21,10,0,True])
-			self.tail_list.append([22,10,0,True])
 		else:
 			raise ValueError("Player number "+str(player_index)+" not implemented in SnakePlayer")
 		

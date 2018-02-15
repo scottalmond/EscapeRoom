@@ -196,7 +196,8 @@ class ResourceManager:
 	#pressing the enter/return key advances to the next chapter
 	def isNextChapter(self):
 		for event in self.pygame_event:
-			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_RETURN):
+			if(event.type == self.pygame.KEYDOWN and (event.key == self.pygame.K_RETURN or
+													  event.key == self.pygame.K_KP_ENTER)):
 				return True
 		return False
 		
