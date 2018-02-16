@@ -24,6 +24,7 @@ Usage:
 """
 
 from util.Chapter import Chapter
+from chapters.wall.noise_helper.ScreenNoise import ScreenNoise
 
 import numpy as np
 
@@ -34,9 +35,11 @@ class LightPuzzle(Chapter):
 		super().__init__(this_book)
 		if(self.is_debug):
 			print("LightPuzzle: Hello World")
+		self.screen_noise=ScreenNoise()
 		
 	def clean(self):
 		super().clean()
+		self.screen_noise.clean(self.rm)
 	
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
@@ -56,6 +59,7 @@ class LightPuzzle(Chapter):
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		all_done=True
+		self.screen_noise.update()
 		debug_strings=[]
 		for input_index in range(self.NUMBER_OF_INPUTS):
 			if(self.rm.isLightPuzzleInputActive(input_index)):
@@ -65,8 +69,7 @@ class LightPuzzle(Chapter):
 		debug_strings.append("is_done: "+str(all_done))
 		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		if(all_done): self.is_done=True
-			
-		
+
 	def draw(self):
 		super().draw()
 		self.rm.screen_2d.fill(self.background_color)
@@ -76,6 +79,7 @@ class LightPuzzle(Chapter):
 		#		this_y_px=this_string_index*self.font_line_height_px #vertically offset each line of text
 		#		rendered_string=self.font.render(this_string,False,self.font_color)
 		#		self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+		self.screen_noise.draw(self.rm)
 		self.displayDebugStringList()
 		self.rm.pygame.display.flip()
 				
