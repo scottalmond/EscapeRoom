@@ -50,7 +50,8 @@ class Hyperspace(Chapter):
 			self.io.disposeVideo(self.background_video_player)
 		if(self.VIDEO_ENABLED):
 			self.background_video_player=loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO)
-		
+			
+			
 	def dipose(self,is_final_call):
 		super().dipose(self,is_final_call)
 		if(not self.background_video_player is None):

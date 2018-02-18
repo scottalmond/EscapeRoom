@@ -21,7 +21,7 @@ Usage:
 
 """
 
-class MasterListener:
+class CommunicationManager:
 	def __init__(self,this_book):
 		pass
 

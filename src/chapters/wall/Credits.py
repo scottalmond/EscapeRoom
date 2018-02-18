@@ -24,11 +24,11 @@ credits sequence, a brief cutscene of the corporate logo is played.
 
 Usage:
 This chapter will first look in the PRIMARY_DIRECTORY for:
-- a series of images prepended with "XXW_" where "XX" is a numeric from 00 to 99 (00 displays first)
+- a series of images prepended with "WXX_" where "XX" is a numeric from 00 to 99 (00 displays first)
 	"W" refers to a win condition, "L" refers to the image displayed when the game room
 	is lost (not completed in 60 minutes)
 - a coporate_logo.mp4 video file
-- a CSV file containing the following columns:
+- a "config.csv" file containing the following columns:
 Type, Value.  Type is a tag like HEADER or NAME.  Value is a string.
 ex: "HEADER_1, Hyperspace", "HEADER_2, Design & Programming", "NAME, Scott Almond",
 "HEADER_2","2D Art", "FINAL, Special Thanks"
@@ -41,8 +41,10 @@ such as special thanks
 
 from util.Chapter import Chapter
 
+import os
+
 class Credits(Chapter):
-	PRIMARY_DIRECTOR='/home/pi/Documents/corporate_credits/'
+	PRIMARY_DIRECTORY='/home/pi/Documents/corporate_credits/'
 	BACKUP_DIRECTORY='/home/pi/Documents/EscapeRoom/src/chapters/wall/assets/credits/'
 	MUSIC_PATH='./chapters/wall/assets/credits/escaperoom01_pre01_0.mp3'
 	MUSIC_ENABLED=False
@@ -55,6 +57,21 @@ class Credits(Chapter):
 		super().clean()
 		self.images_win=[]
 		self.images_lose=[]
+		
+		#locate asset folder
+		is_primary_exists=os.path.isdir(PRIMARY_DIRECTORY)
+		is_backup_exists=os.path.isdir(BACKUP_DIRECTORY)
+		if(not is_primary_exists and not is_backup_exists):
+			raise ValueError("Wall.Credits: Unable to locate credits asset folder: "+str(PRIMARY_DIRECTORY))
+		self.asset_folder=PRIMARY_DIRECTORY if is_primary_exists else BACKUP_DIRECTORY
+		
+		#load config file
+		config_path=self.asset_folder+"config.csv"
+		config_exists=os.path.exists(config_path)
+		if(not config_exists): raise ValueError("Wall.Credits: Unable to locate credits configuration file: "+str(config_path))
+		config_contents=self.rm.loadCSV(config_exists)
+		
+		
 
 	def dispose(self,is_final_call):
 		super().dispose(is_final_call) 

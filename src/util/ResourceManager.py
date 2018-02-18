@@ -155,6 +155,8 @@ class ResourceManager:
 				data.append(row)
 		return data
 	
+	# -- VIDEO --
+	
 	#loads a video from a file, pauses the video, hides the video
 	#and returns the reference, to the video player	
 	def loadVideo(self,video_path,is_loop=False):
@@ -185,6 +187,36 @@ class ResourceManager:
 			video_player.quit()
 		except OMXPlayerDeadError:
 			pass #silence errors about player already being closed
+		
+	# -- AUDIO --
+	
+	#pygame restricts music tracks to one-at-a-time, so queue that one file here
+	def loadMusic(self,filename):
+		pygame.mixer.music.load(filename)
+		
+	def playMusic(self):
+		pygame.mixer.music.play()
+		
+	
+	
+	# -- 3D assets --
+	
+	#loads the 3D asset into memory and returns a pointer
+	#if object has already been loaded in this playthrough, returns the existing
+	# 3D object reference instead of loading another instance
+	def get3dAsset(self,filename):
+		pass
+	
+	# -- RPi Environment --
+	
+	def getCPU_Temperature(self):
+		pass
+		
+	def getGPU_Temperature(self):
+		pass
+		
+	def getRAM_Usage(self):
+		pass
 		
 	#query user and programmer inputs to determine if a STOP command has been placed
 	def isStopped(self):
