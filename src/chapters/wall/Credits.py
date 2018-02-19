@@ -171,7 +171,7 @@ class Credits(Chapter):
 
 	#gets the duration of the Credits sequence in seconds
 	def getDurationSeconds(self):
-		return 20
+		return 60
 		
 	def isWin(self):
 		return self.book.isSuccessfulPlaythrough()
