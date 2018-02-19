@@ -109,14 +109,14 @@ class Credits(Chapter):
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		elapsed_time_seconds=self.book.getCountdownElapsed()
-		if(elapsed_time_seconds>=self.getDurationSeconds()):
+		self.image_list_draw=[] #list of images and locations to be rendered
+		self.text_list_draw=[] #list of text strings, fonts, and locations to be rendered
+		this_slide_index_ratio=this_frame_elapsed_seconds*len(self.slides)/self.getDurationSeconds()
+		this_slide_index=int(this_slide_index_ratio)
+		if(this_slide_index>=len(self.slides)):
 			self.is_done=True
 			return
 		else:
-			self.image_list_draw=[] #list of images and locations to be rendered
-			self.text_list_draw=[] #list of text strings, fonts, and locations to be rendered
-			this_slide_index_ratio=this_frame_elapsed_seconds*len(self.slides)/self.getDurationSeconds()
-			this_slide_index=int(this_slide_index_ratio)
 			slide_duration_seconds=self.getDurationSeconds()/len(self.slides)
 			for slide_index in range(this_slide_index+1):
 				slide=self.slides[slide_index]
@@ -171,7 +171,7 @@ class Credits(Chapter):
 
 	#gets the duration of the Credits sequence in seconds
 	def getDurationSeconds(self):
-		return 60
+		return 20
 		
 	def isWin(self):
 		return self.book.isSuccessfulPlaythrough()
