@@ -107,13 +107,18 @@ class Chapter():
 		self._osd_debug_strings=string_list
 	
 	#if debug is enabled, show debug strings on screen
-	def displayDebugStringList(self):
+	# if is_2d, use pygame 2D graphics
+	# else render to pi3d text overlay layer
+	def displayDebugStringList(self,is_2d=True):
 		if(self.is_debug): #display debug text
-			for this_string_index in range(len(self._osd_debug_strings)):
-				this_string=self._osd_debug_strings[this_string_index]
-				this_y_px=this_string_index*self._debug_font_line_height_px #vertically offset each line of text
-				rendered_string=self._debug_font.render(this_string,False,self._debug_font_color)
-				self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+			if(is_2d):
+				for this_string_index in range(len(self._osd_debug_strings)):
+					this_string=self._osd_debug_strings[this_string_index]
+					this_y_px=this_string_index*self._debug_font_line_height_px #vertically offset each line of text
+					rendered_string=self._debug_font.render(this_string,False,self._debug_font_color)
+					self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+				else:
+					pass #TODO
 		
 	#during a single chapter run
 	@property

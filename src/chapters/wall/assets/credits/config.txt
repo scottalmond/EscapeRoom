@@ -1,0 +1,60 @@
+#Config file breaks down each slide into a different definition
+# the credits is broken down so each slide receives equal time
+# the credits lasts as long as the provided music file
+#Image (x,y) [Frames] Filename #(x,y) is the location where the top-left of the image is drawn
+# (x1,y1,x2,y2) allows for an image to move from an initial (x,y) to a final (x,y) over several seconds
+# [Win/Lose,Frames] indicates how long the image exists for, use [] to exist through the full credits sequence for both win and lose conditions
+# Filename is the name of the file in this folder
+#Head1 (x,y) Text #this is the largest text render, approximately TBR pixels tall 
+#Note: only use 1 space between arguments, ex: Image[Space](20,20)[Space]image.jpg
+
+Slide
+Image (0,0) [-1] placeholder_space.jpg
+
+Image (960,0) [W,2] placeholder_planet.jpg
+Image (1700,100,1000,600) [W,2] placeholder_pod.png
+#Image (960,0) [L,1] snake_construction
+#Image (200,400) 
+Head1 (200,0) Snake
+Head2 (200,20) Code & Design
+Head3 (200,40) Scott Almond
+Head2 (200,60) 2D & 3D Art Assets
+Head3 (200,80) XXX
+Head2 (200,100) Music
+Head3 (200,120) YYY
+
+Slide
+Head1 (200,0) Hyperspace
+Head2 (200,20) Code & Design
+
+Slide
+Image (960,0) [W,2] placeholder_pod_landed.jpg
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
+Head1 (200,0) Placeholder
+

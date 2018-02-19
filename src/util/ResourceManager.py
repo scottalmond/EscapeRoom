@@ -148,12 +148,22 @@ class ResourceManager:
 	"""
 	@staticmethod
 	def loadCSV(filename):
+		import csv
 		data=[]
 		with open(filename) as file_obj:
 			reader = csv.DictReader(file_obj, delimiter=',')
 			for row in reader:
 				data.append(row)
+				print(row)
 		return data
+		
+	@staticmethod
+	def loadTXT(filename):
+		text_file = open(filename, "r")
+		lines = text_file.readlines()
+		text_file.close()
+		return lines
+		
 	
 	# -- VIDEO --
 	

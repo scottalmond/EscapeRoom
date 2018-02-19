@@ -33,7 +33,7 @@ import threading
 #custom support assets
 #from util.IO_Manager import IO_Manager #interface for reading button state
 from util.ResourceManager import ResourceManager #wrapper for fetching art assets
-from util.MasterListener import MasterListener#interface for receiving external commands from Proctor or Wall computer
+from util.CommunicationManager import CommunicationManager#interface for receiving external commands from Proctor or Wall computer
 from util.Chapter import Chapter
 
 #Wall Chapters
@@ -83,7 +83,7 @@ class Book:
 		self._resource_manager=ResourceManager(self.book_type,is_debug,is_windowed,is_keyboard)
 		#self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
 		self._chapter_list=self.__get_all_chapters(self.book_type,self.resource_manager)
-		self._master_listener=MasterListener(self)
+		self._communication_manager=CommunicationManager(self)
 		
 	#METHODS
 	"""
@@ -108,7 +108,7 @@ class Book:
 		self.resource_manager.clean()
 		for chapter in self._chapter_list:
 			chapter.clean()
-		self._master_listener.clean()
+		self._communication_manager.clean()
 	
 	"""
 	external operators should call is_alive=False to ensure a clean exit
@@ -177,7 +177,7 @@ class Book:
 	"""
 	executes the external command
 	DEBUG calls this method directly
-	MASTER sends a command to MasterListener, which then executes this method
+	MASTER sends a command to CommunicationManager, which then executes this method
 	
 	Used for the following:
 	to set the next chapter
@@ -287,11 +287,6 @@ class Book:
 			chapter=self._chapter_list(chapter_iter)
 			if(self._visible_chapter==chapter): return chapter_iter
 		return -1
-	
-	def __create_TCP_listener(self,this_book_type):
-		#only create if not already initialized
-		if(self._tcp_listener is None):
-			pass
 	
 	#delay single-threaded operations until the book is ready to receive commands
 	#advise using this only for debugging
