@@ -125,11 +125,13 @@ if __name__ == "__main__":
 			args.remove("KEYBOARD")
 		book_type=args[1]
 		if(book_type=="Wall"):
-			book_type=0
+			book_type=BOOK_TYPE.WALL
 		elif(book_type=="Helm"):
-			book_type=1
+			book_type=BOOK_TYPE.HELM
+		elif(book_type=="Proctor"):
+			book_type=BOOK_TYPE.PROCTOR
 		else:
-			raise ValueError("Book type not defined: "+book_tye)
+			raise ValueError("Book type not defined: "+book_type)
 		go_to_chapter=False
 		if(len(args)>2):
 			go_to_chapter=True

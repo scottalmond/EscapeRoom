@@ -53,6 +53,7 @@ import chapters.helm.Map
 class BOOK_TYPE(Enum):
 	WALL=0 #for running operationally on main monitor
 	HELM=1 #for running operationally on auxilary monitor
+	PROCTOR=2
 
 class Book:
 	#CONSTANTS

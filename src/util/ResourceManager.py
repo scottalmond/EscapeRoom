@@ -33,20 +33,6 @@ import time
 import numpy as np
 from enum import Enum
 
-#Physical Interfaces
-import wiringpi as wp
-
-#2D Graphics
-import pygame
-
-#3D Graphics
-import pi3d
-import sys
-sys.path.insert(1, '/home/pi/pi3d')
-
-#Video
-#from omxplayer.player import OMXPlayer
-
 #joystick directions
 #units increasing from 0, per WASD order, used as indecies in Tutorial
 class DIRECTION(Enum):
@@ -66,8 +52,23 @@ class ResourceManager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only - higher values used to reduce pixelation in 3D graphics
 	
 	def __init__(self,this_book_type,is_debug=False,is_windowed=False,is_keyboard=False):
+		from util.Book import BOOK_TYPE #must be run after Book.py is initialized, otherwise fails to load (cannot find import)
+		if(this_book_type==BOOK_TYPE.WALL or this_book_type==BOOK_TYPE.HELM):
+			print("rm.init: here")
+			#if need supporting libraries, load them
+			#Physical Interfaces
+			import wiringpi as wp
+			#2D Graphics
+			import pygame
+			#3D Graphics
+			import pi3d
+			import sys
+			sys.path.insert(1, '/home/pi/pi3d')
+			#Video
+			#from omxplayer.player import OMXPlayer
+			self.pygame=pygame
+			self.pi3d=pi3d
 		self.pygame_init=False
-		self.pygame=pygame
 		self.display_3d=None
 		self.is_windowed=is_windowed
 		self.is_keyboard=is_keyboard
@@ -84,7 +85,7 @@ class ResourceManager:
 		#so there is only one oportunity to fetch the keys that are pressed
 		#do so here every frame
 		self.pygame_event=self.pygame.event.get()
-		self.pygame_keys_pressed=pygame.key.get_pressed()
+		self.pygame_keys_pressed=self.pygame.key.get_pressed()
 		#when programmer hits the tab key, toggle between listening to keyboard inputs and DI/O inputs
 		for event in self.pygame_event:
 			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_F1):
@@ -120,9 +121,9 @@ class ResourceManager:
 			screen_dimensions=self.getScreenDimensions()
 			#display_info=pygame.display.Info()
 			if(self.is_windowed):
-				self.screen_2d=pygame.display.set_mode(screen_dimensions)
+				self.screen_2d=self.pygame.display.set_mode(screen_dimensions)
 			else:
-				self.screen_2d=pygame.display.set_mode(screen_dimensions,pygame.FULLSCREEN)
+				self.screen_2d=self.pygame.display.set_mode(screen_dimensions,pygame.FULLSCREEN)
 			self.pygame.display.flip()
 		
 	def __dispose2Dgraphics(self):
@@ -133,7 +134,7 @@ class ResourceManager:
 	def __create3Dgraphics(self):
 		print("ResourceManager: Create 3D Graphics")
 		if(self.display_3d is None):
-			self.display_3d = pi3d.Display.create(samples=self.OVERSAMPLE_RATIO_3D)
+			self.display_3d = self.pi3d.Display.create(samples=self.OVERSAMPLE_RATIO_3D)
 			self.display_3d.set_background(0,0,0,0)#transparent background
 		
 	def __dispose3Dgraphics(self):
@@ -365,7 +366,7 @@ class ResourceManager:
 	
 	#return tuple with (width,height)
 	def getScreenDimensions(self):
-		display_info=pygame.display.Info()
+		display_info=self.pygame.display.Info()
 		return (int(display_info.current_w),int(display_info.current_h))
 
 	#debug includes on-screen-displays
