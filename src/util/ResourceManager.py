@@ -53,6 +53,8 @@ class ResourceManager:
 	
 	def __init__(self,this_book_type,is_debug=False,is_windowed=False,is_keyboard=False):
 		from util.Book import BOOK_TYPE #must be run after Book.py is initialized, otherwise fails to load (cannot find import)
+		self.pygame=None
+		self.pi3d=None
 		if(this_book_type==BOOK_TYPE.WALL or this_book_type==BOOK_TYPE.HELM):
 			print("rm.init: here")
 			#if need supporting libraries, load them
@@ -84,18 +86,19 @@ class ResourceManager:
 		#pygame insists on removing all events with a single method call,
 		#so there is only one oportunity to fetch the keys that are pressed
 		#do so here every frame
-		self.pygame_event=self.pygame.event.get()
-		self.pygame_keys_pressed=self.pygame.key.get_pressed()
-		#when programmer hits the tab key, toggle between listening to keyboard inputs and DI/O inputs
-		for event in self.pygame_event:
-			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_F1):
-				self._is_debug=not self._is_debug
-			if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_TAB):
-				if(not self.was_keyboard_toggle):
-					self.is_keyboard=not self.is_keyboard
-				self.was_keyboard_toggle=True
+		if(not self.pygame is None):
+			self.pygame_event=self.pygame.event.get()
+			self.pygame_keys_pressed=self.pygame.key.get_pressed()
+			#when programmer hits the tab key, toggle between listening to keyboard inputs and DI/O inputs
+			for event in self.pygame_event:
+				if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_F1):
+					self._is_debug=not self._is_debug
+				if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_TAB):
+					if(not self.was_keyboard_toggle):
+						self.is_keyboard=not self.is_keyboard
+					self.was_keyboard_toggle=True
 		self.was_keyboard_toggle=False
-		self.updateMorse()
+		#self.updateMorse() #TODO - implement, but be mindful proctor does not use feature
 		
 	def clean(self):
 		print("ResourceManager clean()")
@@ -113,7 +116,7 @@ class ResourceManager:
 
 	def __create2Dgraphics(self):
 		print("ResourceManager: Create 2D Graphics")
-		if(not self.pygame_init):
+		if(not self.pygame_init and not self.pygame is None):
 			self.pygame_init=True
 			self.pygame.init()
 			self.pygame.font.init()
@@ -133,7 +136,7 @@ class ResourceManager:
 		
 	def __create3Dgraphics(self):
 		print("ResourceManager: Create 3D Graphics")
-		if(self.display_3d is None):
+		if(self.display_3d is None and not self.pi3d is None):
 			self.display_3d = self.pi3d.Display.create(samples=self.OVERSAMPLE_RATIO_3D)
 			self.display_3d.set_background(0,0,0,0)#transparent background
 		

@@ -78,9 +78,9 @@ class Chapter():
 		self._osd_debug_strings=[]
 		
 		#on-screen graphics debug tools
-		self._debug_font=self.rm.pygame.font.SysFont('Comic Sans MS',70)
+		self._debug_font=None if self.rm.pygame is None else self.rm.pygame.font.SysFont('Comic Sans MS',70)
 		self._debug_font_color=(0,255,0)
-		self._debug_font_line_height_px=self._debug_font.get_height()
+		self._debug_font_line_height_px=0 if self.rm.pygame is None else self._debug_font.get_height()
 		
 	#discontinue asset use, stop threads and async processes in preparation
 	#for a clean exit to the terminal
@@ -112,13 +112,14 @@ class Chapter():
 	def displayDebugStringList(self,is_2d=True):
 		if(self.is_debug): #display debug text
 			if(is_2d):
-				for this_string_index in range(len(self._osd_debug_strings)):
-					this_string=self._osd_debug_strings[this_string_index]
-					this_y_px=this_string_index*self._debug_font_line_height_px #vertically offset each line of text
-					rendered_string=self._debug_font.render(this_string,False,self._debug_font_color)
-					self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
-				else:
-					pass #TODO
+				if(not self.rm.pygame is None):
+					for this_string_index in range(len(self._osd_debug_strings)):
+						this_string=self._osd_debug_strings[this_string_index]
+						this_y_px=this_string_index*self._debug_font_line_height_px #vertically offset each line of text
+						rendered_string=self._debug_font.render(this_string,False,self._debug_font_color)
+						self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
+			else:
+				pass #TODO
 		
 	#during a single chapter run
 	@property

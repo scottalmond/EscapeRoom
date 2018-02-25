@@ -50,6 +50,9 @@ import chapters.helm.MorseCode
 import chapters.helm.BlackScreen
 import chapters.helm.Map
 
+#Proctor Chapters
+import chapters.proctor.Console
+
 class BOOK_TYPE(Enum):
 	WALL=0 #for running operationally on main monitor
 	HELM=1 #for running operationally on auxilary monitor
@@ -274,6 +277,10 @@ class Book:
 				#chapters.helm.BlackScreen.BlackScreen(self, "Snake"),
 				chapters.helm.Map.Map(self),
 				#chapters.helm.BlackScreen.BlackScreen(self, "Credits")
+			]
+		elif(this_book_type==BOOK_TYPE.PROCTOR):
+			return [
+				chapters.proctor.Console.Console(self)
 			]
 		raise ValueError("Book chapters have not been specified for book_type: "+str(this_book_type))
 	
