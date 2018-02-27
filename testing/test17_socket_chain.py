@@ -10,6 +10,8 @@
 #note: two inputs: data from programmer, data from client (if WALL or PROCTOR)
 # to stop SELF: send command 'q'
 
+#sudo nmap -sS -O -p80,8080 192.168.1.0/24
+
 PROCTOR_PORT=7070
 WALL_PORT=6060
 CLIENT_PORT=5050

@@ -55,7 +55,7 @@ class ResourceManager:
 		from util.Book import BOOK_TYPE #must be run after Book.py is initialized, otherwise fails to load (cannot find import)
 		self.pygame=None
 		self.pi3d=None
-		if(this_book_type==BOOK_TYPE.WALL or this_book_type==BOOK_TYPE.HELM):
+		if(this_book_type==BOOK_TYPE.WALL or this_book_type==BOOK_TYPE.HELM): #should probably generalize to be book-type agnostic... just is_2d_enabled, is_3d_enabled, etc
 			print("rm.init: here")
 			#if need supporting libraries, load them
 			#Physical Interfaces
