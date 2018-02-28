@@ -21,7 +21,7 @@ Usage:
 
 """
 
-class CommunicationManager:
+class ConnectionManager:
 	def __init__(self,this_book):
 		pass
 
@@ -30,3 +30,19 @@ class CommunicationManager:
 		
 	def dispose(self):
 		pass
+
+	#inspect the latest message in the queue for the given taget (Book or Chapter)
+	def peek(self,target):
+		if(not self.is_alive): return None #if closed, return no object
+		if(isinstance(target,Book):
+			pass
+		elif(isinstance(target,Chapter):
+			pass
+		else:
+			raise ValueError("Invalid target specified to fetch queued messages for (type: "+str(type(target))+"): "+str(target))
+		
+	#pull the latest message off the top of the queue
+	def poll(self,target):
+		outbound=peek(target)
+		if(not outbound is None):
+			pass
