@@ -86,6 +86,10 @@ class Chapter():
 	#for a clean exit to the terminal
 	def dispose(self,is_final_call): pass
 		
+	#scope like "Book" or "Chapter"
+	def getScope(self):
+		return "Chapter"
+		
 	#Multiple chapters of the same class may exist (ex. Standby)
 	#Differentiate them using a unique title string in the constructor
 	#Default value is class name

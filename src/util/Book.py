@@ -33,7 +33,7 @@ import threading
 #custom support assets
 #from util.IO_Manager import IO_Manager #interface for reading button state
 from util.ResourceManager import ResourceManager #wrapper for fetching art assets
-from util.CommunicationManager import CommunicationManager#interface for receiving external commands from Proctor or Wall computer
+#from util.ConnectionManager import ConnectionManager#interface for receiving external commands from Proctor or Wall computer
 from util.Chapter import Chapter
 
 #Wall Chapters
@@ -87,7 +87,7 @@ class Book:
 		self._resource_manager=ResourceManager(self.book_type,is_debug,is_windowed,is_keyboard)
 		#self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
 		self._chapter_list=self.__get_all_chapters(self.book_type,self.resource_manager)
-		self._communication_manager=CommunicationManager(self)
+		self._connection_manager=None#ConnectionManager(self)
 		
 	#METHODS
 	"""
@@ -112,7 +112,7 @@ class Book:
 		self.resource_manager.clean()
 		for chapter in self._chapter_list:
 			chapter.clean()
-		self._communication_manager.clean()
+#		self._connection_manager.clean()
 	
 	"""
 	external operators should call is_alive=False to ensure a clean exit
@@ -366,7 +366,11 @@ class Book:
 		return current_chapter_index>=credits_index
 	
 	#GET/SET
-	
+	#either a book or chapter
+	def getScope(self):
+		return "Book"
+		
+	#title like "PROCTOR"
 	def getTitle(self):
 		return self._book_type.name
 		
@@ -375,6 +379,7 @@ class Book:
 	#can be toggled anytime by pressing the TAB key
 	def setKeyboard(self,value):
 		self.resource_manager.is_keyboard=value
+		
 		
 	#debug includes on-screen-displays
 	@property

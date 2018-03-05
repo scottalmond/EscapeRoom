@@ -1,3 +1,24 @@
+#scratch notes:
+#start with list of connections that need to be made, and curent location in that network
+#step 1 is to initialize all placeholder NMs, these represent from-to relationships
+#server NMs will need to wait for clients before being isConnected()
+#how to determine which client is which...
+#client shall self-id as first message perhaps...
+#servers
+# server-to-external-client connection - needs to pull from singular server listener...? yes
+# client-to-external-server connection
+#
+#so listen for server input in ConnectionManager, but each client NodeManager listens for input independently
+#or just have all connections in ConnectionManager...
+#and just tag each one
+#node: [source_name, target_name, is_server, target_socket
+#servers just wait for input, clients actively look for servers using nmap
+#connection_target can be: ConnectionManager, Book, Chapter
+
+
+
+
+
 #show that:
 #master-slave server-client conenctions can be daisy-chained
 #the network can be interrupted and restarted automatically
