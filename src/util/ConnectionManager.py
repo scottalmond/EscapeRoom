@@ -55,25 +55,27 @@ class ConnectionManager(threading.Thread):
 		[BOOK_TYPE.WALL.name,BOOK_TYPE.HELM.name]
 		]
 	
-	def __init__(self,this_book_title):
+	def __init__(self,this_book_title,is_debug=False):
 		threading.Thread.__init__(self)
 		self._is_alive=True
+		self.is_debug=is_debug
 		self.book_title=this_book_title
 		self.nodes=[]
+		self.inbound_queue=queue.Queue()
 		server_nm=None
 		#create NodeManagers to represent the connections this PC has with
 		# external actors
 		for relationship in self.BOOK_MASTER_RELATIONSHIP:
 			if(relationship[0]==self.book_title):
 				if(server_nm is None):
-					server_nm=NodeManager(self,relationship[0],relationship[1],True)
+					server_nm=NodeManager(self,relationship[0],relationship[1],True,is_debug)
 					self.nodes.append(server_nm)
 				else:
 					server_nm.appendTarget(relationship[1])
 			elif(relationship[1]==self.book_title):
-				client_nm=NodeManager(self,relationship[1],relationship[0],False)
+				client_nm=NodeManager(self,relationship[1],relationship[0],False,is_debug)
 				self.nodes.append(client_nm)
-		print("ConnectionManager.init: number of NMs: "+str(len(self.nodes)))
+		if(self.is_debug): print("ConnectionManager.init: number of NMs: "+str(len(self.nodes)))
 		for node in self.nodes:
 			node.start() #kick off threads that will seek connections and listen to input
 		
@@ -81,30 +83,51 @@ class ConnectionManager(threading.Thread):
 		pass
 		
 	def dispose(self):
-		print("ConnectionManager.dispose()")
+		if(self.is_debug): print("ConnectionManager.dispose()")
 		self._is_alive=False #it appears threads also have an is_alive bool and there is a conflict, so set _is_alive directly
 		for node in self.nodes:
 			node.dispose()
 		
 	def run(self):
-		print("ConnectionManager.run: enter method")
+		if(self.is_debug): print("ConnectionManager.run: enter method")
 		while(self._is_alive):
 			#time.sleep(1)
-			print("CM -- "+str(time.time()))
-			print(self.getStatus())
+			if(self.is_debug): print("CM -- "+str(time.time()))
+			if(self.is_debug): print(self.getStatus())
 			if(not self.isReady()):
-				print("ConnectionManager.run: Attempt to (re-)connect nodes...")
+				if(self.is_debug): print("ConnectionManager.run: Attempt to (re-)connect nodes...")
 			for node in self.nodes:
 				node.connect()
 				#call in an infinite loop to reestablish any dropped connections
 	
 	#external PC sends package to this PC
+	#package is a dictinary
 	def receive(self,package):
-		print("ConnectionManager.receive: "+str(package))
+		if(self.is_debug): print("ConnectionManager.receive: "+str(package))
+		self.inbound_queue.put(package)
+		
+	#scope is a string like "Book" or "Chapter"
+	#returns the packet on the top of the queue
+	# if none is thre, returns None
+	def pop(self,scope):
+		if(self.inbound_queue.empty()):
+			return None
+		peek=self.inbound_queue.queue[0]
+		if(peek["target_scope"]==scope):
+			try:
+				return self.inbound_queue.get(block=False)
+			except queue.Empty:
+				pass
+		return None
 		
 	#this PC sending a package out bound to another PC
-	def send(self,package):
-		pass
+	#packet is json.dumps encoded
+	def send(self,packet):
+		#TODO: attempt to send to all node managers, only relevant node manager will comply
+		for node in self.nodes:
+			is_success=node.send(packet)
+			if(is_success): return True
+		return False
 		
 	#query whether the link to a particular book has been established
 	# assumes each PC has a unique name and only exists once as either a server or client, not both
@@ -291,12 +314,32 @@ if __name__ == "__main__":
 	print("START")
 	import sys
 	import time
+	is_debug=False
 	args=sys.argv
-	cm=ConnectionManager(str(args[1]))
+	cm=ConnectionManager(str(args[1]),is_debug)
 	cm.start()
-	if(str(args[1])=="HELM"):
-		time.sleep(10)
-		cm.dispose()
+	#if(str(args[1])=="HELM"):
+	#	time.sleep(10)
+	#	cm.dispose()
+	if(str(args[1])=="PROCTOR"):
+		while(True):
+			time.sleep(1)
+			packet=cm.getPacketFor(
+				source_book_title="PROCTOR",
+				source_chapter_title=None,
+				target_book_title="WALL",
+				target_scope="Book",
+				command="time",
+				package=str(time.time()))
+			print("CM.__main__: send packet: "+str(packet))
+			cm.send(packet)
+	if(str(args[1])=="WALL"):
+		while(True):
+			time.sleep(5)
+			while(True):
+				inbound_packet=cm.pop("Book")
+				if(inbound_packet is None): break
+				print("CM.__main__: received command: "+str(inbound_packet["command"])+", package: "+str(inbound_packet["package"]))
 	print("DONE")
 	
 	
