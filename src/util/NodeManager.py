@@ -35,6 +35,9 @@ refer to AttributionErrors throughout code
 
 future version should use 'payload' rather than 'package' jargon
 
+note: interrupted socket connection can lead to malformed json packet
+whick throws json.decoder.JSONDecodeError
+
 """
 
 

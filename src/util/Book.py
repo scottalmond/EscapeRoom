@@ -151,6 +151,8 @@ class Book:
 				self._visible_chapter.enterChapter(first_frame_unix_seconds)
 				self._is_ready.set()
 				while(self.is_alive and not self._visible_chapter.is_done):
+					#TODO: connection_manager.pop("Book")
+					#TODO: connection_manager.pop("Chapter") --> pass to update() method
 					self.resource_manager.update() #used to look for things like the programmer hitting the tab key
 					if(self.resource_manager.isStopped()):
 						self.is_alive=False
