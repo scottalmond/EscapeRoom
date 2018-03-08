@@ -50,6 +50,7 @@ class DEVICE(Enum):
 
 class ResourceManager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only - higher values used to reduce pixelation in 3D graphics
+	SCREENSHOT_PATH='/home/pi/Documents/aux/screencaps/' #captured by pressing F2
 	
 	def __init__(self,this_book_type,is_debug=False,is_windowed=False,is_keyboard=False):
 		from util.Book import BOOK_TYPE #must be run after Book.py is initialized, otherwise fails to load (cannot find import)
@@ -93,6 +94,10 @@ class ResourceManager:
 			for event in self.pygame_event:
 				if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_F1):
 					self._is_debug=not self._is_debug
+				if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_F2):
+					#take screenshot
+					if(not self.pygame is None and not self.screen_2d is None):
+						self.pygame.image.save(self.screen_2d,self.SCREENSHOT_PATH+"screenshot_"+str(int(time.time()))+".jpg")
 				if(event.type == self.pygame.KEYDOWN and event.key == self.pygame.K_TAB):
 					if(not self.was_keyboard_toggle):
 						self.is_keyboard=not self.is_keyboard
@@ -126,7 +131,7 @@ class ResourceManager:
 			if(self.is_windowed):
 				self.screen_2d=self.pygame.display.set_mode(screen_dimensions)
 			else:
-				self.screen_2d=self.pygame.display.set_mode(screen_dimensions,pygame.FULLSCREEN)
+				self.screen_2d=self.pygame.display.set_mode(screen_dimensions,self.pygame.FULLSCREEN)
 			self.pygame.display.flip()
 		
 	def __dispose2Dgraphics(self):
