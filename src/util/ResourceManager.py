@@ -32,6 +32,7 @@ Either way, libraries are no longer rebooted after the initial creation but inst
 import time
 import numpy as np
 from enum import Enum
+import threading
 
 #joystick directions
 #units increasing from 0, per WASD order, used as indecies in Tutorial
@@ -57,20 +58,25 @@ class ResourceManager:
 		self.pygame=None
 		self.pi3d=None
 		if(this_book_type==BOOK_TYPE.WALL or this_book_type==BOOK_TYPE.HELM): #should probably generalize to be book-type agnostic... just is_2d_enabled, is_3d_enabled, etc
-			print("rm.init: here")
+			print("ResourceManager.init: here")
 			#if need supporting libraries, load them
 			#Physical Interfaces
 			import wiringpi as wp
 			#2D Graphics
 			import pygame
-			#3D Graphics
-			import pi3d
-			import sys
-			sys.path.insert(1, '/home/pi/pi3d')
+			#3D graphics
+			# moved to __create3DGraphics due to dependence in
+			# pi3d.Shader.__init__ which calls pi3d.Loadable.is_display_thread()
+			# which asserts that the thread where pi3d was loaded from
+			# is the same as the thread which is calling the pi3d.Shader
+			# ie, pi3d cannot be loaded in the main thread (ResourceManager constructor)
+			# and then used in another thread (Book run() method)
+			# https://github.com/tipam/pi3d/blob/master/pi3d/Shader.py
+			# https://pi3d.github.io/html/_modules/pi3d/util/Loadable.html
+			self.pi3d=None
 			#Video
 			#from omxplayer.player import OMXPlayer
 			self.pygame=pygame
-			self.pi3d=pi3d
 		self.pygame_init=False
 		self.display_3d=None
 		self.is_windowed=is_windowed
@@ -80,7 +86,7 @@ class ResourceManager:
 		self.pygame_keys_pressed=[]
 		self.morse_sequence=[] #list of True, False the represent Morse Code sequence
 		self.morse_cleared_seconds=0 #last time that the morse code sequence was cleared
-		print("RM.init: set debug: "+str(is_debug))
+		print("ResourceManager.init: set debug: "+str(is_debug))
 		self._is_debug=is_debug
 		
 	def update(self):
@@ -104,6 +110,8 @@ class ResourceManager:
 					self.was_keyboard_toggle=True
 		self.was_keyboard_toggle=False
 		#self.updateMorse() #TODO - implement, but be mindful proctor does not use feature
+		if(not self.display_3d is None):
+			self.display_3d.loop_running()
 		
 	def clean(self):
 		print("ResourceManager clean()")
@@ -141,9 +149,25 @@ class ResourceManager:
 		
 	def __create3Dgraphics(self):
 		print("ResourceManager: Create 3D Graphics")
-		if(self.display_3d is None and not self.pi3d is None):
+		if(self.display_3d is None): # and not self.pi3d is None
+			
+			#3D Graphics
+			import sys
+			sys.path.insert(1, '/home/pi/pi3d')
+			import pi3d
+			print("ResourceManager.__create3Dgraphics: Thread: "+str(threading.current_thread()))
+			self.pi3d=pi3d
+			
 			self.display_3d = self.pi3d.Display.create(samples=self.OVERSAMPLE_RATIO_3D)
 			self.display_3d.set_background(0,0,0,0)#transparent background
+			
+			self.camera_3d = self.pi3d.Camera(is_3d=True)
+			self.camera_3d_overlay = self.pi3d.Camera(is_3d=False) #2d graphics overlay for GUI
+			
+			self.shader_3d = self.pi3d.Shader("uv_light") #grr, pi3d has an assertion that shaders need to be created in the same thread that pi3d was loaded in
+			self.shader_3d_overlay = self.pi3d.Shader("uv_flat")
+			
+			print("ResourceManager.__create3dgraphics: complete")
 		
 	def __dispose3Dgraphics(self):
 		if(False):#not self.display_3d is None):
@@ -156,14 +180,15 @@ class ResourceManager:
 	ref: https://www.reddit.com/r/learnpython/comments/2l07bz/help_reading_csv_file_and_putting_data_into_arrays/
 	"""
 	@staticmethod
-	def loadCSV(filename):
+	def loadCSV(filename,print_debug=False):
 		import csv
 		data=[]
 		with open(filename) as file_obj:
 			reader = csv.DictReader(file_obj, delimiter=',')
 			for row in reader:
 				data.append(row)
-				print(row)
+				if(print_debug):
+					print(row)
 		return data
 		
 	@staticmethod
@@ -374,8 +399,12 @@ class ResourceManager:
 	
 	#return tuple with (width,height)
 	def getScreenDimensions(self):
-		display_info=self.pygame.display.Info()
-		return (int(display_info.current_w),int(display_info.current_h))
+		if(not self.pygame is None):#attempt 2d fetch
+			display_info=self.pygame.display.Info()
+			return (int(display_info.current_w),int(display_info.current_h))
+		else:#attempt 3d fetch
+			display_info=self.display_3d
+			return (int(display_info.width),int(display_info.height))
 
 	#debug includes on-screen-displays
 	@property

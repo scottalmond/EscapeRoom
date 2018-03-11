@@ -1,5 +1,5 @@
 This Node,Next Node,Direction,Distance (pixels),Node X (pixels),Node Y (pixels)
-100,91,N,50,lower,left
+100,91,N,50,50,50
 91,80,N,50,,
 91,92,NE,50,,
 92,81,N,50,,

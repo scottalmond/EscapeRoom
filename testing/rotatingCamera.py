@@ -1,10 +1,8 @@
-import sys
-sys.path.insert(1, '/home/pi/pi3d')
-import pi3d
 from numpy import sin, cos, radians
 
 class RotatingCamera:
 	def __init__(self, CAMRAD, mouse):
+		pi3d=self.getpi3d()
 		self.CAMERA = pi3d.Camera()
 		self.CAMRAD = CAMRAD
 		self.mouserot=0.0
@@ -23,3 +21,10 @@ class RotatingCamera:
 		self.CAMERA.position((self.CAMRAD * sin(radians(self.mouserot)) * cos(radians(self.tilt)),
 							  self.CAMRAD * sin(radians(self.tilt)),
 							  -self.CAMRAD * cos(radians(self.mouserot)) * cos(radians(self.tilt))))
+
+	@staticmethod
+	def getpi3d():
+		import sys
+		sys.path.insert(1, '/home/pi/pi3d')
+		import pi3d
+		return pi3d

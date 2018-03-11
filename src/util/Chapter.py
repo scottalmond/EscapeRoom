@@ -40,6 +40,8 @@ import math
 import numpy as np
 
 class Chapter():
+	UTIL_ASSET_FOLDER='util/assets/'
+	FONT_3D_FILENAME='CenturyGothicBold.ttf'#'NotoSans-Regular.ttf'
 	
 	@abstractmethod
 	def __init__(self,this_book,book_title=None):
@@ -78,9 +80,26 @@ class Chapter():
 		self._osd_debug_strings=[]
 		
 		#on-screen graphics debug tools
+		#2d
 		self._debug_font=None if self.rm.pygame is None else self.rm.pygame.font.SysFont('Comic Sans MS',70)
 		self._debug_font_color=(0,255,0)
 		self._debug_font_line_height_px=0 if self.rm.pygame is None else self._debug_font.get_height()
+		
+		#3d (on screen display overlay)
+		MAX_NUM_CHARACTERS_PER_LINE=40
+		FONT_SIZE_3D=70
+		font_path=self.UTIL_ASSET_FOLDER+self.FONT_3D_FILENAME
+		self._debug_font_3d=None if self.rm.pi3d is None else self.rm.pi3d.Font(font_path, self._debug_font_color, codepoints=list(range(32,128)))
+		self._debug_point_text_3d_overlay = self.rm.pi3d.PointText(self._debug_font_3d,self.rm.camera_3d_overlay, max_chars=200, point_size=FONT_SIZE_3D)
+		self._debug_font_line_height_px_3d_overlay=FONT_SIZE_3D
+		
+		screen_dims=self.rm.getScreenDimensions()
+		HWIDTH=screen_dims[0]/2
+		HHEIGHT=screen_dims[1]/2
+		MAX_NUM_CHARACTERS_PER_LINE=40
+		self._debug_block_text_3d_overlay = self.rm.pi3d.TextBlock(-HWIDTH+30, HHEIGHT-30, 0.1, 0.0, MAX_NUM_CHARACTERS_PER_LINE, #text_format="Static str",
+						size=0.99, spacing="F", space=0.05, colour=(0.0, 0.0, 1.0, 1.0))
+		self._debug_point_text_3d_overlay.add_text_block(self._debug_block_text_3d_overlay)
 		
 	#discontinue asset use, stop threads and async processes in preparation
 	#for a clean exit to the terminal
@@ -123,7 +142,17 @@ class Chapter():
 						rendered_string=self._debug_font.render(this_string,False,self._debug_font_color)
 						self.rm.screen_2d.blit(rendered_string,(0,this_y_px))
 			else:
-				pass #TODO
+				if(not self.rm.pi3d is None):
+					screen_dims=self.rm.getScreenDimensions()
+					HWIDTH=screen_dims[0]/2
+					HHEIGHT=screen_dims[1]/2
+					for this_string_index in range(len(self._osd_debug_strings)):
+						this_string=self._osd_debug_strings[this_string_index]
+						self._debug_block_text_3d_overlay.y=HHEIGHT-30-self._debug_font_line_height_px_3d_overlay*this_string_index
+						self._debug_block_text_3d_overlay.set_text(this_string)
+						self._debug_point_text_3d_overlay.regen()
+						self._debug_point_text_3d_overlay.draw()
+					
 		
 	#during a single chapter run
 	@property

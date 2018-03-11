@@ -4,7 +4,7 @@
 #using Pi3D rendering into a ellipsoid with texture on the inside (and rendering foreground objects): 17 FPS
 #using code to polar transform a 2k x 2k image (and nothing else): ~2FPS
 #using OpenCV to polar transform a 2k x 2k image (and nothing else): ~5 FPS
-0#playing a video using omxplayer-wrapper behind pi3d (and rendering foreground objects): 25 FPS
+#playing a video using omxplayer-wrapper behind pi3d (and rendering foreground objects): 25 FPS
 
 import sys
 sys.path.insert(1, '/home/pi/pi3d')
@@ -63,7 +63,7 @@ working_directory = os.path.dirname(os.path.realpath(__file__))
 font_path = os.path.abspath(os.path.join(working_directory, 'fonts', 'NotoSans-Regular.ttf'))
 pointFont = pi3d.Font(font_path, font_colour, codepoints=list(range(32,128)))
 text = pi3d.PointText(pointFont, cam2d, max_chars=200, point_size=32)
-newtxt = pi3d.TextBlock(-HWIDTH+30, HHEIGHT-30, 0.1, 0.0, 14, #text_format="Static str",
+newtxt = pi3d.TextBlock(-HWIDTH+30, HHEIGHT-30, 0.1, 0.0, 40, #text_format="Static str",
           size=0.99, spacing="F", space=0.05, colour=(0.0, 0.0, 1.0, 1.0))
 text.add_text_block(newtxt)
 

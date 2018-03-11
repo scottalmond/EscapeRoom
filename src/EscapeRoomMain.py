@@ -28,14 +28,16 @@ is_debug = False
 book_type = Wall
 chapter_name = Hyperspace
 
-python3 EscapeRoomMain.py WALL Hyperspace WINDOWED OSD KEYBOARD
+python3 EscapeRoomMain.py WALL Hyperspace WINDOWED DEBUG KEYBOARD
 
-OSD is on-screen-display (text debugging)
+DEBUG is on-screen-display (text debugging)
 WINDOWED allows 2D pygame window to be moved around to see terminal errors
 KEYBOARD uses the keyboard as an input device rather than DI/O
 
 ESC - EXIT
 ENTER - Next chapter
+F1 - toggle debug
+F2 - take screenshot, save to: ResourceManager.SCREENSHOT_PATH
 TAB - Toggle between using keyboard inputs and DI/O inputs
 WASD, SPACE - Laser keyboad controls
 up,left,down,right - Camera keyboard controls
@@ -124,11 +126,11 @@ if __name__ == "__main__":
 			is_keyboard=True
 			args.remove("KEYBOARD")
 		book_type=args[1]
-		if(book_type=="Wall"):
+		if(book_type=="WALL"):
 			book_type=BOOK_TYPE.WALL
-		elif(book_type=="Helm"):
+		elif(book_type=="HELM"):
 			book_type=BOOK_TYPE.HELM
-		elif(book_type=="Proctor"):
+		elif(book_type=="PROCTOR"):
 			book_type=BOOK_TYPE.PROCTOR
 		else:
 			raise ValueError("Book type not defined: "+book_type)

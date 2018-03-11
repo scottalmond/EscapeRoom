@@ -23,9 +23,11 @@ This class contains the information about the hyperspace map.  This includes:
 
 Usage:
 The Wall console contains a MASTER copy of this object.
-At the start of te Hyperspace Chapter, the Wall seriealizes the map, sends it
+At the start of te Hyperspace Chapter, the Wall seriealizes the map, send it
 to the SLAVE Helm console.  The Wall then updates the state of the map and forwards
 these updates to the Helm
+
+python3 -m chapters.wall.hyperspace_helper.Maze
 
 """
 
@@ -36,12 +38,12 @@ import json #for serializable objects
 #util
 from util.ResourceManager import ResourceManager
 
-class HYPERSPACE_SERIAL_TYPE(Enum):
-	MAP_CONNECTIONS="map_connections"
-	NODE_TYPE="node_type"
-	NODE_RELATIONSHIP="node_relationship"
+class MAZE_FILE_TYPE(Enum):
+	MAP_CONNECTIONS="map_connections" #how the PC represents the nodes - as a series of prev-current-next relationships
+	NODE_TYPE="node_type" #dead-end, branch, elbow, etc
+	NODE_RELATIONSHIP="node_relationship" #how nodes are drawn on screen repective to each other
 
-class HyperspaceState:
+class Maze:
 	#note, it is uncler which way the screen will be installed
 	#allow for post-installation rotation as a parameter
 	IS_SCREEN_ROTATED_180=False
@@ -61,7 +63,7 @@ class HyperspaceState:
 	#Out - one node the player can chose to go toward (if traveling over a branch)
 	#Two-way - if FALSE, then this sequence of nodes is only accessible in the direction stated
 	#  if TRUE, then the player can also travel down a Out-Node-In path
-	MAP_CONNECTIONS_FILE_PATH='./chapters/wall/assets/configuration_map_connections.csv'
+	MAP_CONNECTIONS_FILE_PATH='./chapters/wall/assets/hyperspace/configuration_map_connections.csv'
 	#file column titles (and constants used throughout execution)
 	MAP_CONN_IN_KEY="In"
 	MAP_CONN_NODE_KEY="Node"
@@ -101,14 +103,14 @@ class HyperspaceState:
 		self.node_relationship=None
 		
 	"""
-	fetch contents of a csv file, expresses as json and returns
+	fetch contents of a csv file, expresses as dictionary and returns
 	"""
 	def file_load(self,serial_type,filename):
 		struct={}
 		struct[self.SERIAL_TYPE_KEY]=serial_type.value
 		file_contents=ResourceManager.loadCSV(filename)
 		#print(file_contents)
-		if(serial_type==HYPERSPACE_SERIAL_TYPE.MAP_CONNECTIONS):
+		if(serial_type==MAZE_FILE_TYPE.MAP_CONNECTIONS):
 			map_connections=[]
 			for row in file_contents:
 				new_row={self.MAP_CONN_IN_KEY:row[self.MAP_CONN_IN_KEY],
@@ -121,14 +123,14 @@ class HyperspaceState:
 								 self.MAP_CONN_OUT_KEY:row[self.MAP_CONN_IN_KEY]}
 					map_connections.append(reverse_row)
 			struct[self.SERIAL_PACKAGE_KEY]=map_connections
-			print(len(map_connections))
-		elif(serial_type==HYPERSPACE_SERIAL_TYPE.NODE_TYPE):
+			#print(len(map_connections))
+		elif(serial_type==MAZE_FILE_TYPE.NODE_TYPE):
 			for row in file_contents:
 				pass
-		elif(serial_type==HYPERSPACE_SERIAL_TYPE.NODE_RELATIONSHIP):
+		elif(serial_type==MAZE_FILE_TYPE.NODE_RELATIONSHIP):
 			for row in file_contents:
 				print(row)
-		return json.dumps(struct)
+		return struct#json.dumps(struct)
 	
 	"""
 	produce a string that can be sent between the wall and the helm computers
@@ -165,13 +167,26 @@ class HyperspaceState:
 			
 		elif(serial_type==HYPERSPACE_SERIAL_TYPE.NODE_RELATIONSHIP.value):
 			if(package is None or not type(package)==type([])): raise ValueError("Invalid package specified in de-serialization packet of type "+str(serial_type)+": "+str(json_string))
-			
 		else:
 			raise ValueError("Invalid de-serialization type sepcified: "+str(json_dict[SERIAL_TYPE_KEY])+", from: "+str(json_string))
+
+	#evaluate whether maze state has been loaded from disk or over TCP
+	def isLoaded(self):
+		return (not self.map_connections is None and
+			    not self.node_type is None and 
+			    not self.node_relationship is None)
+
+	#draw Helm contents of maze state object
+	def drawBackground(self,rm):
+		#for every node in 
+		if(not self.isLoaded()): return False #skip drawing if no content available
+		
+		
 
 #cd /Documents/EscapeRoom/src/
 #python3 -m chapters.wall.hyperspace_helper.HyperspaceState
 if __name__ == "__main__":
-	hs=HyperspaceState()
-	out=hs.file_load(HYPERSPACE_SERIAL_TYPE.MAP_CONNECTIONS,HyperspaceState.MAP_CONNECTIONS_FILE_PATH)
+	hs=Maze()
+	out=hs.file_load(MAZE_FILE_TYPE.MAP_CONNECTIONS,Maze.MAP_CONNECTIONS_FILE_PATH)
 	print(out)
+	

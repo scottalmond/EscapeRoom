@@ -203,6 +203,8 @@ xxx TODO sudo pip3 install omxplayer-wrapper
 		- Command: sudo /etc/init.d/dphys-swapfile start
 - Gimp, 2D image processing
 	- command: sudo apt-get install gimp
+- Kolour Pait, lightweight 2d image processing
+	- command: sudo apt-get install kolourpaint4
 - Blender, 3D model processing
 	- command: sudo apt-get install blender
 - Mini Mic
