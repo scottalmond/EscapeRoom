@@ -28,6 +28,8 @@ import time
 import numpy as np
 import math
 from chapters.wall.hyperspace_helper import *
+from random import *
+from numpy import sin, cos, radians
 
 class Hyperspace(Chapter):
 	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
@@ -36,7 +38,9 @@ class Hyperspace(Chapter):
 	MUSIC_ENABLED=False #if True, play looping music
 	
 	ASSET_FOLDER='chapters/wall/assets/hyperspace/'
-	POD_3D_MODEL='Pod.obj'
+	#dictionary of description:filename
+	ASSETS_3D={"pod":'Pod.obj',"ring0":'ring007.obj',"ring1":'ring006.obj'}
+	POD_DEBUG_TEXTURE='circuit.jpg'
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -75,21 +79,79 @@ class Hyperspace(Chapter):
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		debug_strings=[]
-		debug_strings.append("DEBUG.HERE")
+		debug_strings.append("DEBUG.HEREXXXXXX")
+		
+		self.is_first_frame=this_frame_number==0
+		#if(self.is_first_frame): self.debug_index=0
+		#self.debug_index=self.debug_index+1
+		
+		#cx=(self.debug_index%64<32)*20-10
+		#cy=(self.debug_index%16<8)*20-10
+		#cz=(self.debug_index%32<16)*20-10
+		#debug_strings.append("XYZ: "+str(cx)+", "+str(cy)+", "+str(cz))
+		#self.rm.camera_3d.reset()
+		#self.rm.camera_3d.rotate(0,0,0)
+		#self.rm.camera_3d.position((0,0,-10))
+		#self.pod_model.x=cx
+		#self.pod_model.y=cy
+		#self.pod_model.z=cz
+		if(self.is_first_frame):
+			self.rm.camera_3d.reset()
+			self.rm.camera_3d.rotate(0,0,0)
+			self.rm.camera_3d.position((0,0,-10))
+		
+		mouserot=this_frame_elapsed_seconds*30
+		tilt=25.0
+		camera_radius=16.0
+		
+		self.rm.camera_3d.reset()
+		self.rm.camera_3d.rotate(-tilt,mouserot,0)
+		self.rm.camera_3d.position((camera_radius * sin(radians(mouserot)) * cos(radians(tilt)),
+								    camera_radius * sin(radians(tilt)),
+								   -camera_radius * cos(radians(mouserot)) * cos(radians(tilt))))
+			
 		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
-
+		
 	def draw(self):
 		super().draw()
-		self.rm.screen_2d.fill(self.background_color)
-		#self.displayDebugStringList(is_2d=True)
-		self.rm.pygame.display.flip()
-		self.pod_model.draw()
+		if(self.is_first_frame):
+			self.rm.screen_2d.fill(self.background_color)
+			self.displayDebugStringList(is_2d=True)
+			self.rm.pygame.display.flip()
+			
 		self.displayDebugStringList(is_2d=False)
+		#self.sphere.draw(self.rm.shader_3d,[self.pod_texture])
+		#self.pod_model.draw()
+		asset_id=0
+		DISTANCE_BETWEEN_DEBUG_ASSETS=6
+		for asset_name in sorted(self.assets_3d.keys()):
+			asset_model=self.assets_3d[asset_name]
+			asset_model.position(DISTANCE_BETWEEN_DEBUG_ASSETS*asset_id,0,0)
+			asset_id=asset_id+1
+			asset_model.draw()
 
+	#load assets into a dictionary
 	def __loadAssets(self):
-		this_filename=self.ASSET_FOLDER + self.POD_3D_MODEL
-		this_shader=self.rm.shader_3d
-		this_cam=self.rm.camera_3d
-		model = self.rm.pi3d.Model(camera=this_cam, file_string=this_filename, x=0.0, y=0.0, z=3*1,rx=90.0*(0),ry=0.0,rz=0.0)
-		model.set_shader(this_shader)
-		self.pod_model=model
+		#this_filename=self.ASSET_FOLDER + self.POD_3D_MODEL
+		#this_shader=self.rm.shader_3d
+		#this_cam=self.rm.camera_3d
+		#model = self.rm.pi3d.Model(camera=this_cam, file_string=this_filename, x=1.0, y=0.0, z=1.0,rx=90.0,ry=0.0,rz=0.0)
+		#model.set_shader(this_shader)
+		#self.pod_model=model
+
+		#this_filename=self.ASSET_FOLDER + self.POD_DEBUG_TEXTURE
+		#self.pod_texture=self.rm.pi3d.Texture(this_filename)
+		
+		#self.sphere=self.rm.pi3d.Sphere(radius=2.0, slices=32, sides=32)
+		#self.sphere.position(6.0,0.0,0.0)
+		#self.sphere.set_shader(self.rm.shader_3d)
+		
+		self.assets_3d={}
+		for asset_name in sorted(self.ASSETS_3D.keys()):
+			this_filename=self.ASSET_FOLDER+self.ASSETS_3D[asset_name]
+			this_shader=self.rm.shader_3d
+			this_cam=self.rm.camera_3d
+			model = self.rm.pi3d.Model(camera=this_cam, file_string=this_filename, x=1.0, y=0.0, z=1.0,rx=90.0,ry=0.0,rz=0.0)
+			model.set_shader(this_shader)
+			self.assets_3d[asset_name]=model
+		

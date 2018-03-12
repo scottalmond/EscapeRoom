@@ -111,6 +111,7 @@ class ResourceManager:
 		self.was_keyboard_toggle=False
 		#self.updateMorse() #TODO - implement, but be mindful proctor does not use feature
 		if(not self.display_3d is None):
+			#print("ResourceManager.update: loop_running checkup")
 			self.display_3d.loop_running()
 		
 	def clean(self):
@@ -143,7 +144,7 @@ class ResourceManager:
 			self.pygame.display.flip()
 		
 	def __dispose2Dgraphics(self):
-		if(False):
+		if(False): #note that pygame does not dipose() gracefully (3/11/18 forgot the exact issue...), so it is necessary to keep pyagme, and all other assets, live between playthroughs rather than doing a clean refresh each time
 			self.pygame.display.quit()
 			self.pygame.quit()
 		

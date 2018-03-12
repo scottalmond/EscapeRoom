@@ -64,7 +64,7 @@ font_path = os.path.abspath(os.path.join(working_directory, 'fonts', 'NotoSans-R
 pointFont = pi3d.Font(font_path, font_colour, codepoints=list(range(32,128)))
 text = pi3d.PointText(pointFont, cam2d, max_chars=200, point_size=32)
 newtxt = pi3d.TextBlock(-HWIDTH+30, HHEIGHT-30, 0.1, 0.0, 40, #text_format="Static str",
-          size=0.99, spacing="F", space=0.05, colour=(0.0, 0.0, 1.0, 1.0))
+          size=0.99, spacing="F", space=0.05, colour=(1.0, 0.0, 1.0, 1.0))
 text.add_text_block(newtxt)
 
 model_filename=["ring007.obj","Pod.obj","ring006.obj","space002.obj"]#,"space001.obj"],"pod001.obj"

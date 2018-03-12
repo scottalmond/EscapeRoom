@@ -265,7 +265,7 @@ class Book:
 		if(this_book_type==BOOK_TYPE.WALL):
 			return [
 				chapters.wall.Standby.Standby(self),
-				chapters.wall.LightPuzzle.LightPuzzle(self),
+#				chapters.wall.LightPuzzle.LightPuzzle(self),
 				chapters.wall.Tutorial.Tutorial(self),
 				chapters.wall.Snake.Snake(self),
 				chapters.wall.Hyperspace.Hyperspace(self),

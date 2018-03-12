@@ -17,10 +17,15 @@ class RotatingCamera:
 		self.omx=self.mx
 		self.omy=self.my
 		self.CAMERA.reset()
-		self.CAMERA.rotate(-self.tilt,self.mouserot,0)
-		self.CAMERA.position((self.CAMRAD * sin(radians(self.mouserot)) * cos(radians(self.tilt)),
-							  self.CAMRAD * sin(radians(self.tilt)),
-							  -self.CAMRAD * cos(radians(self.mouserot)) * cos(radians(self.tilt))))
+		FIXED=True
+		if(FIXED):
+			self.CAMERA.rotate(0,0,0)
+			self.CAMERA.position((0,0,-10))
+		else:
+			self.CAMERA.rotate(-self.tilt,self.mouserot,0)
+			self.CAMERA.position((self.CAMRAD * sin(radians(self.mouserot)) * cos(radians(self.tilt)),
+								  self.CAMRAD * sin(radians(self.tilt)),
+								  -self.CAMRAD * cos(radians(self.mouserot)) * cos(radians(self.tilt))))
 
 	@staticmethod
 	def getpi3d():
