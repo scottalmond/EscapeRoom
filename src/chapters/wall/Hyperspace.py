@@ -43,7 +43,9 @@ class Hyperspace(Chapter):
 	
 	ASSET_FOLDER='chapters/wall/assets/hyperspace/'
 	#dictionary of description:filename
-	ASSETS_3D={"pod":'pod_1.obj'}#,"ring0":'ring007.obj',"ring1":'ring006.obj'}
+	ASSETS_3D={"pod":'pod_1.obj',
+			   "laser_base":'laser_base_1.obj',
+			   "laser_gun":'laser_gun_1.obj'}#,"ring0":'ring007.obj',"ring1":'ring006.obj'}
 	POD_DEBUG_TEXTURE='circuit.jpg'
 	
 	def __init__(self,this_book):
@@ -105,7 +107,7 @@ class Hyperspace(Chapter):
 			self.rm.camera_3d.rotate(0,0,0)
 			self.rm.camera_3d.position((0,0,-10))
 		
-		mouserot=0#this_frame_elapsed_seconds*30
+		mouserot=-2*this_frame_elapsed_seconds*30
 		tilt=25.0
 		camera_radius=20.0
 		
