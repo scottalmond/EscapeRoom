@@ -43,7 +43,7 @@ class Hyperspace(Chapter):
 	
 	ASSET_FOLDER='chapters/wall/assets/hyperspace/'
 	#dictionary of description:filename
-	ASSETS_3D={"pod":'Pod.obj'}#,"ring0":'ring007.obj',"ring1":'ring006.obj'}
+	ASSETS_3D={"pod":'pod_1.obj'}#,"ring0":'ring007.obj',"ring1":'ring006.obj'}
 	POD_DEBUG_TEXTURE='circuit.jpg'
 	
 	def __init__(self,this_book):
