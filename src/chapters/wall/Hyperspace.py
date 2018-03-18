@@ -23,11 +23,15 @@ Usage:
 
 """
 
+#responsible for Maze (map definition), Environment (3D object definitions, video, music)
+#ConnectionManager (relay object state between PCs)
+
 from util.Chapter import Chapter
+from chapters.wall.hyperspace_helper.HypserspaceEnvironment import *
 import time
 import numpy as np
 import math
-from chapters.wall.hyperspace_helper import *
+#from chapters.wall.hyperspace_helper import * #does not import properly
 from random import *
 from numpy import sin, cos, radians
 
@@ -39,7 +43,7 @@ class Hyperspace(Chapter):
 	
 	ASSET_FOLDER='chapters/wall/assets/hyperspace/'
 	#dictionary of description:filename
-	ASSETS_3D={"pod":'Pod.obj',"ring0":'ring007.obj',"ring1":'ring006.obj'}
+	ASSETS_3D={"pod":'Pod.obj'}#,"ring0":'ring007.obj',"ring1":'ring006.obj'}
 	POD_DEBUG_TEXTURE='circuit.jpg'
 	
 	def __init__(self,this_book):
@@ -61,6 +65,7 @@ class Hyperspace(Chapter):
 		
 		#assets - create after resource manager has been initialized
 		self.__loadAssets()
+		self.environment=HypserspaceEnvironment(self.assets_3d)
 			
 	def dipose(self,is_final_call):
 		super().dipose(self,is_final_call)
@@ -100,14 +105,22 @@ class Hyperspace(Chapter):
 			self.rm.camera_3d.rotate(0,0,0)
 			self.rm.camera_3d.position((0,0,-10))
 		
-		mouserot=this_frame_elapsed_seconds*30
+		mouserot=0#this_frame_elapsed_seconds*30
 		tilt=25.0
-		camera_radius=16.0
+		camera_radius=20.0
+		
+		self.environment.update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,
+								self.rm)
+		
+		pod_position_x=self.environment.player_pod.x_offset
+		pod_position_y=self.environment.player_pod.y_offset
+		debug_strings.append("pod x: "+str(pod_position_x))
+		debug_strings.append("pod y: "+str(pod_position_y))
 		
 		self.rm.camera_3d.reset()
 		self.rm.camera_3d.rotate(-tilt,mouserot,0)
 		self.rm.camera_3d.position((camera_radius * sin(radians(mouserot)) * cos(radians(tilt)),
-								    camera_radius * sin(radians(tilt)),
+									camera_radius * sin(radians(tilt)),
 								   -camera_radius * cos(radians(mouserot)) * cos(radians(tilt))))
 			
 		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
@@ -119,16 +132,19 @@ class Hyperspace(Chapter):
 			self.displayDebugStringList(is_2d=True)
 			self.rm.pygame.display.flip()
 			
+		self.environment.draw()
+			
 		self.displayDebugStringList(is_2d=False)
 		#self.sphere.draw(self.rm.shader_3d,[self.pod_texture])
 		#self.pod_model.draw()
-		asset_id=0
-		DISTANCE_BETWEEN_DEBUG_ASSETS=6
-		for asset_name in sorted(self.assets_3d.keys()):
-			asset_model=self.assets_3d[asset_name]
-			asset_model.position(DISTANCE_BETWEEN_DEBUG_ASSETS*asset_id,0,0)
-			asset_id=asset_id+1
-			asset_model.draw()
+		if(False): #debug overlay of all 3D models
+			asset_id=0
+			DISTANCE_BETWEEN_DEBUG_ASSETS=6
+			for asset_name in sorted(self.assets_3d.keys()):
+				asset_model=self.assets_3d[asset_name]
+				asset_model.position(DISTANCE_BETWEEN_DEBUG_ASSETS*asset_id,0,0)
+				asset_id=asset_id+1
+				asset_model.draw()
 
 	#load assets into a dictionary
 	def __loadAssets(self):
