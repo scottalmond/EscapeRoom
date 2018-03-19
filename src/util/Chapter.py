@@ -98,7 +98,7 @@ class Chapter():
 		screen_dims=self.rm.getScreenDimensions()
 		HWIDTH=screen_dims[0]/2
 		HHEIGHT=screen_dims[1]/2
-		MAX_NUM_CHARACTERS_PER_LINE=40
+		MAX_NUM_CHARACTERS_PER_LINE=120
 		self._debug_block_text_3d_overlay = self.rm.pi3d.TextBlock(-HWIDTH+30, HHEIGHT-30, 0.1, 0.0, MAX_NUM_CHARACTERS_PER_LINE,
 						size=0.99, spacing="F", space=0.03, colour=self._debug_font_color_3d_overlay)
 		self._debug_point_text_3d_overlay.add_text_block(self._debug_block_text_3d_overlay)

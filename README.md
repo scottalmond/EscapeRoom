@@ -110,6 +110,8 @@ TODO: 10-20 second demo video
 	- Command: _sudo raspi-config_
 		- 7 Advanced Operations >> A3 Memory Split >> 256
 		- To allow greater utilization of the GPU, a larger memory allocation is needed [source](http://pi3d.github.io/html/ReadMe.html#setup-on-the-raspberry-pi)
+	- Command: _pip3 install transforms3d_
+		- To help with 3D vector math translation/rotation of CAD models
 - Sound
 	- Command: _amixer cset numid=3 1_
 		- Change the audio to come out over the headphone jack [source](https://www.raspberrypi.org/documentation/configuration/audio-config.md)

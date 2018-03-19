@@ -27,7 +27,7 @@ Usage:
 #ConnectionManager (relay object state between PCs)
 
 from util.Chapter import Chapter
-from chapters.wall.hyperspace_helper.HypserspaceEnvironment import *
+from chapters.wall.hyperspace_helper.HyperspaceEnvironment import *
 import time
 import numpy as np
 import math
@@ -43,9 +43,9 @@ class Hyperspace(Chapter):
 	
 	ASSET_FOLDER='chapters/wall/assets/hyperspace/'
 	#dictionary of description:filename
-	ASSETS_3D={"pod":'pod_1.obj',
-			   "laser_base":'laser_base_1.obj',
-			   "laser_gun":'laser_gun_1.obj'}#,"ring0":'ring007.obj',"ring1":'ring006.obj'}
+	ASSETS_3D={"pod":'pod_2.obj',
+			   "laser_base":'laser_base_2.obj',
+			   "laser_gun":'laser_gun_2.obj'}#,"ring0":'ring007.obj',"ring1":'ring006.obj'}
 	POD_DEBUG_TEXTURE='circuit.jpg'
 	
 	def __init__(self,this_book):
@@ -107,17 +107,17 @@ class Hyperspace(Chapter):
 			self.rm.camera_3d.rotate(0,0,0)
 			self.rm.camera_3d.position((0,0,-10))
 		
-		mouserot=-2*this_frame_elapsed_seconds*30
-		tilt=25.0
-		camera_radius=20.0
+		mouserot=45#-2*this_frame_elapsed_seconds*30
+		tilt=15.0
+		camera_radius=16.0
 		
 		self.environment.update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,
 								self.rm)
 		
-		pod_position_x=self.environment.player_pod.x_offset
-		pod_position_y=self.environment.player_pod.y_offset
-		debug_strings.append("pod x: "+str(pod_position_x))
-		debug_strings.append("pod y: "+str(pod_position_y))
+		laser_r=self.environment.player_pod.laser_base["rotation"]
+		gun_r=self.environment.player_pod.laser_gun["rotation"]
+		debug_strings.append("laser_base rot: "+str(laser_r))
+		debug_strings.append("laser_gun rot: "+str(gun_r))
 		
 		self.rm.camera_3d.reset()
 		self.rm.camera_3d.rotate(-tilt,mouserot,0)
@@ -169,7 +169,7 @@ class Hyperspace(Chapter):
 			this_filename=self.ASSET_FOLDER+self.ASSETS_3D[asset_name]
 			this_shader=self.rm.shader_3d
 			this_cam=self.rm.camera_3d
-			model = self.rm.pi3d.Model(camera=this_cam, file_string=this_filename, x=1.0, y=0.0, z=1.0,rx=90.0,ry=0.0,rz=0.0)
+			model = self.rm.pi3d.Model(camera=this_cam, file_string=this_filename, x=0.0, y=0.0, z=0.0,rx=0.0,ry=0.0,rz=0.0)
 			model.set_shader(this_shader)
 			self.assets_3d[asset_name]=model
 		
