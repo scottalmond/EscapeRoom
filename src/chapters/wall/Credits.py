@@ -53,8 +53,8 @@ import os
 class Credits(Chapter):
 	PRIMARY_DIRECTORY='/home/pi/Documents/corporate_credits/'
 	BACKUP_DIRECTORY='/home/pi/Documents/EscapeRoom/src/chapters/wall/assets/credits/'
-	MUSIC_PATH='./chapters/wall/assets/credits/escaperoom01_pre01_0.mp3'
-	MUSIC_ENABLED=False
+	MUSIC_PATH='./chapters/wall/assets/credits/escaperoom03_pre02_0.mp3'
+	MUSIC_ENABLED=True
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -97,7 +97,7 @@ class Credits(Chapter):
 		super().enterChapter(unix_time_seconds)
 		self.book.endCountdown() #end timer if not already done
 		if(self.MUSIC_ENABLED):
-			self.rm.pygame.mixer.music.load(MUSIC_PATH)
+			self.rm.pygame.mixer.music.load(self.MUSIC_PATH)
 			self.rm.pygame.mixer.music.play()
 		self.background_color=(0,0,255)
 
@@ -114,7 +114,7 @@ class Credits(Chapter):
 		this_slide_index_ratio=this_frame_elapsed_seconds*len(self.slides)/self.getDurationSeconds()
 		this_slide_index=int(this_slide_index_ratio)
 		if(this_slide_index>=len(self.slides)):
-			self.is_done=True
+			self.is_done=True #may want to redefine as after the cororate credits video has played
 			return
 		else:
 			slide_duration_seconds=self.getDurationSeconds()/len(self.slides)

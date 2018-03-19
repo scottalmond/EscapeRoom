@@ -45,6 +45,7 @@ class Snake(Chapter):
 	MIN_VISIBLE_PELLETS_PER_PLAYER=2 #number of pellets that must be on screen for players to eat (unless they are already at max length)
 	GOAL_WIDTH_CELLS=3
 	MUSIC_PATH='./chapters/wall/assets/snake/escaperoom01_pre05_2.mp3'
+	MUSIC_ENABLED=True
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -70,8 +71,9 @@ class Snake(Chapter):
 		
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
-		self.rm.pygame.mixer.music.load(self.MUSIC_PATH)
-		self.rm.pygame.mixer.music.play(loops=-1)
+		if(self.MUSIC_ENABLED):
+			self.rm.pygame.mixer.music.load(self.MUSIC_PATH)
+			self.rm.pygame.mixer.music.play(loops=-1)
 		self.background_color=(0,0,0) #placeholder graphics background
 		if(self.is_debug):
 			print("Wall."+self.getTitle()+": set debug background color")
@@ -84,7 +86,8 @@ class Snake(Chapter):
 		
 	def exitChapter(self):
 		super().exitChapter()
-		self.rm.pygame.mixer.music.stop()
+		if(self.MUSIC_ENABLED):
+			self.rm.pygame.mixer.music.stop()
 		
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
@@ -171,7 +174,8 @@ class Snake(Chapter):
 					all_exiting_or_dead=False
 		if(all_exiting_or_dead and not self.is_music_fading_out):
 			self.is_music_fading_out=True #start fadeout when last player exists the field
-			self.rm.pygame.mixer.music.fadeout(int((self.WINNING_PLAYER_LENGTH-1)*player.SECONDS_PER_CELL*1000))
+			if(self.MUSIC_ENABLED):
+				self.rm.pygame.mixer.music.fadeout(int((self.WINNING_PLAYER_LENGTH-1)*player.SECONDS_PER_CELL*1000))
 		if(not any_alive):
 			self.is_done=True
 		
