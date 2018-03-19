@@ -82,6 +82,14 @@ class PlayerPod:
 			position,rotation=self.__getOrientation(obj["name"])
 			model=obj["model"]
 			model.position(position[0],position[1],position[2])
+			#model.rotateToX(0)
+			#model.rotateToy(0)
+			#model.rotateToz(0)
+			#tr1=model.tr1
+			#for row in range(3):
+			#	for col in range(3):
+			#		tr1[row][col]=rotation_matrix[row][col]
+			#model.tr1=tr1
 			model.rotateToX(math.degrees(rotation[0])) #pi3d operates in degrees
 			model.rotateToY(math.degrees(rotation[1]))
 			model.rotateToZ(math.degrees(rotation[2]))
@@ -133,46 +141,47 @@ class PlayerPod:
 	# where translaction and rotation are 3 element numpy arrays
 	def __getOrientation(self,obj):
 		position=np.array([0,0,0]) #start at origin
-		rotation=np.identity(3) # local_xyz * __rotation__ = global_XYZ
+		rotation_matrix=np.identity(3) # local_xyz * __rotation__ = global_XYZ
 		
 		#translation of pod in x,y in original coordinate frame
-		position+=np.dot(self.pod["translation"],rotation)
+		position=np.dot(self.pod["translation"],rotation_matrix)+position
 		#rotation of pod about x, z (TODO: implement x,z motion elsewhere in program)
 		xyz=self.pod["rotation"]
 		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
-		rotation=np.dot(R,rotation)
-		z,x,y=mat2euler(rotation,'szxy') #pi3d uses ZXY rotation https://pi3d.github.io/html/_modules/pi3d/Shape.html
+		rotation_matrix=np.dot(R,rotation_matrix)
+		z,x,y=mat2euler(rotation_matrix,'szxy') #pi3d uses ZXY rotation https://pi3d.github.io/html/_modules/pi3d/Shape.html
 		rotation_euler=np.array([x,y,z])
 		#return pod
 		if(obj=="pod"):
 			return position,rotation_euler
 			
 		#translation from center of pod to top gun base
-		position+=np.dot(self.laser_base["translation"],rotation)
+		position=np.dot(self.laser_base["translation"],rotation_matrix)+position
 		#rotation of gun base about y
 		xyz=self.laser_base["rotation"]
 		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
-		rotation=np.dot(R,rotation)
-		z,x,y=mat2euler(rotation,'szxy')
+		rotation_matrix=np.dot(R,rotation_matrix)
+		z,x,y=mat2euler(rotation_matrix,'szxy')
 		rotation_euler=np.array([x,y,z])
 		#return gun base
 		if(obj=="laser_base"):
 			return position,rotation_euler
 			
 		#translation from center of gun base to center of gun turret
-		position+=np.dot(self.laser_gun["translation"],rotation)
+		position=np.dot(self.laser_gun["translation"],rotation_matrix)+position
 		#rotation of gun turret about x
 		xyz=self.laser_gun["rotation"]
 		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
-		rotation=np.dot(R,rotation)
-		z,x,y=mat2euler(rotation,'szxy')
+		rotation_matrix=np.dot(R,rotation_matrix)
+		z,x,y=mat2euler(rotation_matrix,'szxy')
 		rotation_euler=np.array([x,y,z])
+		#rotation_euler=np.array([self.laser_gun["rotation"][0],self.laser_base["rotation"][1],0]) #hotpatch for ZXY euler angle rotation back-calculation issue - no change in behavior
 		#return gun turret
 		if(obj=="laser_gun"):
 			return position,rotation_euler
 			
 		#translation from center of gun turret to tip of laser
 		# TODO: implement laser visal effect from tip to asteroid
-		position=np.dot(self.laser_tip["translation"],rotation)+position
+		position=np.dot(self.laser_tip["translation"],rotation_matrix)+position
 		return position,rotation_euler
 		

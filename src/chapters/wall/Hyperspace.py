@@ -107,7 +107,7 @@ class Hyperspace(Chapter):
 			self.rm.camera_3d.rotate(0,0,0)
 			self.rm.camera_3d.position((0,0,-10))
 		
-		mouserot=45#-2*this_frame_elapsed_seconds*30
+		mouserot=0#-2*this_frame_elapsed_seconds*30
 		tilt=15.0
 		camera_radius=16.0
 		
