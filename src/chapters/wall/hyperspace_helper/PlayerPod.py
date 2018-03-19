@@ -42,9 +42,6 @@ class PlayerPod:
 		self.laser_base={"name":"laser_base","model":laser_joint_model}
 		self.laser_gun={"name":"laser_gun","model":laser_model}
 		self.laser_tip={"name":"laser_tip"}
-		#self.pod_model=pod_model
-		#self.laser_base=laser_joint_model
-		#self.laser_gun=laser_model
 		self.is_user_input_active=True #False #user inputs are only active after intro plays, but gas effects will still appear
 		self.deaths=-1 #number of times the player has died
 		self.restart(0)
@@ -81,38 +78,15 @@ class PlayerPod:
 	#pi3d rotates objects about their origin, then moves them along
 	# the global reference frame axes to the given translation offset
 	def draw(self):
-		#pod_position=np.add(np.multiply(camera.getFieldXvector(),self.x_offset),
-						#np.multiply(camera.getFieldYvector(),self.y_offset))
-		#laser_base_position=np.add(pod_position,(0,3.03,0))
-		#laser_gun_position=np.add(laser_base_position,(0,0.48,-0.45))
-		#model_list=[self.pod_model,self.laser_base,self.laser_gun]
-		#position_list=[pod_position,laser_base_position,laser_gun_position]
-		#for model_index in range(len(model_list)):
-			#model=model_list[model_index]
-			#position=position_list[model_index]
-			#model.position(position[0],position[1],position[2])
-			#if(model_index==1):
-				#pass#model.translateY(3.0)
-			#if(model_index==2):
-				#pass#model.translateY(3.45)
-			#model.rotateToX(0) #reset rotation
-			#model.rotateToY(0)
-			#model.rotateToZ(0)
-			##self.pod_model.rotateIncX(0) #compensate for offset in object axes definition
-			##coordinate transform using camera state to get center of play field
-			##if(model_index>0):
-			##model.rotateIncY(1.3*self.mouserot) #Y is about the spin axis
-			#model.draw()
 		for obj in [self.pod,self.laser_base,self.laser_gun]:
 			position,rotation=self.__getOrientation(obj["name"])
 			model=obj["model"]
 			model.position(position[0],position[1],position[2])
-			model.rotateToZ(math.degrees(rotation[2]))
 			model.rotateToX(math.degrees(rotation[0])) #pi3d operates in degrees
 			model.rotateToY(math.degrees(rotation[1]))
+			model.rotateToZ(math.degrees(rotation[2]))
 			model.draw()
 			
-		
 	#accessor method for GUI to echo the user input joystick states
 	#also for laser to determine if laser is firing
 	def getUserInput(self):
@@ -125,9 +99,11 @@ class PlayerPod:
 		if(self.hits>=MAX_HITS):
 			return True
 	
-	#the Laser GUI reports the position of the laser on screen
+	#the Laser GUI reports the position of the laser pointer on screen
 	# x is the horizontal position on the screen, +x is right/East
 	# y is vertical, +y is up/North, max pixel extent: (+540,-540)
+	#movement in x changes the rotation of the laser_base about the local y-axis
+	#movement in y changes the rotation of the laser_gun about the local x-axis
 	def setLaserPointer(self,screen_x,screen_y):
 		radians_hori=math.atan(screen_x/500) #radians
 		radians_vert=math.atan(screen_y/500)
@@ -137,36 +113,34 @@ class PlayerPod:
 			self.laser_base["rotation"]=rotation_base
 			self.laser_gun["rotation"]=rotation_gun
 	
-	#restart level	
+	#restart level, reset player to default config
 	def restart(self,level_start_time_elapsed_seconds):
 		self.hits=0
-		self.pod["translation"]=np.array([0,0,0])
-		self.pod["rotation"]=np.array([0,0,0]) #rotation in radians, euler angles
+		self.pod["translation"]=np.array([0,0,0]) # (X,Y,Z)
+		self.pod["rotation"]=np.array([0,0,0]) #rotation in radians, euler angles (X,Y,Z)
 		self.laser_base["translation"]=np.array([0,3.03,0]) #property of the specific .obj file
 		self.laser_base["rotation"]=np.array([0,0,0])
 		self.laser_gun["translation"]=np.array([0,0.48,-0.45])
 		self.laser_gun["rotation"]=np.array([0,0,0])
 		self.laser_tip["translation"]=np.array([0,0.25,2.76])
-		#self.x_offset=0
-		#deviation from center of play field in Pi3D units,
-		# may not be literal X axis due to rotation of playfield throughout
-		# game and camera motion
-		#self.y_offset=0
 		self.level_start_seconds=level_start_time_elapsed_seconds
 		self.deaths=self.deaths+1
 
+	#extract the X, Y, Z position of, and alpha, beta, gamma angles of, the
+	# given object to feed into Pi3D
 	#obj is a String: "pod", "laser_base", "laser_gun", "laser_tip"
 	#returns translation,rotation=getOrientation()
 	# where translaction and rotation are 3 element numpy arrays
 	def __getOrientation(self,obj):
-		position=np.array([0,0,0])
-		rotation=np.identity(3)
+		position=np.array([0,0,0]) #start at origin
+		rotation=np.identity(3) # local_xyz * __rotation__ = global_XYZ
+		
 		#translation of pod in x,y in original coordinate frame
-		position=np.dot(self.pod["translation"],rotation)+position
-		#rotation of pod about x, z
+		position+=np.dot(self.pod["translation"],rotation)
+		#rotation of pod about x, z (TODO: implement x,z motion elsewhere in program)
 		xyz=self.pod["rotation"]
 		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
-		rotation=np.dot(rotation,R)
+		rotation=np.dot(R,rotation)
 		z,x,y=mat2euler(rotation,'szxy') #pi3d uses ZXY rotation https://pi3d.github.io/html/_modules/pi3d/Shape.html
 		rotation_euler=np.array([x,y,z])
 		#return pod
@@ -174,30 +148,31 @@ class PlayerPod:
 			return position,rotation_euler
 			
 		#translation from center of pod to top gun base
-		position=np.dot(self.laser_base["translation"],rotation)+position
+		position+=np.dot(self.laser_base["translation"],rotation)
 		#rotation of gun base about y
 		xyz=self.laser_base["rotation"]
 		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
-		rotation=np.dot(rotation,R)
+		rotation=np.dot(R,rotation)
 		z,x,y=mat2euler(rotation,'szxy')
 		rotation_euler=np.array([x,y,z])
 		#return gun base
 		if(obj=="laser_base"):
 			return position,rotation_euler
 			
-		#translaction from center of gun base to center of gun turret
-		position=np.dot(self.laser_gun["translation"],rotation)+position
+		#translation from center of gun base to center of gun turret
+		position+=np.dot(self.laser_gun["translation"],rotation)
 		#rotation of gun turret about x
 		xyz=self.laser_gun["rotation"]
 		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
-		rotation=np.dot(rotation,R)
+		rotation=np.dot(R,rotation)
 		z,x,y=mat2euler(rotation,'szxy')
 		rotation_euler=np.array([x,y,z])
 		#return gun turret
 		if(obj=="laser_gun"):
 			return position,rotation_euler
 			
-		#translaction from center of gun turret to tip of laser
+		#translation from center of gun turret to tip of laser
+		# TODO: implement laser visal effect from tip to asteroid
 		position=np.dot(self.laser_tip["translation"],rotation)+position
 		return position,rotation_euler
 		
