@@ -76,12 +76,16 @@ class Hyperspace(Chapter):
 		
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
+		if(self.MUSIC_ENABLED):
+			self.rm.pygame.mixer.music.load(self.MUSIC_PATH)
 		if(self.VIDEO_ENABLED):
 			self.io.playVideo(self.background_video_player)
 		self.background_color=(0,100,255)
 		
 	def exitChapter(self):
 		super().exitChapter()
+		if(self.MUSIC_ENABLED):
+			self.rm.pygame.mixer.music.stop()
 	
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
