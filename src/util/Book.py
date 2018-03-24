@@ -32,8 +32,7 @@ import threading
 
 #custom support assets
 #from util.IO_Manager import IO_Manager #interface for reading button state
-from util.ResourceManager import ResourceManager #wrapper for fetching art assets
-#from util.ConnectionManager import ConnectionManager#interface for receiving external commands from Proctor or Wall computer
+from util.ResourceManager import ResourceManager #wrapper for fetching config-file/art assets, and IO button/joystick status
 from util.Chapter import Chapter
 
 #Wall Chapters
@@ -70,9 +69,8 @@ class Book:
 	#VARIABLES
 	
 	#CONSTRUCTOR
-	
-	# this_book_type - an ENUM defining 
-	def __init__(self,this_book_type,is_debug,is_windowed,is_keyboard):
+	#is_isolated_node means this computer does not communicate over TCP with any other PCs
+	def __init__(self,this_book_type,is_debug,is_windowed,is_keyboard,is_isolated_node):
 		print("Book.__init__: Hello World")
 		#configure variables
 		self._is_alive=True
@@ -85,14 +83,17 @@ class Book:
 		self._is_ready.clear()
 		self._visible_chapter=None #pointer to currently running chapter
 		self._resource_manager=ResourceManager(self.book_type,is_debug,is_windowed,is_keyboard)
-		#self._io_manager=IO_Manager(self.book_type,is_debug_enabled)
+		
+		#due to inter-dependence of classes, this needs to be imported at run time
+		from util.ConnectionManager import ConnectionManager #interface for receiving external commands from Proctor or Wall computer
+		self._connection_manager=ConnectionManager(self.getTitle(),not is_isolated_node,self.is_debug)
+		
 		self._chapter_list=self.__get_all_chapters(self.book_type,self.resource_manager)
-		self._connection_manager=None#ConnectionManager(self)
 		
 	#METHODS
 	"""
 	kicks off threads and other resource/time-heavy tasks
-	wrapper for run() in case Book needs to extrend Thread later
+	wrapper for run() in case Book needs to extend Thread later
 	"""
 	def start(self):
 		self.run()
@@ -112,11 +113,11 @@ class Book:
 		self.resource_manager.clean()
 		for chapter in self._chapter_list:
 			chapter.clean()
-#		self._connection_manager.clean()
+		self.connection_manager.clean()
 	
 	"""
 	external operators should call is_alive=False to ensure a clean exit
-	from run()
+	from run(), don't call dispose(), that'll happen automatically
 	"""
 	def dispose(self):
 		print("book.dipose()")
@@ -127,8 +128,13 @@ class Book:
 		# master_listener will self-dispose when book.is_alive becomes False
 		self.resource_manager.dispose()
 		#self._io_manager.dispose()
+		self.connection_manager.dispose()
+		self.connection_manager.join() #once dead, wait for listener thread to exit
 	
 	def run(self):
+		#print("Book.run(): _cm.__class__.__name__: "+str(self._connection_manager.__class__.__name__))
+		#print("Book.run(): cm.__class__.__name__: "+str(self.connection_manager.__class__.__name__))
+		self.connection_manager.start()
 		while(self.is_alive): #for each playthrough
 			#step out of current chapter and into next chapter when ready
 			chapter_empty_or_error=self._visible_chapter is None or not isinstance(self._visible_chapter,Chapter)
@@ -423,4 +429,11 @@ class Book:
 	@resource_manager.setter
 	def resource_manager(self,value):
 		raise ValueError("Changing resource_manager after initialization is not supported: "+str(value))
+		
+	@property
+	def connection_manager(self): return self._connection_manager
+	
+	@connection_manager.setter
+	def connection_manager(self,value):
+		raise ValueError("Changing connection_manager after initialization is not supported: "+str(value))
 	

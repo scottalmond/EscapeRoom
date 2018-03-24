@@ -34,6 +34,7 @@ import json
 import socket
 import subprocess
 from enum import Enum
+import time
 
 import util.Book
 from util.Book import BOOK_TYPE
@@ -55,9 +56,13 @@ class ConnectionManager(threading.Thread):
 		[BOOK_TYPE.WALL.name,BOOK_TYPE.HELM.name]
 		]
 	
-	def __init__(self,this_book_title,is_debug=False):
+	#if is_enabled is False, then this class acts as a placeholder, returning empty responses
+	# if is_enabled is True, then this class performs intended duties
+	# to connect computers
+	def __init__(self,this_book_title,is_enabled=True,is_debug=False):
 		threading.Thread.__init__(self)
 		self._is_alive=True
+		self._is_enabled=is_enabled
 		self.is_debug=is_debug
 		self.book_title=this_book_title
 		self.nodes=[]
@@ -68,45 +73,54 @@ class ConnectionManager(threading.Thread):
 		for relationship in self.BOOK_MASTER_RELATIONSHIP:
 			if(relationship[0]==self.book_title):
 				if(server_nm is None):
-					server_nm=NodeManager(self,relationship[0],relationship[1],True,is_debug)
+					server_nm=NodeManager(self,relationship[0],relationship[1],True,is_enabled,is_debug)
 					self.nodes.append(server_nm)
 				else:
 					server_nm.appendTarget(relationship[1])
 			elif(relationship[1]==self.book_title):
-				client_nm=NodeManager(self,relationship[1],relationship[0],False,is_debug)
+				client_nm=NodeManager(self,relationship[1],relationship[0],False,is_enabled,is_debug)
 				self.nodes.append(client_nm)
-		if(self.is_debug): print("ConnectionManager.init: number of NMs: "+str(len(self.nodes)))
+		if(self.__isPrintEnabled()): print("ConnectionManager.init: number of NMs: "+str(len(self.nodes)))
 		for node in self.nodes:
 			node.start() #kick off threads that will seek connections and listen to input
+		
+	def __isPrintEnabled(self):
+		return self.is_debug and self._is_enabled
 		
 	def clean(self):
 		pass
 		
 	def dispose(self):
-		if(self.is_debug): print("ConnectionManager.dispose()")
+		if(self.__isPrintEnabled()): print("ConnectionManager.dispose()")
 		self._is_alive=False #it appears threads also have an is_alive bool and there is a conflict, so set _is_alive directly
 		for node in self.nodes:
 			node.dispose()
+			node.join()
 		
 	def run(self):
-		if(self.is_debug): print("ConnectionManager.run: enter method")
+		if(self.__isPrintEnabled()): print("ConnectionManager.run: enter method")
 		while(self._is_alive):
-			#time.sleep(1)
-			if(self.is_debug): print("CM -- "+str(time.time()))
-			if(self.is_debug): print(self.getStatus())
-			if(not self.isReady()):
-				if(self.is_debug): print("ConnectionManager.run: Attempt to (re-)connect nodes...")
-			for node in self.nodes:
-				node.connect()
-				#call in an infinite loop to reestablish any dropped connections
+			if(not self._is_enabled):
+				time.sleep(0.1)
+			else:
+				#time.sleep(1)
+				if(self.__isPrintEnabled()): print("CM -- "+str(time.time()))
+				if(self.__isPrintEnabled()): print(self.getStatus())
+				if(not self.isReady()):
+					if(self.__isPrintEnabled()): print("ConnectionManager.run: Attempt to (re-)connect nodes...")
+				for node in self.nodes:
+					node.connect()
+					#call in an infinite loop to reestablish any dropped connections
 	
 	#external PC sends package to this PC
 	#package is a dictinary
 	def receive(self,package):
-		if(self.is_debug): print("ConnectionManager.receive: "+str(package))
+		if(self.__isPrintEnabled()): print("ConnectionManager.receive: "+str(package))
 		self.inbound_queue.put(package)
 		
-	#scope is a string like "Book" or "Chapter"
+	#scope is a string like "Book" or "Chapter" (class name)
+	# or even "NodeManager", but these packets are wiped away before
+	# getting up to this level
 	#returns the packet on the top of the queue
 	# if none is thre, returns None
 	def pop(self,scope):
@@ -121,7 +135,7 @@ class ConnectionManager(threading.Thread):
 		return None
 		
 	#this PC sending a package out bound to another PC
-	#packet is json.dumps encoded
+	#packet is a json.dumps String
 	def send(self,packet):
 		#TODO: attempt to send to all node managers, only relevant node manager will comply
 		for node in self.nodes:
@@ -132,6 +146,7 @@ class ConnectionManager(threading.Thread):
 	#query whether the link to a particular book has been established
 	# assumes each PC has a unique name and only exists once as either a server or client, not both
 	#if target_book_title is None, then check the status of all books together
+	# etiehr they are all ready (True) or one or more is not (False)
 	def isReady(self,target_book_title=None):
 		if(target_book_title is None):
 			for nm in self.nodes:

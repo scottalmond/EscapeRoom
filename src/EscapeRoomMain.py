@@ -54,13 +54,13 @@ import distutils.util
 
 class Main(threading.Thread):
 	
-	def __init__(self,this_book_type,is_debug,is_windowed,is_keyboard):
+	def __init__(self,this_book_type,is_debug,is_windowed,is_keyboard,is_isolated_node):
 		threading.Thread.__init__(self)
 		print("Main.__init__: Hello World")
 		#configure constants
 		
 		#configure lists and objects
-		self.my_book=Book(BOOK_TYPE(this_book_type),is_debug,is_windowed,is_keyboard)
+		self.my_book=Book(BOOK_TYPE(this_book_type),is_debug,is_windowed,is_keyboard,is_isolated_node)
 		
 	"""
 	Extends Thread
@@ -101,6 +101,7 @@ if __name__ == "__main__":
 		print("  WINDOWED: specifies whether pygame should be run in a windowed mode, useful when a program lock-up is anticipated and terminal access is needed")
 		print("  DEBUG: specifies whether on-screen-displays and otehr debugging tools/graphics are to be used within each chapter")
 		print("  KEYBOARD: specifies if inputs are to be pulled from the keyboard or from external discretes")
+		print("  ISOLATED: specifies if this computer acts alone (True) or should look to connect with other PCs through TPC (False)")
 		print("")
 		print("Keyboard commands:")
 		print("  ENTER: jump to next chapter")
@@ -125,6 +126,10 @@ if __name__ == "__main__":
 		if("KEYBOARD" in args):
 			is_keyboard=True
 			args.remove("KEYBOARD")
+		is_isolated_node=False
+		if("ISOLATED" in args):
+			is_isolated_node=True
+			args.remove("ISOLATED")
 		book_type=args[1]
 		if(book_type=="WALL"):
 			book_type=BOOK_TYPE.WALL
@@ -138,7 +143,7 @@ if __name__ == "__main__":
 		if(len(args)>2):
 			go_to_chapter=True
 			chapter_name=sys.argv[2]
-		my_main=Main(book_type,is_debug,is_windowed,is_keyboard)
+		my_main=Main(book_type,is_debug,is_windowed,is_keyboard,is_isolated_node)
 		my_main.start()
 		my_main.wait_for_book() #wait for book to be booted and past variable initialization so variables can be changed
 		#my_main.setKeyboard(is_keyboard)

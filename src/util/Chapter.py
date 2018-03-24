@@ -49,6 +49,7 @@ class Chapter():
 		self._is_done=False
 		self._book=this_book
 		self._resource_manager=None if this_book is None else this_book.resource_manager
+		self._connection_manager=None if this_book is None else this_book.connection_manager
 		#print("Chapter.io: "+str(this_book.io_manager))
 		#self._io_manager=this_book.io_manager
 		self.my_title=book_title
@@ -189,4 +190,11 @@ class Chapter():
 	@rm.setter
 	def rm(self, value):
 		raise ValueError("Changing resource_manager after initialization is not supported: "+str(value))
+		
+	@property
+	def cm(self): return self._connection_manager
+
+	@rm.setter
+	def cm(self, value):
+		raise ValueError("Changing connection_manager after initialization is not supported: "+str(value))
 		

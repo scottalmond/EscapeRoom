@@ -69,9 +69,10 @@ class NodeManager(threading.Thread):
 	#target_node_types is a String - append additional clients with appendClient()
 	#is_server is a Boolean - indicates whehter the Book running on this PC is acting
 	# as a server or a client in this NM relationship
-	def __init__(self,connection_manager,source_node_title,target_node_title,is_server,is_debug=False):
+	def __init__(self,connection_manager,source_node_title,target_node_title,is_server,is_enabled=True,is_debug=False):
 		threading.Thread.__init__(self)
 		self._is_alive=True
+		self._is_enabled=is_enabled
 		self.is_debug=is_debug
 		self.connection_manager=connection_manager
 		self.is_server=is_server
@@ -87,39 +88,47 @@ class NodeManager(threading.Thread):
 		#target name, target pointer, is_error
 		self.nodes.append({"target_node_title":target_node_title,"target_pointer":None,"is_error":False})
 			
+	def __isPrintEnabled(self):
+		return self.is_debug and self._is_enabled
+			
 	#infinite loop looking for input from sockets, enqueuing to
 	# ConnectionManager all that is found
 	def run(self):
-		if(self.is_debug): print("NodeManager.run: enter")
+		if(self.__isPrintEnabled()): print("NodeManager.run: enter")
 		while(self._is_alive):
 			#time.sleep(1)
 			#print("NM -- "+str(time.time()))
 #			print("NodeManager.run: wait for input: "+str(time.time()))
-			for node_index in range(len(self.nodes)):
-				node=self.nodes[node_index]
-				conn=node["target_pointer"] #get socket
-				if(self.__nodeReady(node)):
-					#listen for input from existing clients, if not closed
-					#note: may be operating on None type for node["target_pointer"]
-					# due to multi-threaded access to dictionary
-					try:
-						data=conn.recv(self.MAX_PACKET_SIZE_BYTES)
-						self.receive(data.decode())
-					except socket.timeout:
-						pass #if no input received, then move on to next task
-					except AttributeError:
-						pass #type changed to None during execution
-					except ConnectionResetError:
-						node["is_error"]=True
-					#there may be errors related to sending data over a closed connection... --> no action upon is_error
-					#BrokenPipeError --> set is_error=True
-					# if is_server, then server["is_error"]=True
+			if(not self._is_enabled):
+				time.sleep(0.1)
+			else:
+				for node_index in range(len(self.nodes)):
+					node=self.nodes[node_index]
+					conn=node["target_pointer"] #get socket
+					if(self.__nodeReady(node)):
+						#listen for input from existing clients, if not closed
+						#note: may be operating on None type for node["target_pointer"]
+						# due to multi-threaded access to dictionary
+						try:
+							data=conn.recv(self.MAX_PACKET_SIZE_BYTES)
+							self.receive(data.decode())
+						except socket.timeout:
+							pass #if no input received, then move on to next task
+						except AttributeError:
+							pass #type changed to None during execution
+						except ConnectionResetError:
+							node["is_error"]=True
+						#there may be errors related to sending data over a closed connection... --> no action upon is_error
+						#BrokenPipeError --> set is_error=True
+						# if is_server, then server["is_error"]=True
 		self.__disposeNode() #when done with thread, close connections
 				
 	#Establish or re-establish connections with external PCs
 	# an external thread in ConnectionManger regularly calls this method
 	def connect(self):
-		if(self.is_debug): print("NodeManager.connect: enter")
+		if(self.__isPrintEnabled()): print("NodeManager.connect: enter")
+		if(not self._is_enabled):
+			return #skip TCP tasks if NodeManager is acting as a dummy class
 		is_action_needed=not self.isReady()
 		if(is_action_needed): #skip resource-intensive tasks if no action is needed
 			if(self.is_server): #this PC is server, has many clients
@@ -132,9 +141,9 @@ class NodeManager(threading.Thread):
 				#listen for new clients
 				try:
 					conn, addr=server_socket.accept()
-					if(self.is_debug): print("NodeManager.connect: New client joined: "+str(conn)+", "+str(addr))
+					if(self.__isPrintEnabled()): print("NodeManager.connect: New client joined: "+str(conn)+", "+str(addr))
 					identity_packet=conn.recv(self.MAX_PACKET_SIZE_BYTES).decode()
-					if(self.is_debug): print("NodeManager.connect: identity packet: "+str(identity_packet))
+					if(self.__isPrintEnabled()): print("NodeManager.connect: identity packet: "+str(identity_packet))
 					self.receive(identity_packet,conn)
 					conn.settimeout(self.CONNECTION_TIMEOUT_SECONDS)
 					
@@ -168,7 +177,7 @@ class NodeManager(threading.Thread):
 						
 	#call to close out open threads
 	def dispose(self):
-		if(self.is_debug): print("NodeManager.dispose: enter")
+		if(self.__isPrintEnabled()): print("NodeManager.dispose: enter")
 		self._is_alive=False
 		
 	#when input is received from an external PC, add it to the internal queue
@@ -176,7 +185,7 @@ class NodeManager(threading.Thread):
 	def receive(self,message,socket=None):
 		message_decoded=json.loads(message)
 		if(len(message)>0):
-			if(self.is_debug): print("NodeManager.receive: message: "+str(message_decoded))
+			if(self.__isPrintEnabled()): print("NodeManager.receive: message: "+str(message_decoded))
 			if(message_decoded["target_scope"]=="NodeManager"):#if target is NodeManager, parse here, else flow upward
 				self.receiveCommand(message_decoded,socket)
 			else:
@@ -189,7 +198,7 @@ class NodeManager(threading.Thread):
 		package=packet["package"] #WALL (when being sent to PROCTOR)
 		if(command=="client_identification"):
 			if(self.is_server):
-				if(self.is_debug): print("NodeManager.receiveCommand: client_identification")
+				if(self.__isPrintEnabled()): print("NodeManager.receiveCommand: client_identification")
 				#look through nodes for matching connection
 				# and assign this socket in that list
 				for node_index in range(len(self.nodes)):
@@ -207,8 +216,8 @@ class NodeManager(threading.Thread):
 	def send(self,message):
 		#identify the socket to send the packet out over...
 		message_decoded=json.loads(message)
-		if(self.is_debug): print("NodeManager.send: message: "+str(message_decoded))
-		if(self.is_debug): print("NodeManager.send: iterating over number of nodes: "+str(len(self.nodes)))
+		if(self.__isPrintEnabled()): print("NodeManager.send: message: "+str(message_decoded))
+		if(self.__isPrintEnabled()): print("NodeManager.send: iterating over number of nodes: "+str(len(self.nodes)))
 		for node in self.nodes:
 			target_node_title=node["target_node_title"]
 			target_message_title=message_decoded["target_book_title"]
@@ -216,8 +225,8 @@ class NodeManager(threading.Thread):
 			if(target_node_title==target_message_title):
 				if(self.__nodeReady(node)):
 					try:
-						if(self.is_debug): print("NodeManager.send: sending...")
-						socket.send(message.encode())
+						if(self.__isPrintEnabled()): print("NodeManager.send: sending...")
+						if(self._is_enabled): socket.send(message.encode())
 						return True
 					except BrokenPipeError:
 						node["is_error"]=True
@@ -239,7 +248,7 @@ class NodeManager(threading.Thread):
 		try:
 			skt.bind((host,port))
 			skt.listen(max_connections)
-			if(self.is_debug): print("NodeManager.createServer: Opened server as: "+str(host)+", port: "+str(port))
+			if(self.__isPrintEnabled()): print("NodeManager.createServer: Opened server as: "+str(host)+", port: "+str(port))
 			return skt
 		except socket.error as msg:
 			pass
@@ -253,7 +262,7 @@ class NodeManager(threading.Thread):
 			skt.settimeout(self.CONNECTION_TIMEOUT_SECONDS)
 			try:
 				skt.connect((host,port))
-				if(self.is_debug): print("Connected to server: "+str(host)+", port: "+str(port))
+				if(self.__isPrintEnabled()): print("Connected to server: "+str(host)+", port: "+str(port))
 				return skt
 			except socket.error as msg:
 				pass #silence connection errors
