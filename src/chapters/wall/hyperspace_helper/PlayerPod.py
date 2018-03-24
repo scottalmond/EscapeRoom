@@ -25,7 +25,7 @@ Usage:
 import numpy as np
 import math
 
-from transforms3d.euler import euler2mat, mat2euler
+#from transforms3d.euler import euler2mat, mat2euler
 
 from util.ResourceManager import DEVICE,DIRECTION
 #retains the state of the center of the player cargo pod
@@ -147,9 +147,9 @@ class PlayerPod:
 		position=np.dot(self.pod["translation"],rotation_matrix)+position
 		#rotation of pod about x, z (TODO: implement x,z motion elsewhere in program)
 		xyz=self.pod["rotation"]
-		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
+		R=[0,0,0] #euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
 		rotation_matrix=np.dot(R,rotation_matrix)
-		z,x,y=mat2euler(rotation_matrix,'szxy') #pi3d uses ZXY rotation https://pi3d.github.io/html/_modules/pi3d/Shape.html
+		z,x,y=[0,0,0] #mat2euler(rotation_matrix,'szxy') #pi3d uses ZXY rotation https://pi3d.github.io/html/_modules/pi3d/Shape.html
 		rotation_euler=np.array([x,y,z])
 		#return pod
 		if(obj=="pod"):
@@ -159,9 +159,9 @@ class PlayerPod:
 		position=np.dot(self.laser_base["translation"],rotation_matrix)+position
 		#rotation of gun base about y
 		xyz=self.laser_base["rotation"]
-		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
+		R=[0,0,0] #euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
 		rotation_matrix=np.dot(R,rotation_matrix)
-		z,x,y=mat2euler(rotation_matrix,'szxy')
+		z,x,y=[0,0,0] #mat2euler(rotation_matrix,'szxy')
 		rotation_euler=np.array([x,y,z])
 		#return gun base
 		if(obj=="laser_base"):
@@ -171,9 +171,9 @@ class PlayerPod:
 		position=np.dot(self.laser_gun["translation"],rotation_matrix)+position
 		#rotation of gun turret about x
 		xyz=self.laser_gun["rotation"]
-		R=euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
+		R=[0,0,0] #euler2mat(xyz[0],xyz[1],xyz[2],'sxyz')
 		rotation_matrix=np.dot(R,rotation_matrix)
-		z,x,y=mat2euler(rotation_matrix,'szxy')
+		z,x,y=[0,0,0] #mat2euler(rotation_matrix,'szxy')
 		rotation_euler=np.array([x,y,z])
 		#rotation_euler=np.array([self.laser_gun["rotation"][0],self.laser_base["rotation"][1],0]) #hotpatch for ZXY euler angle rotation back-calculation issue - no change in behavior
 		#return gun turret
