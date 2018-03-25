@@ -159,6 +159,14 @@ class Book:
 				while(self.is_alive and not self._visible_chapter.is_done):
 					#TODO: connection_manager.pop("Book")
 					#TODO: connection_manager.pop("Chapter") --> pass to update() method
+					peek=None if self.connection_manager.inbound_queue.empty() else self.connection_manager.inbound_queue.queue[0]
+					if(self.getTitle().lower()=="Wall".lower()):
+						print("Book.run: peek: "+str(peek))
+					book_packets=self.getScopePackets("Book")
+					#print("Book.run: number of packets: "+str(len(book_packets)))
+					for book_packet in book_packets:
+						print("Book.run: execute book_packet: "+str(book_packet))
+						self.executeCommand(book_packet)
 					self.resource_manager.update() #used to look for things like the programmer hitting the tab key
 					if(self.resource_manager.isStopped()):
 						self.is_alive=False
@@ -170,7 +178,8 @@ class Book:
 						print("Book.run: frame 0")
 					else:
 						this_frame_elapsed_seconds=time.time()-first_frame_unix_seconds
-					self._visible_chapter.update(this_frame_number,this_frame_elapsed_seconds,last_frame_elapsed_seconds)
+					chapter_packets=self.getScopePackets("Chapter")
+					self._visible_chapter.update(this_frame_number,this_frame_elapsed_seconds,last_frame_elapsed_seconds,chapter_packets)
 					#only draw if book is alive and chapter is not done
 					if(self.is_alive and not self._visible_chapter.is_done):
 						self._visible_chapter.draw()
@@ -208,13 +217,18 @@ class Book:
 	{"command":"go_to_next_chapter"}
 	"""
 	def executeCommand(self,json_cmd):
-		json_dict=json.loads(json_cmd)
+		if(type(json_cmd)==type({})): #if a dictionary is input, do nothing
+			json_dict=json_cmd
+		else:#parse anything else from a json structure to a dictionary
+			json_dict=json.loads(json_cmd)
 		if(not "command" in json_dict):
 			raise ValueError("Command is malformed, missing 'command' key: "+str(json_cmd))
 		command=json_dict["command"]
 		parameters=None
 		if("parameters" in json_dict):
 			parameters=json_dict["parameters"]
+		elif("package" in json_dict):
+			parameters=json_dict["package"]
 		#begin switch statement
 		if(command=="set_next_chapter"):
 			chapter_index=None
@@ -230,7 +244,7 @@ class Book:
 					raise ValueError("Chapter title not found for command: "+str(json_cmd))
 			elif("by_index" in parameters):
 				chapter_index_iter=int(parameters["by_index"])
-				if(chapter_index_iter<0 or chapter_index_iter>=len(elf._chapter_list)):
+				if(chapter_index_iter<0 or chapter_index_iter>=len(self._chapter_list)):
 					raise ValueError("Chapter index out of range for command: "+str(json_cmd))
 				chapter_index=chapter_index_iter
 			else:
@@ -388,6 +402,15 @@ class Book:
 	def setKeyboard(self,value):
 		self.resource_manager.is_keyboard=value
 		
+	#query the connection_manager and extract all in-coming packets from other PCs
+	def getScopePackets(self,scope="Book"):
+		packet_list_out=[]
+		packet=0
+		while(not packet is None):
+			packet=self.connection_manager.pop(scope)
+			if(not packet is None):
+				packet_list_out.append(packet)
+		return packet_list_out
 		
 	#debug includes on-screen-displays
 	@property

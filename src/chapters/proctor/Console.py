@@ -72,13 +72,15 @@ class Console(Chapter):
 		self.gui.setVisible(False)
 		print("proctor."+self.getTitle()+".exitChapter(): done")
 		
-	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):#perhaps include total time elapsed in chapter... and playthrough number...
-		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):#perhaps include total time elapsed in chapter... and playthrough number...
+		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets)
 		
 		self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
 		self.this_frame_number=this_frame_number
 		
 		self.setDebugStringList([],this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+		
+		#self.gui.update(self._osd_debug_strings,
 		
 	def draw(self):
 		super().draw()
@@ -125,7 +127,7 @@ class GUI(threading.Thread):
 		label = tk.Label(root, textvariable=status)
 		label.pack()
 		
-		status.set("new text")
+		status.set("PLACEHOLDER")
 		
 		root.geometry("300x600+100+100")
 		
@@ -133,7 +135,16 @@ class GUI(threading.Thread):
 
 	def nextChapter(self):
 		print("Next Chapter")
-	
+		connection_manger=self.chapter.cm
+		source_book_title=self.chapter.book.getTitle()
+		source_chapter_title=self.chapter.getTitle()
+		target_book_title="Wall"
+		target_scope="Book"
+		command="go_to_next_chapter"
+		package=None
+		packet_go_to_next_chapter=connection_manger.getPacketFor(source_book_title,source_chapter_title,target_book_title,target_scope,command,package)
+		connection_manger.send(packet_go_to_next_chapter)
+		
 	def resetRoom(self):
 		print("Reset")
 		connection_manger=self.chapter.cm

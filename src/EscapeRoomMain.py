@@ -28,11 +28,12 @@ is_debug = False
 book_type = Wall
 chapter_name = Hyperspace
 
-python3 EscapeRoomMain.py WALL Hyperspace WINDOWED DEBUG KEYBOARD
+python3 EscapeRoomMain.py WALL Hyperspace WINDOWED DEBUG KEYBOARD ISOLATED
 
 DEBUG is on-screen-display (text debugging)
 WINDOWED allows 2D pygame window to be moved around to see terminal errors
 KEYBOARD uses the keyboard as an input device rather than DI/O
+ISOLATED disables TCP communication with external PCs
 
 ESC - EXIT
 ENTER - Next chapter

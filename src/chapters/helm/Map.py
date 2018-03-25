@@ -44,8 +44,8 @@ class Map(Chapter):
 	def exitChapter(self):
 		super().exitChapter()
 	
-	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
-		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):
+		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets)
 		
 	def draw(self):
 		super().draw()

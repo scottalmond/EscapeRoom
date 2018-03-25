@@ -106,8 +106,8 @@ class Credits(Chapter):
 		if(self.MUSIC_ENABLED):
 			self.rm.pygame.mixer.music.stop()
 
-	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
-		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):
+		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets)
 		elapsed_time_seconds=self.book.getCountdownElapsed()
 		self.image_list_draw=[] #list of images and locations to be rendered
 		self.text_list_draw=[] #list of text strings, fonts, and locations to be rendered

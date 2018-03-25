@@ -67,8 +67,8 @@ class Standby(Chapter):
 			print("wall."+self.getTitle()+": exitChapter()")
 		
 		
-	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):#perhaps include total time elapsed in chapter... and playthrough number...
-		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):#perhaps include total time elapsed in chapter... and playthrough number...
+		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets)
 		
 		self.seconds_since_last_frame=this_frame_elapsed_seconds-previous_frame_elapsed_seconds
 		self.this_frame_number=this_frame_number

@@ -24,7 +24,14 @@ Assumptions:
 
 
 Usage:
+cd
 python3 -m util.ConnectionManager WALL
+
+in another terminal:
+cd
+python3 -m util.ConnectionManager PROCTOR
+
+two nodes should automatically connect and exchange messages
 
 """
 
@@ -55,6 +62,9 @@ class ConnectionManager(threading.Thread):
 		[BOOK_TYPE.PROCTOR.name,BOOK_TYPE.WALL.name],
 		[BOOK_TYPE.WALL.name,BOOK_TYPE.HELM.name]
 		]
+		
+	SECONDS_BETWEEN_DEBUG_PRINT=4 #minimum number of seconds between debug printing in the run method
+	RATE_LIMIT_SECONDS=0.1 #limit how often activity is queried over TCP connection
 	
 	#if is_enabled is False, then this class acts as a placeholder, returning empty responses
 	# if is_enabled is True, then this class performs intended duties
@@ -68,6 +78,7 @@ class ConnectionManager(threading.Thread):
 		self.nodes=[]
 		self.inbound_queue=queue.Queue()
 		server_nm=None
+		self.last_run_print_seconds=0 #time of last print
 		#create NodeManagers to represent the connections this PC has with
 		# external actors
 		for relationship in self.BOOK_MASTER_RELATIONSHIP:
@@ -100,14 +111,17 @@ class ConnectionManager(threading.Thread):
 	def run(self):
 		if(self.__isPrintEnabled()): print("ConnectionManager.run: enter method")
 		while(self._is_alive):
+			if(self.RATE_LIMIT_SECONDS>0): time.sleep(self.RATE_LIMIT_SECONDS)
+			run_print_enabled=time.time()-self.SECONDS_BETWEEN_DEBUG_PRINT>self.last_run_print_seconds
+			if(run_print_enabled):
+				self.last_run_print_seconds=time.time()
 			if(not self._is_enabled):
 				time.sleep(0.1)
 			else:
-				#time.sleep(1)
-				if(self.__isPrintEnabled()): print("CM -- "+str(time.time()))
-				if(self.__isPrintEnabled()): print(self.getStatus())
+				if(run_print_enabled and self.__isPrintEnabled()): print("CM -- "+str(time.time()))
+				if(run_print_enabled and self.__isPrintEnabled()): print(self.getStatus())
 				if(not self.isReady()):
-					if(self.__isPrintEnabled()): print("ConnectionManager.run: Attempt to (re-)connect nodes...")
+					if(run_print_enabled and self.__isPrintEnabled()): print("ConnectionManager.run: Attempt to (re-)connect nodes...")
 				for node in self.nodes:
 					node.connect()
 					#call in an infinite loop to reestablish any dropped connections
@@ -121,6 +135,7 @@ class ConnectionManager(threading.Thread):
 	#scope is a string like "Book" or "Chapter" (class name)
 	# or even "NodeManager", but these packets are wiped away before
 	# getting up to this level
+	# case sensitive
 	#returns the packet on the top of the queue
 	# if none is thre, returns None
 	def pop(self,scope):
@@ -190,148 +205,16 @@ class ConnectionManager(threading.Thread):
 				   "package":package}
 		json_packet=json.dumps(json_dict)
 		return json_packet
-		
-	#@property
-	#def is_alive(self): return self._is_alive
-
-	#@is_alive.setter
-	#def is_alive(self, value):
-		#if(not value): self._is_alive = False
-		#else: raise ValueError("Cannot configure is_alive to: "+str(value))
-
-##can't use priority queue which requires the peek() method to return the same 
-## output as pop() (when called sequentially), which is only guaranteed in a strict FIFO
-## Would need some kind of locking mechanism on the queue to ensure peek()/pop() operate
-## harmonously if a PriorityQueue is needed
-#import queue
-#import json
-#from enum import Enum
-
-#import util.Book
-#import util.Chapter
-#import util.NodeManager
-
-#class ConnectionManager:
-	##document how books are mapped between each other
-	##[[MASTER,SLAVE],[MASTER,SLAVE]]
-	#BOOK_MASTER_RELATIONSHIP=[
-		#[Book.BOOK_TYPE.PROCTOR,Book.BOOK_TYPE.WALL],
-		#[Book.BOOK_TYPE.WALL,Book.BOOK_TYPE.HELM]
-		#]
-	
-	#def __init__(self,this_book_title):
-		#self.incoming_queue=queue.Queue()
-		##use BOOK_MASTER_RELATIONSHIP to configure Nodes
-		#self.sockets=[]
-		#client_list=[]
-		#for relationship in BOOK_MASTER_RELATIONSHIP:
-			#if(relationship[0].name==this_book_title): client_list.append(relationship[1].name)
-		#if(len(client_list)>0):
-			#self.sockets.append(NodeManager(self,
-
-	#def clean(self):
-		#pass
-		
-	#def dispose(self):
-		#pass
-		
-	##called when nodes receive external input
-	## used to store incoming messages until ready to be used by super()
-	#def enqueue(self,message):
-		##sanitize, ensure message is json format, has a source, target
-		#try:
-			#json_dict=json.loads(message)
-		#except JSONDecodeError:
-			#print("ConnectionManager.enqueue: External message received at socket could not be parsed as JSON: "+str(message))
-		#key="None"
-		#try:
-			#for key in ["source_book_title","source_chapter_title","target_scope","target_title","command","package"]:
-				#value=json_dict[key] #attempt to fetch value for a key, and if key is not present, throw an error
-		#except KeyError:
-			#raise ValueError("ConnectionManager.enqueue: Unable to find key '"+str(key)+"' in incoming JSON packet: "+str(json_dict))
-		
-	##call this method to send a message outbound from this PC
-	## to either the master or slave sockets
-	##source_book_title - ex "PROCTOR" String
-	##source_chapter_title - ex None if command comes from Book, or "Hyperspace" String
-	##target_book_title - ex "HELM" String
-	##target_scope - ex "Book" or "Chapter" String
-	##target_title - ex "Map"
-	##command - ex "set_player_position" String
-	##packet - ex dictionary {"branch":[10,20],"fractional":0.2}
-	#def send(self,source_book_title,source_chapter_title,target_book_title,target_scope,target_title,command,package):
-		#source_book_title=str(source_book_title) #Book.getTitle()
-		#source_chapter_title=str(source_chapter_title) #Chapter.getTitle() or None
-		#target_book_title=str(target_book_title)
-		#target_scope=str(target_scope)
-		#target_name=str(target_name)
-		#command=str(command)
-		#json_dict={"source_book_title":source_book_title,
-				   #"source_chapter_title":source_chapter_title,
-				   #"target_book_title":target_book_title,
-				   #"target_scope":target_scope,
-				   #"target_name":target_name,
-				   #"command":command,
-				   #"package":package}
-		#json_packet=json.dumps(json_dict)
-		#node_manager=self.getNodeFor(source_book_title,target_book_title)
-		#if(node_manager is None):
-			#raise ValueError("ConnectionManager.send: Attempted to send packet to non-existant NodeManager for books source: "+source_book_title+", target: "+target_book_title+", packet: "+str(json_dict))
-		#return node_manager.send(json_packet)
-	
-	##evaluate whether a connection exists and is ready to exchange packets
-	#def isReady(self,source_book_title,target_book_title):
-		#node_manager=self.getNodeManagerFor(source_book_title,target_book_title)
-		#if(node_manager is None): return False
-		#return node_manager.isReady(source_book_title,target_book_title)
-	
-	##returns the NodeManager for a given book relationship
-	## if no NM exists, reteurn None
-	##note that for server NMs, the client may or may not exist
-	## the client status needs to be independently checked with isReady()
-	#def getNodeManagerFor(self,source_book_title,target_book_title):
-		#is_to_master=self.is_to_master(source_book_title,target_book_title)
-		#for node_manager in self.sockets:
-			#if(source_book_title==node_manager.getSourceBookTitle()
-				#and (node_manager.is_server or target_book_title=node_manager.getTargetBookTitle())):
-				#return node_manager
-		#return None
-	
-	##evaluate whether one book is the master to another
-	#def is_to_master(self,source_book_title,target_book_title):
-		#for relationship in ConnectionManager.BOOK_MASTER_RELATIONSHIP:
-			#master_book=relationship[0].name
-			#slave_book=relationship[1].name
-			#if(master_book==source_book_title and slave_book==target_book_title):
-				#return True
-			#if(slave_book==source_book_title and master_book==target_book_title):
-				#return False
-		#raise ValueError("ConnectionManager.__is_to_master: Unable to determine relationship of source to target books: "+str(source_book_title)+", "+str(target_book_title))
-		
-	##inspect the latest message in the queue for the given taget (Book or Chapter)
-	#def peek(self,target):
-		#if(not self.is_alive): return None #if closed, return no object
-		#peek=incoming_queue.queue[0]
-		#if(isinstance(target,Book)):
-			#pass
-		#elif(isinstance(target,Chapter)):
-			#pass
-		#else:
-			#raise ValueError("Invalid target specified to fetch queued messages for (type: "+str(type(target))+"): "+str(target))
-		
-	##pull the latest message off the top of the queue
-	#def poll(self,target):
-		#outbound=peek(target)
-		#if(not outbound is None):
-			#pass
 
 if __name__ == "__main__":
 	print("START")
 	import sys
 	import time
-	is_debug=False
 	args=sys.argv
-	cm=ConnectionManager(str(args[1]),is_debug)
+	is_debug=False
+	if("DEBUG" in args):
+		is_debug=True
+	cm=ConnectionManager(str(args[1]),is_enabled=True,is_debug=is_debug)
 	cm.start()
 	#if(str(args[1])=="HELM"):
 	#	time.sleep(10)

@@ -56,8 +56,8 @@ class LightPuzzle(Chapter):
 			print("Wall."+self.getTitle()+": set debug background color")
 			self.background_color=(0,0,255)
 		
-	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds):
-		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):
+		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets)
 		all_done=True
 		self.screen_noise.update()
 		debug_strings=[]

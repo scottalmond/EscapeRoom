@@ -62,8 +62,10 @@ class NODE_TYPE(Enum):
 
 class NodeManager(threading.Thread):
 	MAX_CONNECTIONS=10 #max clients that can connect to this server
-	CONNECTION_TIMEOUT_SECONDS=0.01 #how long to listen for new connections before doing something else
+	CONNECTION_TIMEOUT_SECONDS=0.1 #how long to listen for new connections before doing something else
 	MAX_PACKET_SIZE_BYTES=1024 #presumed maximum size of a packet from an external PC
+	SECONDS_BETWEEN_DEBUG_PRINT=4 #minimum number of seconds between debug printing in the run method
+	RATE_LIMIT_SECONDS=0.1 #limit how often activity is queried over TCP connection
 	
 	#source_node_type is a String (representing name of Book running on this PC)
 	#target_node_types is a String - append additional clients with appendClient()
@@ -79,6 +81,7 @@ class NodeManager(threading.Thread):
 		self.nodes=[]
 		self.appendTarget(target_node_title)
 		self.source_node_title=source_node_title
+		self.last_run_print_seconds=0 #time of last print
 		if(self.is_server):
 			port=self.__getPortForServer(source_node_title)
 			self.server={"pointer":None,"port":port,"is_error":False}
@@ -96,6 +99,10 @@ class NodeManager(threading.Thread):
 	def run(self):
 		if(self.__isPrintEnabled()): print("NodeManager.run: enter")
 		while(self._is_alive):
+			if(self.RATE_LIMIT_SECONDS>0): time.sleep(self.RATE_LIMIT_SECONDS)
+			run_print_enabled=time.time()-self.SECONDS_BETWEEN_DEBUG_PRINT>self.last_run_print_seconds
+			if(run_print_enabled):
+				self.last_run_print_seconds=time.time()
 			#time.sleep(1)
 			#print("NM -- "+str(time.time()))
 #			print("NodeManager.run: wait for input: "+str(time.time()))
@@ -111,7 +118,8 @@ class NodeManager(threading.Thread):
 						# due to multi-threaded access to dictionary
 						try:
 							data=conn.recv(self.MAX_PACKET_SIZE_BYTES)
-							self.receive(data.decode())
+							if(not self.receive(data.decode())):
+								node["is_error"]=True
 						except socket.timeout:
 							pass #if no input received, then move on to next task
 						except AttributeError:
@@ -126,7 +134,7 @@ class NodeManager(threading.Thread):
 	#Establish or re-establish connections with external PCs
 	# an external thread in ConnectionManger regularly calls this method
 	def connect(self):
-		if(self.__isPrintEnabled()): print("NodeManager.connect: enter")
+		#if(self.__isPrintEnabled()): print("NodeManager.connect: enter")
 		if(not self._is_enabled):
 			return #skip TCP tasks if NodeManager is acting as a dummy class
 		is_action_needed=not self.isReady()
@@ -141,9 +149,9 @@ class NodeManager(threading.Thread):
 				#listen for new clients
 				try:
 					conn, addr=server_socket.accept()
-					if(self.__isPrintEnabled()): print("NodeManager.connect: New client joined: "+str(conn)+", "+str(addr))
+					if(self.is_debug): print("NodeManager.connect: New client joined: "+str(conn)+", "+str(addr))
 					identity_packet=conn.recv(self.MAX_PACKET_SIZE_BYTES).decode()
-					if(self.__isPrintEnabled()): print("NodeManager.connect: identity packet: "+str(identity_packet))
+					if(self.is_debug): print("NodeManager.connect: identity packet: "+str(identity_packet))
 					self.receive(identity_packet,conn)
 					conn.settimeout(self.CONNECTION_TIMEOUT_SECONDS)
 					
@@ -153,10 +161,13 @@ class NodeManager(threading.Thread):
 					pass #looking for new clients, if none found, move on
 				except AttributeError:
 					pass #server_socket is None
+				except OSError:
+					pass #[Errno 9] Bad file descriptor
 			else: #this PC is a client, connected to one server
 				#seek servers for uninitiated connection
 				ip_list=self.getAllAddresses() #called once here instead of in __connectToServer
 				# to conserve execution time (takes several seconds to run)
+				if(self.__isPrintEnabled()): print("NodeManager.connect: len(ip_list): "+str(len(ip_list)))
 				for node_index in range(len(self.nodes)):
 					node=self.nodes[node_index] #for node in self.nodes - makes a deep copy of node, but using indexing does not - unexpected behavior in python
 					if(not self.__nodeReady(node)):
@@ -183,13 +194,17 @@ class NodeManager(threading.Thread):
 	#when input is received from an external PC, add it to the internal queue
 	#message is a json encoded binary
 	def receive(self,message,socket=None):
-		message_decoded=json.loads(message)
+		try:
+			message_decoded=json.loads(message)
+		except json.decoder.JSONDecodeError:
+			return False
 		if(len(message)>0):
 			if(self.__isPrintEnabled()): print("NodeManager.receive: message: "+str(message_decoded))
 			if(message_decoded["target_scope"]=="NodeManager"):#if target is NodeManager, parse here, else flow upward
 				self.receiveCommand(message_decoded,socket)
 			else:
 				self.connection_manager.receive(message_decoded)
+		return True
 		
 	#received a command from an external PC destined for this NodeManager
 	#packet is a dictionary
@@ -205,6 +220,7 @@ class NodeManager(threading.Thread):
 					node=self.nodes[node_index] #pointer to node rather than (shallow?) copy
 					if(package==node["target_node_title"]):
 						node["target_pointer"]=socket
+						node["is_error"]=False
 		
 	#determine if this is the socket relationship for a given book relationship
 	#inputs are strings
@@ -222,7 +238,9 @@ class NodeManager(threading.Thread):
 			target_node_title=node["target_node_title"]
 			target_message_title=message_decoded["target_book_title"]
 			socket=node["target_pointer"]
-			if(target_node_title==target_message_title):
+			if(self.__isPrintEnabled()): print("NodeManager.send: target_node_title==target_message_title: "+str(target_node_title)+" == "+str(target_message_title))
+			if(target_node_title.lower()==target_message_title.lower()):
+				if(self.__isPrintEnabled()): print("NodeManager.send: self.__nodeReady(node): "+str(self.__nodeReady(node)))
 				if(self.__nodeReady(node)):
 					try:
 						if(self.__isPrintEnabled()): print("NodeManager.send: sending...")
@@ -331,10 +349,22 @@ class NodeManager(threading.Thread):
 					ip_list.append(this_ip[-1])
 			ip_list.append(getOwnAddress()) #for testing, allow server to connect to SELF
 		else:#use nmap
-			ip_raw = subprocess.check_output(["nmap", "-sP", "192.168.1.0/24"])
-			ip_raw=str(ip_raw)
-			regex=re.compile(r"""\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}""")
-			ip_list=regex.findall(ip_raw)
+			#some routers use one internal routing address set, some use another
+			#by default, try both
+			# but if own_address can be found, use that as a basis
+			# to narrow the search for other PCs
+			router_ip_list=["192.168.0.0/24","192.168.1.0/24"]
+			self_ip=self.getOwnAddress()
+			if(len(self_ip)>0):
+				router_ip_index=self_ip.rfind(".")
+				router_ip=self_ip[:router_ip_index]+".0/24"
+				router_ip_list=[router_ip]
+			for ip_root in router_ip_list: #search differetn ip address permutations based on router type
+				ip_raw = subprocess.check_output(["nmap", "-sP", ip_root])
+				ip_raw=str(ip_raw)
+				regex=re.compile(r"""\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}""")
+				ip_list=regex.findall(ip_raw)
+				if(len(ip_list)>0): break
 		return ip_list
 
 	def isReady(self):

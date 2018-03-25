@@ -62,8 +62,9 @@ class Chapter():
 	
 	#called every frame by the Book to update the chapter state
 	#prior to calling draw()
+	# incoming_packets are TCP packets sent to this chapter from external computers
 	@abstractmethod
-	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds): pass
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets): pass
 	
 	#called to render one frame
 	@abstractmethod
@@ -129,7 +130,9 @@ class Chapter():
 		string_list.insert(0,self.book.getTitle()+"."+self.getTitle())
 		string_list.insert(1,"FPS: "+str(math.floor(1/np.max((0.00001,seconds_since_last_frame)))))
 		string_list.insert(2,"Frame: "+str(this_frame_number))
-		string_list.insert(3,"Remaining: "+str(remaining_minutes)+" m "+str(remaining_seconds)+" s")
+		is_wall_book=self.book.getTitle()=="Wall"
+		if(is_wall_book):
+			string_list.insert(3,"Remaining: "+str(remaining_minutes)+" m "+str(remaining_seconds)+" s")
 		self._osd_debug_strings=string_list
 	
 	#if debug is enabled, show debug strings on screen
@@ -194,7 +197,7 @@ class Chapter():
 	@property
 	def cm(self): return self._connection_manager
 
-	@rm.setter
+	@cm.setter
 	def cm(self, value):
 		raise ValueError("Changing connection_manager after initialization is not supported: "+str(value))
 		
