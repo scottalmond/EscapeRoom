@@ -393,6 +393,7 @@ class Book:
 		return "Book"
 		
 	#title like "PROCTOR"
+	# note title will be all capitals
 	def getTitle(self):
 		return self._book_type.name
 		
