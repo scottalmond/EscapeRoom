@@ -293,11 +293,11 @@ class Book:
 			]
 		elif(this_book_type==BOOK_TYPE.HELM):
 			return [ #Wall book assumes the sane number of chapters exist in the Helm book
-				#chapters.helm.Standby.Standby(self),
-				#chapters.helm.MorseCode.MorseCode(self),
+				chapters.helm.Standby.Standby(self),
+				chapters.helm.MorseCode.MorseCode(self),
 				#chapters.helm.BlackScreen.BlackScreen(self,"Tutorial"),
 				#chapters.helm.BlackScreen.BlackScreen(self, "Snake"),
-				chapters.helm.Map.Map(self),
+				#chapters.helm.Map.Map(self),
 				#chapters.helm.BlackScreen.BlackScreen(self, "Credits")
 			]
 		elif(this_book_type==BOOK_TYPE.PROCTOR):
