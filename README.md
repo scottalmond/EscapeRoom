@@ -66,6 +66,9 @@ TODO: 10-20 second demo video
 - Qty: 1, [Z533 Logitech Sound System](https://www.logitech.com/en-us/product/z533-multimedia-speaker-system)
 - Qty: 4, [5m 5050 SMD Supernight RGB LED strip](https://www.newegg.com/Product/Product.aspx?Item=9SIA3W31A14276)
 - Qty: 4, [Human load cell](https://www.newegg.com/Product/Product.aspx?Item=9SIADMZ5Z97241), each cell contains two resistors in series, one is a fixed X (TODO) ohms, the other is a strain gauge that increases (TODO) by Y (TODO) ohms when 50 lbs is applied
+- Qty: 2, 4-direct joystick, no fire, TODO
+- Qty: 4, webcam, TODO
+- Qty: 1, router, TODO
 
 ## Software
 - Raspberry Pi Operating System
@@ -106,12 +109,10 @@ TODO: 10-20 second demo video
 		- Set Remote GPIO to Enabled
 - [Pi3D](https://github.com/tipam/pi3d) ([FAQ](https://pi3d.github.io/html/FAQ.html))
 	- Command: _sudo pip3 install pi3d_
-		- Used for 3D graphics
+		- Used for 3D graphics, v2.23 or later
 	- Command: _sudo raspi-config_
 		- 7 Advanced Operations >> A3 Memory Split >> 256
 		- To allow greater utilization of the GPU, a larger memory allocation is needed [source](http://pi3d.github.io/html/ReadMe.html#setup-on-the-raspberry-pi)
-	- Command: _pip3 install transforms3d_
-		- To help with 3D vector math translation/rotation of CAD models
 - Sound
 	- Command: _amixer cset numid=3 1_
 		- Change the audio to come out over the headphone jack [source](https://www.raspberrypi.org/documentation/configuration/audio-config.md)
@@ -122,12 +123,6 @@ TODO: 10-20 second demo video
 		- https://www.raspberrypi.org/forums/viewtopic.php?f=36&t=81505
 	- Command: _sudo apt-get install nmap_
 		- supports automatic detection of other devices in the local network
-	- xxx
-		- https://www.modmypi.com/blog/how-to-give-your-raspberry-pi-a-static-ip-address-update
-		- Used to set the static IP address of the raspberry pi
-			- PROCTOR: 192.168.0.170
-			- WALL: 192.168.0.160
-			- HELM: 192.168.0.150
 - Reboot
 	- Command: _sudo reboot_
 		- Clean all installs and settings changes
@@ -135,11 +130,6 @@ TODO: 10-20 second demo video
 	- Command: _cd /home/pi/Documents/EscapeRoom/_
 	- Command: TODO
 		- Run a functional test of all library dependencies
-
-xxx TODO sudo apt-get install vlc --> omxplayer
-xxx TODO sudo pip3 install omxplayer-wrapper
-
-
 
 ### Development Tools
 
