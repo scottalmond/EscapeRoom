@@ -123,6 +123,13 @@ TODO: 10-20 second demo video
 		- https://www.raspberrypi.org/forums/viewtopic.php?f=36&t=81505
 	- Command: _sudo apt-get install nmap_
 		- supports automatic detection of other devices in the local network
+- Time Zone
+	- Command: _sudo dpkg-reconfigure tzdata_
+		- Select local time zone
+	- Set to 12-hour format
+		- Right click clock at top right
+		- Select "Digital Clock Settings"
+		- Clock Format: _%b %e %l:%M %p_
 - Reboot
 	- Command: _sudo reboot_
 		- Clean all installs and settings changes
