@@ -13,14 +13,22 @@ MODEL_PATH = 'models/'
 RINGS_PER_SECOND=0.5 #how many rings per second the player passes through
 DISTANCE_BETWEEN_RINGS=45.0 #Pi3D units of distance between rings
 RING_ROTATION_DEGREES_PER_SECOND=30
-ALPHA=2.4 #a lower alpha means the pod "cuts the corners" when moving through a ring
+ALPHA=2.6 #a lower alpha means the pod "cuts the corners" when moving through a ring
 # a high alpha means the pod is lined up the next ring long before going through it (or overshoots the alignment)
+
+prevX_random=[random.random()]
+prevY_random=[random.random()]
 
 #a subassembly consists of ring center, ring itself, and any asteroids within ring
 def instantiateRingSubassembly():
 	ring_subassembly=ring_subassembly_template.shallow_clone()
-	rotX=(random.random()-0.5)*30.0
-	rotY=(random.random()-0.5)*30.0
+	nextX_random=random.random()
+	nextY_random=random.random()
+	prev_mix_ratio=0.05
+	rotX=((prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio))-0.5)*20.0
+	rotY=((prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio))-0.5)*20.0
+	prevX_random[0]=prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio)
+	prevY_random[0]=prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio)
 	z_0=DISTANCE_BETWEEN_RINGS/2.0
 	c_x=math.cos(math.radians(rotX))
 	s_x=math.sin(math.radians(rotX))
@@ -115,6 +123,7 @@ previous_ring_pass=0
 previous_ring_subassembly=(ring_list[0][0],20,0,0)#model, posZ, rotX, rotY
 
 poped_ring=0
+print_burst=0
 
 while display.loop_running():
 	scene.draw()
@@ -148,11 +157,23 @@ while display.loop_running():
 		rotY_next=ring_ratio_elapsed*ring_list[0][3]
 		posZ=posZ_next
 		#ring_ratio_elapsed=0 if ring_ratio_elapsed<0.5 else 1
-		raised_cos=math.cos(ring_ratio_elapsed*3.1415)*.5+.5
+		#raised_cos=math.cos(ring_ratio_elapsed*3.1415)*.5+.5
 		#rotX=rotX_prev*raised_cos+rotX_next*(1-raised_cos)
 		#rotY=rotY_prev*raised_cos+rotY_next*(1-raised_cos)
-		rotX=rotX_next*(1-raised_cos*raised_cos)
-		rotY=rotY_next*(1-raised_cos*raised_cos)
+		#rotX=rotX_next*(1-raised_cos*raised_cos)
+		#rotY=rotY_next*(1-raised_cos*raised_cos)
+		flat_region=0.08 # half the length that the "camera" (closes ring subassembly) remains in a fixed angle
+		#raised_cos_redux=0.5-math.cos((ring_ratio_elapsed-flat_region)*3.1415/(1-2*flat_region))*0.5
+		#scalar=1 if ring_ratio_elapsed<=flat_region else 0 if ring_ratio_elapsed>=(1-flat_region) else raised_cos_redux
+		#rotX=rotX_next*raised_cos_redux
+		#rotY=rotY_next*raised_cos_redux
+		if(print_burst<100):
+			print(ring_ratio_remaining)
+			print_burst+=1
+		raised_cos_redux2=0.5+0.5*math.cos(3.1415*(ring_ratio_remaining-flat_region)/(1-2*flat_region)) #defiend for [flat_region,1-flat_region]
+		rot_progress=1 if ring_ratio_remaining<=flat_region else 0 if ring_ratio_remaining>=(1-flat_region) else pow(raised_cos_redux2,1.5)
+		rotX=rotX_next*rot_progress
+		rotY=rotY_next*rot_progress
 		t=ring_ratio_remaining
 		a=ring_list[0][4]
 		b=ring_list[0][5]
@@ -173,8 +194,8 @@ while display.loop_running():
 	camera.position((0,0,-10))
 	
 	#ring_template.draw()
-	#for ring_assembly in ring_list:
-	#	ring_assembly[0].children[0].rotateToZ(time_elapsed*RING_ROTATION_DEGREES_PER_SECOND+(ring_assembly[2]+ring_assembly[3])*100)
+	for ring_assembly in ring_list:
+		ring_assembly[0].children[0].rotateToZ(time_elapsed*RING_ROTATION_DEGREES_PER_SECOND+(ring_assembly[2]+ring_assembly[3])*100)
 	#	ring_assembly.draw()
 
 	#if last ring in list is visible, add another one
