@@ -24,9 +24,9 @@ def instantiateRingSubassembly():
 	ring_subassembly=ring_subassembly_template.shallow_clone()
 	nextX_random=random.random()
 	nextY_random=random.random()
-	prev_mix_ratio=0.05
-	rotX=((prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio))-0.5)*20.0
-	rotY=((prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio))-0.5)*20.0
+	prev_mix_ratio=0.1
+	rotX=((prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio))-0.5)*10.0
+	rotY=((prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio))-0.5)*40.0
 	prevX_random[0]=prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio)
 	prevY_random[0]=prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio)
 	z_0=DISTANCE_BETWEEN_RINGS/2.0
@@ -105,9 +105,12 @@ ring_subassembly_template = pi3d.Triangle(corners=((0,0),(1,1),(-1,1)))
 ring_list=[]
 ring_template = pi3d.Model(file_string=MODEL_PATH+'straight_ring_1.obj')
 ring_template.set_shader(shader)
+ring_template.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
 # is there a way to getHeight (z dimension) of a Shape in Pi3D...?
 
 #apriori ring subassemblies
+pushRingSubassembly()
+pushRingSubassembly()
 pushRingSubassembly()
 pushRingSubassembly()
 pushRingSubassembly()
@@ -171,7 +174,7 @@ while display.loop_running():
 			print(ring_ratio_remaining)
 			print_burst+=1
 		raised_cos_redux2=0.5+0.5*math.cos(3.1415*(ring_ratio_remaining-flat_region)/(1-2*flat_region)) #defiend for [flat_region,1-flat_region]
-		rot_progress=1 if ring_ratio_remaining<=flat_region else 0 if ring_ratio_remaining>=(1-flat_region) else pow(raised_cos_redux2,1.5)
+		rot_progress=1 if ring_ratio_remaining<=flat_region else 0 if ring_ratio_remaining>=(1-flat_region) else pow(raised_cos_redux2,1.2)
 		rotX=rotX_next*rot_progress
 		rotY=rotY_next*rot_progress
 		t=ring_ratio_remaining
