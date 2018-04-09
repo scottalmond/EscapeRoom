@@ -1,3 +1,4 @@
+# python3 /home/pi/Documents/EscapeRoom/testing/test23_3d_reference_frames.py
 import sys
 import sys
 sys.path.insert(1,'/home/pi/pi3d') # to use local 'develop' branch version
@@ -78,7 +79,7 @@ def instantiateRingSubassembly():
 		asteroid.rotateToZ(random.random()*360)
 		#ring_subassembly.add_child(asteroid)
 		#ring.children.append(asteroid)
-		ring.add_child(asteroid)
+#		ring.add_child(asteroid) #hide for now to help debugging other issues
 		
 	return (ring_subassembly,posZ,rotX,rotY,a,b,c,d)
 
@@ -137,7 +138,7 @@ ring_template.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
 # is there a way to getHeight (z dimension) of a Shape in Pi3D...?
 
 #pod
-pod_scale=0.33
+pod_scale=0.0033
 pod = pi3d.Model(file_string=MODEL_PATH+'pod_2.obj', z=0.0,sx=pod_scale,sy=pod_scale,sz=pod_scale)
 laser_base = pi3d.Model(file_string=MODEL_PATH+'laser_base_2.obj', y=3.15)
 laser_gun = pi3d.Model(file_string=MODEL_PATH+'laser_gun_2.obj', y=0.4, z=-0.4)
@@ -162,6 +163,17 @@ pushRingSubassembly()
 print("ring_list: "+str(len(ring_list)))
 #popRingSubassembly()
 
+scene.draw()
+global_list=[]
+for ring_assembly in ring_list:
+	#print(ring_assembly[0].MRaw)
+	#print(np.dot(ring_assembly[0].MRaw.T,np.array([0,0,0,1])))
+	print(str(ring_assembly[0].MRaw[3]))
+	global_ring=ring_template.shallow_clone()
+	#global_ring.scale(0.95,0.95,1.05)
+	global_list.append(global_ring)
+	global_ring.position(ring_assembly[0].MRaw[3][0],ring_assembly[0].MRaw[3][1],ring_assembly[0].MRaw[3][2])
+
 keys = pi3d.Keyboard()
 
 time_elapsed=0
@@ -172,11 +184,23 @@ previous_ring_subassembly=(ring_list[0][0],20,0,0)#model, posZ, rotX, rotY
 poped_ring=0
 print_burst=0
 
+CAM_RATE=50
+
 while display.loop_running():
+	cam_angle=(time.time()*CAM_RATE)%360
+	camera.reset()
+	#camera.position((0,0,-10))
+	camera.position((100*math.cos(math.radians(cam_angle)),0,150+100*math.sin(math.radians(cam_angle))))
+	camera.rotate(0,cam_angle+90,0)
+	#camera.rotate(-pod.y(),-3*pod.x(),0)
+	
 	scene.draw()
-	delta_time=time.time()-previous_time #time between frames
-	time_elapsed+=delta_time #total time elapsed
-	previous_time=time.time()
+	for this_ring in global_list:
+		this_ring.draw()
+	
+	delta_time=0.01#time.time()-previous_time #time between frames
+	time_elapsed+=0#delta_time #total time elapsed
+	previous_time=0#time.time()
 	
 	ring_time=(time_elapsed-previous_ring_pass) #time spent with this ring
 	ring_ratio_remaining=ring_time*RINGS_PER_SECOND #seconds * Hz = ratio of ring elapsed
@@ -235,9 +259,6 @@ while display.loop_running():
 	
 	#pod_frame.draw()
 	
-	camera.reset()
-	camera.position((0,0,-10))
-	
 	#ring_template.draw()
 	for ring_assembly in ring_list:
 		ring_assembly[0].children[0].rotateToZ(time_elapsed*RING_ROTATION_DEGREES_PER_SECOND+(ring_assembly[2]+ring_assembly[3])*100)
@@ -285,9 +306,15 @@ while display.loop_running():
 	pod.positionX(pod_pos[0])
 	pod.positionY(pod_pos[1])
 
-	if(400<print_burst<500):
+	if(400<print_burst<300):
 		print(buttons)
 	print_burst+=1
+	
+	#camera.reset()
+	#camera.position((0,0,-10))
+	#camera.position((0,-100,0))
+	#camera.rotate(90,0,0)
+	#camera.rotate(-pod.y(),-3*pod.x(),0)
 	
 	if k==27:
 		keys.close()
