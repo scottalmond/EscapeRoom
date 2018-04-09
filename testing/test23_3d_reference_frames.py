@@ -13,8 +13,10 @@ MODEL_PATH = 'models/'
 RINGS_PER_SECOND=0.5 #how many rings per second the player passes through
 DISTANCE_BETWEEN_RINGS=45.0 #Pi3D units of distance between rings
 RING_ROTATION_DEGREES_PER_SECOND=30
-ALPHA=2.6 #a lower alpha means the pod "cuts the corners" when moving through a ring
+ALPHA=2.6 #a lower value alpha means the pod "cuts the corners" when moving through a ring
 # a high alpha means the pod is lined up the next ring long before going through it (or overshoots the alignment)
+MAX_POD_DISPLACEMENT=2.8 #maximum distance the pod can be from the center of the playfield
+POD_DISTANCE_PER_SECOND=7.0 #rate of pod moveemnt per second
 
 prevX_random=[random.random()]
 prevY_random=[random.random()]
@@ -29,6 +31,9 @@ def instantiateRingSubassembly():
 	rotY=((prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio))-0.5)*40.0
 	prevX_random[0]=prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio)
 	prevY_random[0]=prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio)
+	#model the motion between consecutive rings as a vector following a cubic function of time
+	#first ring (v_1) is at origin, second ring (v_0) is z_0 forward, then
+	# another z_0 forward, but after a x-axis and y-axis rotation
 	z_0=DISTANCE_BETWEEN_RINGS/2.0
 	c_x=math.cos(math.radians(rotX))
 	s_x=math.sin(math.radians(rotX))
@@ -42,6 +47,8 @@ def instantiateRingSubassembly():
 	b=-3*v_0+3*v_1-2*v_0_prime-v_1_prime
 	c=v_0_prime
 	d=v_0
+	#for t between 0.0 and 1.0
+	#v(t) = a*t^3 + b*t^2 + c*t + d
 	
 	posZ=DISTANCE_BETWEEN_RINGS #legacy
 	ring_subassembly.positionX(v_0[0]) #distance between rings
@@ -50,8 +57,29 @@ def instantiateRingSubassembly():
 	ring_subassembly.rotateIncX(-rotX) #rotation between sequential rings
 	ring_subassembly.rotateIncY(-rotY)
 	ring=ring_template.shallow_clone()
-	#TODO: asteroids here
+	ring.children=[]
 	ring_subassembly.children=[ring] #add_child will add children to all shallow_cloned objects (?) resulting in a recursion depth overflow error
+	
+	#add asteroids
+	num_asteroids=int(random.random()*4)
+	asteroid_list=[]
+	asteroid_displacement=4.0
+	for asteroid_id in range(num_asteroids):
+		x_val=asteroid_displacement if asteroid_id%2==0 else 0
+		y_val=asteroid_displacement if asteroid_id%2==1 else 0
+		if(asteroid_id>=2):
+			x_val=-x_val
+			y_val=-y_val
+		asteroid=asteroid_template.shallow_clone()
+		asteroid.positionX(x_val)
+		asteroid.positionY(y_val)
+		asteroid.rotateToX(random.random()*360)
+		asteroid.rotateToY(random.random()*360)
+		asteroid.rotateToZ(random.random()*360)
+		#ring_subassembly.add_child(asteroid)
+		#ring.children.append(asteroid)
+		ring.add_child(asteroid)
+		
 	return (ring_subassembly,posZ,rotX,rotY,a,b,c,d)
 
 #add a new ring subsassembly at the end of the path
@@ -108,6 +136,22 @@ ring_template.set_shader(shader)
 ring_template.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
 # is there a way to getHeight (z dimension) of a Shape in Pi3D...?
 
+#pod
+pod_scale=0.33
+pod = pi3d.Model(file_string=MODEL_PATH+'pod_2.obj', z=0.0,sx=pod_scale,sy=pod_scale,sz=pod_scale)
+laser_base = pi3d.Model(file_string=MODEL_PATH+'laser_base_2.obj', y=3.15)
+laser_gun = pi3d.Model(file_string=MODEL_PATH+'laser_gun_2.obj', y=0.4, z=-0.4)
+laser_base.add_child(laser_gun)
+pod.add_child(laser_base)
+pod.set_shader(shader) # all use uv_light shader
+scene.add_child(pod)
+
+#asteroid
+asteroid_scale=0.55
+asteroid_template = pi3d.Model(file_string=MODEL_PATH+'asteroid_large_1.obj',sx=asteroid_scale,sy=asteroid_scale,sz=asteroid_scale)
+asteroid_template.set_shader(shader)
+asteroid_template.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
+
 #apriori ring subassemblies
 pushRingSubassembly()
 pushRingSubassembly()
@@ -130,7 +174,8 @@ print_burst=0
 
 while display.loop_running():
 	scene.draw()
-	time_elapsed+=time.time()-previous_time
+	delta_time=time.time()-previous_time #time between frames
+	time_elapsed+=delta_time #total time elapsed
 	previous_time=time.time()
 	
 	ring_time=(time_elapsed-previous_ring_pass) #time spent with this ring
@@ -146,13 +191,10 @@ while display.loop_running():
 	ring_time=(time_elapsed-previous_ring_pass) #time spent with this ring
 	ring_ratio_remaining=ring_time*RINGS_PER_SECOND #seconds * Hz = ratio of ring elapsed
 	ring_ratio_elapsed=1-ring_ratio_remaining
-	#else: #somewhere between consecutive rings, update partial motion state accordingly
+	#else: #somewhere between consecutive rings, update partial motion state
 	if(True):
 		but_pt, aim_vec = ring_list[0][0].transform_direction([0.0, 0.0, -1.0],
 															  [0.0, 0.0,  0.0])
-		if(time_elapsed>poped_ring+0.9):
-			print("but_pt: "+str(but_pt))
-			poped_ring=time_elapsed
 		rotX_prev=ring_ratio_remaining*previous_ring_subassembly[2]
 		rotY_prev=ring_ratio_remaining*previous_ring_subassembly[3]
 		posZ_next=ring_ratio_elapsed*ring_list[0][1]
@@ -171,10 +213,10 @@ while display.loop_running():
 		#rotX=rotX_next*raised_cos_redux
 		#rotY=rotY_next*raised_cos_redux
 		if(print_burst<100):
-			print(ring_ratio_remaining)
+			#print(ring_ratio_remaining)
 			print_burst+=1
 		raised_cos_redux2=0.5+0.5*math.cos(3.1415*(ring_ratio_remaining-flat_region)/(1-2*flat_region)) #defiend for [flat_region,1-flat_region]
-		rot_progress=1 if ring_ratio_remaining<=flat_region else 0 if ring_ratio_remaining>=(1-flat_region) else pow(raised_cos_redux2,1.2)
+		rot_progress=1 if ring_ratio_remaining<=flat_region else 0 if ring_ratio_remaining>=(1-flat_region) else pow(raised_cos_redux2,1.2) #cos^pow drives how 'snappy' the camera movement about the corner is
 		rotX=rotX_next*rot_progress
 		rotY=rotY_next*rot_progress
 		t=ring_ratio_remaining
@@ -199,6 +241,10 @@ while display.loop_running():
 	#ring_template.draw()
 	for ring_assembly in ring_list:
 		ring_assembly[0].children[0].rotateToZ(time_elapsed*RING_ROTATION_DEGREES_PER_SECOND+(ring_assembly[2]+ring_assembly[3])*100)
+		for asteroid in ring_assembly[0].children[0].children:
+			asteroid.rotateIncZ(0.5)
+			asteroid.rotateIncX(0.17)
+			asteroid.rotateIncY(0.13)
 	#	ring_assembly.draw()
 
 	#if last ring in list is visible, add another one
@@ -207,11 +253,48 @@ while display.loop_running():
 	#if first ring in list is not visible, remove
 	
 	
-	k = keys.read()
+	buttons=[]
+	k=0
+	while k>=0:
+		k = keys.read()
+		buttons.append(k)
+	k=max(buttons)
+	
+	pod_target=np.array([0,0])
+	is_x=False
+	is_y=False
+	a_pressed=False
+	if(k==ord('a')):
+		pod_target[0]=-1
+		is_x=True
+		a_pressed=True
+	if(k==ord('d')):
+		pod_target[0]=1
+		is_x=True
+	if(k==ord('w')):
+		pod_target[1]=1
+		is_y=True
+	if(k==ord('s')):
+		pod_target[1]=-1
+		is_y=True
+	delta_pod=pod_target*POD_DISTANCE_PER_SECOND*delta_time*(0.707 if (is_x and is_y) else 1.0)
+	pod_pos=np.array([pod.x(),pod.y()])+delta_pod
+	scale=np.linalg.norm(pod_pos)
+	if(scale>MAX_POD_DISPLACEMENT):
+		pod_pos=pod_pos*MAX_POD_DISPLACEMENT/scale
+	pod.positionX(pod_pos[0])
+	pod.positionY(pod_pos[1])
+
+	if(400<print_burst<500):
+		print(buttons)
+	print_burst+=1
+	
 	if k==27:
 		keys.close()
 		display.destroy()
 		break
+	
+		
 	#print("hello world: "+str(len(scene.children[0].children)))
 	#print("hello world: "+str(len(ring_list)))
 	#print("hello world")
