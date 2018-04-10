@@ -1,4 +1,4 @@
-# python3 /home/pi/Documents/EscapeRoom/testing/test23_3d_reference_frames.py
+# python3 /home/pi/Documents/EscapeRoom/testing/test24_global_reference_frame_and_camera_motion.py 
 import sys
 import sys
 sys.path.insert(1,'/home/pi/pi3d') # to use local 'develop' branch version
@@ -12,7 +12,7 @@ random.seed(0) #desire predicable results so it's possible to reproduce any visu
 
 MODEL_PATH = 'models/'
 RINGS_PER_SECOND=1.0 #how many rings per second the player passes through
-DISTANCE_BETWEEN_RINGS=25.0 #Pi3D units of distance between rings
+DISTANCE_BETWEEN_RINGS=20.0 #Pi3D units of distance between rings
 RING_ROTATION_DEGREES_PER_SECOND=30
 ALPHA=2.6 #a lower value alpha means the pod "cuts the corners" when moving through a ring
 # a high alpha means the pod is lined up the next ring long before going through it (or overshoots the alignment)
@@ -28,8 +28,8 @@ def instantiateRingSubassembly():
 	nextX_random=random.random()
 	nextY_random=random.random()
 	prev_mix_ratio=0.1
-	rotX=((prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio))-0.5)*10.0*3
-	rotY=((prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio))-0.5)*40.0*3
+	rotX=((prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio))-0.5)*10.0*2
+	rotY=((prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio))-0.5)*40.0*2
 	prevX_random[0]=prevX_random[0]*prev_mix_ratio+nextX_random*(1-prev_mix_ratio)
 	prevY_random[0]=prevY_random[0]*prev_mix_ratio+nextY_random*(1-prev_mix_ratio)
 	#model the motion between consecutive rings as a vector following a cubic function of time
@@ -124,6 +124,21 @@ def popRingSubassembly():
 display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
 camera = pi3d.Camera()
 shader = pi3d.Shader('uv_light')
+#shader = pi3d.Shader('uv_bump')
+print("-- light")
+#pi3d.Light()
+#print("lightpos: "+str(pi3d.Light.lightpos))
+#print("lightcol: "+str(pi3d.Light.lightcol))
+#print("lightamb: "+str(pi3d.Light.lightamb))
+#print("is_point: "+str(pi3d.Light.is_point))
+#pi3d.Light(lightpos=(-100,100,-100),lightcol=(1.0,1.0,0.8), lightamb=(0.25,0.2,0.3))
+#pi3d.Light(lightpos=(10,-10,-10),lightcol=(0.7,0.7,0.0), lightamb=(0.1,0.1,0.5),is_point=False)
+pi3d.Light(lightpos=(10,-10,-7),lightcol=(0.75,0.75,0.45), lightamb=(0.1,0.1,0.42),is_point=False)
+light_scale=850
+light_dist=0.5
+ambient=(0.02,0.02,0.15)
+#pi3d.Light(lightpos=(-40*light_dist,30*light_dist,-40*light_dist),lightcol=(1.0*light_scale,1.0*light_scale,0.7*light_scale), lightamb=ambient,is_point=True)
+#pi3d.Light(lightpos=(-40*light_dist,30*light_dist,-40*light_dist),lightcol=(1.0*light_scale,1.0*light_scale,0.7*light_scale), lightamb=ambient,is_point=True)
 
 #generate reference frames
 scene=pi3d.Triangle(corners=((0,0),(1,1),(-1,1)))
@@ -134,12 +149,15 @@ ring_subassembly_template = pi3d.Triangle(corners=((0,0),(1,1),(-1,1)))
 ring_list=[]
 ring_template = pi3d.Model(file_string=MODEL_PATH+'straight_ring_1.obj')
 ring_template.set_shader(shader)
-#ring_template.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
+ring_template.set_fog((0.0, 0.0, 0.0, 0.0), 130.8)
 # is there a way to getHeight (z dimension) of a Shape in Pi3D...?
 
 #pod
-pod_scale=0.0033
-pod = pi3d.Model(file_string=MODEL_PATH+'pod_2.obj', z=0.0,sx=pod_scale,sy=pod_scale,sz=pod_scale)
+pod = pi3d.Model(file_string=MODEL_PATH+'pod_2.obj', z=0.0)
+#print("pod model dims: "+str(pod.w())+", "+str(pod.h())+", "+str(pod.d()))
+pod_scale=0.33
+pod.scale(pod_scale,pod_scale,pod_scale)
+#print("pod scale dims: "+str(pod.w())+", "+str(pod.h())+", "+str(pod.d()))
 laser_base = pi3d.Model(file_string=MODEL_PATH+'laser_base_2.obj', y=3.15)
 laser_gun = pi3d.Model(file_string=MODEL_PATH+'laser_gun_2.obj', y=0.4, z=-0.4)
 laser_base.add_child(laser_gun)
@@ -154,6 +172,7 @@ asteroid_template.set_shader(shader)
 #asteroid_template.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
 
 #apriori ring subassemblies
+pushRingSubassembly()
 pushRingSubassembly()
 pushRingSubassembly()
 pushRingSubassembly()
@@ -201,18 +220,18 @@ CAM_RATE=50
 while display.loop_running():
 	cam_angle=(time.time()*CAM_RATE)%360
 	camera.reset()
-	#camera.position((0,0,-10))
-	camera.position((200*math.cos(math.radians(cam_angle)),0,150+200*math.sin(math.radians(cam_angle))))
-	camera.rotate(0,cam_angle+90,0)
+	camera.position((0,0,-10))
+	#camera.position((200*math.cos(math.radians(cam_angle)),0,150+200*math.sin(math.radians(cam_angle))))
+	#camera.rotate(0,cam_angle+90,0)
 	#camera.rotate(-pod.y(),-3*pod.x(),0)
 	
 	scene.draw()
 	for this_ring in global_list:
-		this_ring.draw()
+		pass#this_ring.draw()
 	
-	delta_time=0.01#time.time()-previous_time #time between frames
-	time_elapsed+=0#delta_time #total time elapsed
-	previous_time=0#time.time()
+	delta_time=time.time()-previous_time #time between frames
+	time_elapsed+=delta_time #total time elapsed
+	previous_time=time.time()
 	
 	ring_time=(time_elapsed-previous_ring_pass) #time spent with this ring
 	ring_ratio_remaining=ring_time*RINGS_PER_SECOND #seconds * Hz = ratio of ring elapsed
