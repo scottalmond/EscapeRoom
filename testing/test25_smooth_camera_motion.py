@@ -309,8 +309,8 @@ while display.loop_running():
 	xyz_degrees=euler_angles(position_target-position_camera,u_camera,segment,time_elapsed)
 	#light_vect=np.array([10,-10,-7])
 	light_vect=np.array([0,0,-10])
-	#light_vect=light_vect.dot(xyz_degrees[3])
-	light_vect=light_vect.dot(orientation_camera["rotation_matrix"].T)
+	light_vect=light_vect.dot(xyz_degrees[3])
+	#light_vect=light_vect.dot(orientation_camera["rotation_matrix"].T)
 	if(True):#frame_id % 8 <4):
 		pass
 		light.position((light_vect[0],light_vect[1],light_vect[2]))
