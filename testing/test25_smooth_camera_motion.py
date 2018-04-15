@@ -52,6 +52,10 @@ asteroid_template = pi3d.Model(file_string=MODEL_PATH+'asteroid_large_1.obj',sx=
 asteroid_template.set_shader(shader)
 #asteroid_template.set_fog((0.0, 0.0, 0.0, 0.0), 300.6)
 
+# debug sphere
+sphere=pi3d.Sphere(radius=3.0)
+sphere.position(0,0,100)
+
 #input:
 #start_time of segment in seconds (passed directly to output and not otherwise used)
 #duration of segment in seconds (passed directly to output and not otherwise used)
@@ -64,7 +68,7 @@ asteroid_template.set_shader(shader)
 # position(u)=[cos(u*2*np.pi)*x_coeff,cos(u*2*np.pi)*y_coeff,sin(u*2*np.pi)*z_coeff]
 # where u is valid from 0 (start of arc) to 1 (end of arc)
 #TODO: curvature of zero degrees
-def getSegmentParameters(start_time,duration,start_rotation_matrix,distance,curvature_degrees,orientation_degrees):
+def getSegmentParameters(start_time,duration,start_position,start_rotation_matrix,distance,curvature_degrees,orientation_degrees):
 	arc_length=2*np.pi*curvature_degrees/360 #compute an initial estimate of arc length
 	unit_scale=distance/arc_length #scale the initial curve computation to be the specified length
 	orientation_radians=orientation_degrees*np.pi/180
@@ -78,6 +82,7 @@ def getSegmentParameters(start_time,duration,start_rotation_matrix,distance,curv
 	output={"start_time":start_time,
 		    "duration":duration,
 		    "start_rotation_matrix":start_rotation_matrix,
+		    "start_position":start_position,
 		    "distance":distance,
 		    "curvature_degrees":curvature_degrees,
 		    "curvature_radians":curvature_radians,
@@ -94,7 +99,7 @@ def getSegmentParameters(start_time,duration,start_rotation_matrix,distance,curv
 #at a given ration u between 0 and 1, extract the position and rotation of
 # a target point
 #output: x,y,z postion in pi3d distance units
-# X,Y,Z Z-X-Y Euler rotation angles in degrees
+# X,Y,Z: Z-X-Y Euler rotation angles in degrees
 def getOrientationAtTime(segment,u):
 	x_coeff=segment["x_coeff"]
 	y_coeff=segment["y_coeff"]
@@ -102,6 +107,7 @@ def getOrientationAtTime(segment,u):
 	curvature_degrees=segment["curvature_degrees"]
 	curvature_radians=segment["curvature_radians"]
 	orientation_radians=segment["orientation_radians"]
+	theta=segment["curvature_radians"]*u
 	u=u*curvature_degrees/360
 	x_2d=-np.cos(u*2*np.pi)+1
 	x_pos=x_2d*x_coeff
@@ -109,7 +115,6 @@ def getOrientationAtTime(segment,u):
 	z_pos=-np.sin(u*2*np.pi)*z_coeff
 	#testing
 	r_hat=np.array([segment["x_norm"],segment["y_norm"],segment["z_norm"]])
-	theta=segment["curvature_radians"]*u
 	rotation_matrix=getRotationMatrixAboutVector(r_hat,theta)
 	euler=camera.euler_angles(rotation_matrix) #degrees
 	x_rot=euler[0]
@@ -123,6 +128,19 @@ def getOrientationAtTime(segment,u):
 			"z_rot":z_rot,
 			"rotation_matrix":rotation_matrix}
 	return output
+	
+def getOrientationAtElapsedTime(elapsed_time_seconds):
+	for segment_id in range(len(segment_list)):
+		segment=segment_list[segment_id]
+		duration=segment["duration"]
+		u=elapsed_time_seconds/duration
+		elapsed_time_seconds-=duration
+		if( (segment_id==len(segment_list)-1) or u<=1):
+			orientation=getOrientationAtTime(segment,u)
+			vector=np.array(orientation["x_pos"],orientation["y_pos"],orientation["z_pos"])
+			start_position=segment["start_position"] #defined in global coord frame
+			start_rotation=segment["start_rotation_matrix"]
+			
 	
 #copy-paste of pi3d.Camera.euler_angles,
 # but repurposed for an input vector and the assumption of 0 z-axis rotation
@@ -169,8 +187,17 @@ time_elapsed=0
 	
 segment_ring_count=20
 segment=getSegmentParameters(0,segment_ring_count/RINGS_PER_SECOND,
-	np.identity(3),segment_ring_count*DISTANCE_BETWEEN_RINGS,360,30)
+	np.array([0,0,0]),np.identity(3),segment_ring_count*DISTANCE_BETWEEN_RINGS,120,30)
 segment_list.append(segment)
+segment_out=getOrientationAtTime(segment,1)
+
+segment_ring_count2=30
+segment2=getSegmentParameters(segment["duration"],segment_ring_count2/RINGS_PER_SECOND,
+	np.array([segment_out["x_pos"],segment_out["y_pos"],segment_out["z_pos"]]),
+	segment_out["rotation_matrix"],segment_ring_count2*DISTANCE_BETWEEN_RINGS,
+	120,300)
+segment_list.append(segment2)
+
 for step in range(segment_ring_count):
 	u=step/segment_ring_count
 	ring=ring_template.shallow_clone()
@@ -182,7 +209,6 @@ for step in range(segment_ring_count):
 	ring_list.append(ring)
 	print("ring pos: "+str([orientation["x_pos"],orientation["y_pos"],orientation["z_pos"]]))
 	print("ring rot: "+str([orientation["x_rot"],orientation["y_rot"],orientation["z_rot"]]))
-	
 
 #debug init
 pod.position(0,0,10)
@@ -233,6 +259,8 @@ while display.loop_running():
 	
 	for ring in ring_list:
 		ring.draw()
+		
+	sphere.draw()
 	
 	#pod position update
 	pod_target=np.array([0,0])
