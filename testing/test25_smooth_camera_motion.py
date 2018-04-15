@@ -135,18 +135,40 @@ def getOrientationAtElapsedTime(elapsed_time_seconds):
 		duration=segment["duration"]
 		u=elapsed_time_seconds/duration
 		elapsed_time_seconds-=duration
-		if( (segment_id==len(segment_list)-1) or u<=1):
+		if( (segment_id>=(len(segment_list)-1)) or (u<=1) ):
 			orientation=getOrientationAtTime(segment,u)
-			vector=np.array(orientation["x_pos"],orientation["y_pos"],orientation["z_pos"])
+			vector=np.array([orientation["x_pos"],orientation["y_pos"],orientation["z_pos"]])
 			start_position=segment["start_position"] #defined in global coord frame
 			start_rotation=segment["start_rotation_matrix"]
+			this_position=np.array([orientation["x_pos"],orientation["y_pos"],orientation["z_pos"]])
+			this_rotation=orientation["rotation_matrix"]
+			#pre-mult first operation, then post-mult for second operation
+			cumulative_rotation=this_rotation.dot(start_rotation)
+			#print("this_position: "+str(this_position))
+			#print("start_rotation: "+str(start_rotation))
+			#print("this_position*start_rotation: "+str(this_position.dot(start_rotation)))
+			#raise AssertionError("stop")
+			cumulative_position=this_position.dot(start_rotation)+start_position
+			euler=camera.euler_angles(cumulative_rotation) #degrees
+			x_rot=euler[0]
+			y_rot=euler[1]
+			z_rot=euler[2]
+			#print("u: "+str(cumulative_position))
+			output={"x_pos":cumulative_position[0],
+					"y_pos":cumulative_position[1],
+					"z_pos":cumulative_position[2],
+					"x_rot":x_rot,
+					"y_rot":y_rot,
+					"z_rot":z_rot,
+					"rotation_matrix":cumulative_rotation}
+			return output
 			
-	
 #copy-paste of pi3d.Camera.euler_angles,
 # but repurposed for an input vector and the assumption of 0 z-axis rotation
-def euler_angles(vector,u,segment):
+def euler_angles(vector,u,segment,elapsed_time):
 	z_vector=vector/np.linalg.norm(vector)
-	y_vector_pre=getOrientationAtTime(segment,u)["rotation_matrix"][1,:]
+	#y_vector_pre=getOrientationAtTime(segment,u)["rotation_matrix"][1,:]
+	y_vector_pre=getOrientationAtElapsedTime(elapsed_time)["rotation_matrix"][1,:]
 	x_vector=np.cross(y_vector_pre,z_vector)
 	x_vector/=np.linalg.norm(x_vector)
 	y_vector=np.cross(z_vector,x_vector)
@@ -185,17 +207,20 @@ ring_list=[]
 previous_time=time.time()
 time_elapsed=0
 	
-segment_ring_count=20
+segment_ring_count=10
 segment=getSegmentParameters(0,segment_ring_count/RINGS_PER_SECOND,
 	np.array([0,0,0]),np.identity(3),segment_ring_count*DISTANCE_BETWEEN_RINGS,120,30)
 segment_list.append(segment)
 segment_out=getOrientationAtTime(segment,1)
 
-segment_ring_count2=30
+pos=np.array([segment_out["x_pos"],segment_out["y_pos"],segment_out["z_pos"]])
+sphere.position(pos[0],pos[1],pos[2])
+
+segment_ring_count2=10
 segment2=getSegmentParameters(segment["duration"],segment_ring_count2/RINGS_PER_SECOND,
 	np.array([segment_out["x_pos"],segment_out["y_pos"],segment_out["z_pos"]]),
 	segment_out["rotation_matrix"],segment_ring_count2*DISTANCE_BETWEEN_RINGS,
-	120,300)
+	180,300)
 segment_list.append(segment2)
 
 for step in range(segment_ring_count):
@@ -207,13 +232,31 @@ for step in range(segment_ring_count):
 	ring.rotateToY(orientation["y_rot"])
 	ring.rotateToZ(orientation["z_rot"])
 	ring_list.append(ring)
-	print("ring pos: "+str([orientation["x_pos"],orientation["y_pos"],orientation["z_pos"]]))
-	print("ring rot: "+str([orientation["x_rot"],orientation["y_rot"],orientation["z_rot"]]))
+	print("segemnt1 ring pos: "+str([orientation["x_pos"],orientation["y_pos"],orientation["z_pos"]]))
+	#print("ring rot: "+str([orientation["x_rot"],orientation["y_rot"],orientation["z_rot"]]))
 
+for step in range(segment_ring_count2):
+	u=step/segment_ring_count
+	ring=ring_template.shallow_clone()
+	ring_elapsed_time=u*segment2["duration"]+segment2["start_time"]
+	orientation=getOrientationAtElapsedTime(ring_elapsed_time)
+	ring.position(orientation["x_pos"],orientation["y_pos"],orientation["z_pos"])
+	ring.rotateToX(orientation["x_rot"])
+	ring.rotateToY(orientation["y_rot"])
+	ring.rotateToZ(orientation["z_rot"])
+	ring_list.append(ring)
+	print("segment2 ring pos: "+str([orientation["x_pos"],orientation["y_pos"],orientation["z_pos"]]))
+	
 #debug init
 pod.position(0,0,10)
 
+#raise AssertionError("stop")
+
 while display.loop_running():
+	if(time_elapsed>(segment_list[-1]["start_time"]+segment_list[-1]["duration"])):
+		time_elapsed=0
+		previous_time=time.time()
+		previous_time=time.time()
 	this_timestamp=time.time()
 	delta_time=this_timestamp-previous_time
 	time_elapsed+=delta_time
@@ -230,18 +273,20 @@ while display.loop_running():
 	#camera
 	u_camera=time_elapsed/segment["duration"]
 	u_target=(time_elapsed+0.4)/segment["duration"]
-	orientation_camera=getOrientationAtTime(segment,u_camera)
-	orientation_target=getOrientationAtTime(segment,u_target)
+	#orientation_camera=getOrientationAtTime(segment,u_camera)
+	#orientation_target=getOrientationAtTime(segment,u_target)
+	orientation_camera=getOrientationAtElapsedTime(time_elapsed)
+	orientation_target=getOrientationAtElapsedTime(time_elapsed+0.4)
 	x_axis=orientation_camera["rotation_matrix"][0,:]
 	y_axis=orientation_camera["rotation_matrix"][1,:]
 	position_camera=np.array([orientation_camera["x_pos"],orientation_camera["y_pos"],orientation_camera["z_pos"]])
 	position_target=np.array([orientation_target["x_pos"],orientation_target["y_pos"],orientation_target["z_pos"]])
-	camera_moveemnt_scale=0.4
-	position_camera+=x_axis*pod_x*camera_moveemnt_scale
-	position_camera+=y_axis*pod_y*camera_moveemnt_scale
+	camera_movement_scale=0.4
+	position_camera+=x_axis*pod_x*camera_movement_scale
+	position_camera+=y_axis*pod_y*camera_movement_scale
 	position_target+=x_axis*pod_x
 	position_target+=y_axis*pod_y
-	xyz_degrees=euler_angles(position_target-position_camera,u_camera,segment)
+	xyz_degrees=euler_angles(position_target-position_camera,u_camera,segment,time_elapsed)
 	if(time_elapsed<2):
 		#print(segment)
 		pass
@@ -260,7 +305,7 @@ while display.loop_running():
 	for ring in ring_list:
 		ring.draw()
 		
-	sphere.draw()
+	#sphere.draw()
 	
 	#pod position update
 	pod_target=np.array([0,0])
@@ -291,9 +336,9 @@ while display.loop_running():
 		display.destroy()
 		break
 
-#print("ring_list len: "+str(len(ring_list)))
-#for ring in ring_list:
-#	print("ring: "+str([ring.x(),ring.y(),ring.z()]))
+print("ring_list len: "+str(len(ring_list)))
+for ring in ring_list:
+	print("ring: "+str([ring.x(),ring.y(),ring.z()]))
 #print("x_coeff",segment["x_coeff"])
 #print("y_coeff",segment["y_coeff"])
 #print("z_coeff",segment["z_coeff"])
