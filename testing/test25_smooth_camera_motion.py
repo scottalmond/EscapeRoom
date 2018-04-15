@@ -59,15 +59,18 @@ sphere.position(0,0,100)
 #input:
 #start_time of segment in seconds (passed directly to output and not otherwise used)
 #duration of segment in seconds (passed directly to output and not otherwise used)
+#start_position is the u=0 position in the segment (passed directly to
+# output and not otherwise used)
+#start_rotation_matrix is the rotation matrix of the segment at u=0 (passed
+# directly to output and not otherwise used)
 #distance is arc length in Pi3d distance units
-#curvature is number of degrees of arc: 0 degrees is a straight light,
+#curvature is number of degrees of arc: 0 degrees is a straight line (TODO: fix div zero error),
 # 90 degrees turns the input motion into perpendicular motion
 #orientation is the z-axis rotation: 0 degrees is right, 90 degrees is up, 180 to the left, 270 down
 #output:
 # coeffients for a parameterized segment of the form:
 # position(u)=[cos(u*2*np.pi)*x_coeff,cos(u*2*np.pi)*y_coeff,sin(u*2*np.pi)*z_coeff]
 # where u is valid from 0 (start of arc) to 1 (end of arc)
-#TODO: curvature of zero degrees
 def getSegmentParameters(start_time,duration,start_position,start_rotation_matrix,distance,curvature_degrees,orientation_degrees):
 	arc_length=2*np.pi*curvature_degrees/360 #compute an initial estimate of arc length
 	unit_scale=distance/arc_length #scale the initial curve computation to be the specified length
@@ -96,7 +99,7 @@ def getSegmentParameters(start_time,duration,start_position,start_rotation_matri
 		    "z_norm":z_norm}
 	return output
 	
-#at a given ration u between 0 and 1, extract the position and rotation of
+#at a given ratio u between 0 and 1, extract the position and rotation of
 # a target point
 #output: x,y,z postion in pi3d distance units
 # X,Y,Z: Z-X-Y Euler rotation angles in degrees
@@ -129,6 +132,11 @@ def getOrientationAtTime(segment,u):
 			"rotation_matrix":rotation_matrix}
 	return output
 	
+#given an elapsed time since level start, extract the position, rotation
+# and rotation matrix for a node at the given point along the relevant segment
+#output x,y,z_pos in pi3d distance units
+# x,y,z_rot in degrees
+# rotation_matrix as 3x3 numpy
 def getOrientationAtElapsedTime(elapsed_time_seconds):
 	for segment_id in range(len(segment_list)):
 		segment=segment_list[segment_id]
@@ -188,6 +196,9 @@ def euler_angles(vector,u,segment,elapsed_time):
 	return [euler[0],euler[1],euler[2],rot_matrix]
 	#return [X,Y,Z]
 	
+#equation from section 9.2 from: http://ksuweb.kennesaw.edu/~plaval/math4490/rotgen.pdf
+#as camera/pod/etc position is moved around segment, ensure the rotation 
+# reference frame is also rotated in the same way
 def getRotationMatrixAboutVector(r_hat,theta_radians):
 	ux=r_hat[0]
 	uy=r_hat[1]
@@ -203,10 +214,12 @@ def getRotationMatrixAboutVector(r_hat,theta_radians):
 #variables
 segment_list=[]
 ring_list=[]
-	
+
+frame_id=0	
 previous_time=time.time()
 time_elapsed=0
 	
+#first segment definition
 segment_ring_count=10
 segment=getSegmentParameters(0,segment_ring_count/RINGS_PER_SECOND,
 	np.array([0,0,0]),np.identity(3),segment_ring_count*DISTANCE_BETWEEN_RINGS,270,60)
@@ -216,6 +229,7 @@ segment_out=getOrientationAtTime(segment,1)
 pos=np.array([segment_out["x_pos"],segment_out["y_pos"],segment_out["z_pos"]])
 sphere.position(pos[0],pos[1],pos[2])
 
+#second segement definition
 segment_ring_count2=10
 segment2=getSegmentParameters(segment["duration"],segment_ring_count2/RINGS_PER_SECOND,
 	np.array([segment_out["x_pos"],segment_out["y_pos"],segment_out["z_pos"]]),
@@ -223,6 +237,7 @@ segment2=getSegmentParameters(segment["duration"],segment_ring_count2/RINGS_PER_
 	180,300)
 segment_list.append(segment2)
 
+#populate segment 1 rings
 for step in range(segment_ring_count):
 	u=step/segment_ring_count
 	ring=ring_template.shallow_clone()
@@ -235,6 +250,7 @@ for step in range(segment_ring_count):
 	print("segemnt1 ring pos: "+str([orientation["x_pos"],orientation["y_pos"],orientation["z_pos"]]))
 	#print("ring rot: "+str([orientation["x_rot"],orientation["y_rot"],orientation["z_rot"]]))
 
+#populate segment 2 rings
 for step in range(segment_ring_count2):
 	u=step/segment_ring_count
 	ring=ring_template.shallow_clone()
@@ -252,9 +268,10 @@ pod.position(0,0,10)
 
 #raise AssertionError("stop")
 
-frame_id=0
 while display.loop_running():
+	#housekeeping
 	frame_id+=1
+	#restart motion at end of segments
 	if(time_elapsed>(segment_list[-1]["start_time"]+segment_list[-1]["duration"])):
 		time_elapsed=0
 		previous_time=time.time()
@@ -272,7 +289,7 @@ while display.loop_running():
 		buttons.append(k)
 	k=max(buttons)
 	
-	#camera
+	#camera, lights
 	u_camera=time_elapsed/segment["duration"]
 	u_target=(time_elapsed+0.4)/segment["duration"]
 	#orientation_camera=getOrientationAtTime(segment,u_camera)
@@ -351,14 +368,15 @@ while display.loop_running():
 	pod_x=pod_pos[0]
 	pod_y=pod_pos[1]
 	
+	#escape exit
 	if k==27:
 		keys.close()
 		display.destroy()
 		break
 
-print("ring_list len: "+str(len(ring_list)))
-for ring in ring_list:
-	print("ring: "+str([ring.x(),ring.y(),ring.z()]))
+#print("ring_list len: "+str(len(ring_list)))
+#for ring in ring_list:
+#	print("ring: "+str([ring.x(),ring.y(),ring.z()]))
 #print("x_coeff",segment["x_coeff"])
 #print("y_coeff",segment["y_coeff"])
 #print("z_coeff",segment["z_coeff"])
