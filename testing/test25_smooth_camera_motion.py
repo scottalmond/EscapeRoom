@@ -23,7 +23,7 @@ POD_DISTANCE_PER_SECOND=10.0 #rate of pod movement per second
 display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
 camera = pi3d.Camera()
 shader = pi3d.Shader('uv_light')
-pi3d.Light(lightpos=(10,-10,-7),lightcol=(0.75,0.75,0.45), lightamb=(0.1,0.1,0.42),is_point=False)
+light=pi3d.Light(lightpos=(10,-10,-7),lightcol=(0.75,0.75,0.45), lightamb=(0.1,0.1,0.42),is_point=False)
 keys = pi3d.Keyboard()
 
 #models
@@ -163,8 +163,8 @@ def getOrientationAtElapsedTime(elapsed_time_seconds):
 					"rotation_matrix":cumulative_rotation}
 			return output
 			
-#copy-paste of pi3d.Camera.euler_angles,
-# but repurposed for an input vector and the assumption of 0 z-axis rotation
+#repurposed pi3d.Camera.euler_angles for multiple input vectors (direction
+# and apriori y-axis)
 def euler_angles(vector,u,segment,elapsed_time):
 	z_vector=vector/np.linalg.norm(vector)
 	#y_vector_pre=getOrientationAtTime(segment,u)["rotation_matrix"][1,:]
@@ -185,7 +185,7 @@ def euler_angles(vector,u,segment,elapsed_time):
 	#Y=math.acos(rot_matrix[0,0])
 	#Z=0
 	#print("camera: "+str([euler[0],euler[1],euler[2]]))
-	return [euler[0],euler[1],euler[2]]
+	return [euler[0],euler[1],euler[2],rot_matrix]
 	#return [X,Y,Z]
 	
 def getRotationMatrixAboutVector(r_hat,theta_radians):
@@ -209,7 +209,7 @@ time_elapsed=0
 	
 segment_ring_count=10
 segment=getSegmentParameters(0,segment_ring_count/RINGS_PER_SECOND,
-	np.array([0,0,0]),np.identity(3),segment_ring_count*DISTANCE_BETWEEN_RINGS,120,30)
+	np.array([0,0,0]),np.identity(3),segment_ring_count*DISTANCE_BETWEEN_RINGS,270,60)
 segment_list.append(segment)
 segment_out=getOrientationAtTime(segment,1)
 
@@ -252,7 +252,9 @@ pod.position(0,0,10)
 
 #raise AssertionError("stop")
 
+frame_id=0
 while display.loop_running():
+	frame_id+=1
 	if(time_elapsed>(segment_list[-1]["start_time"]+segment_list[-1]["duration"])):
 		time_elapsed=0
 		previous_time=time.time()
@@ -279,6 +281,7 @@ while display.loop_running():
 	orientation_target=getOrientationAtElapsedTime(time_elapsed+0.4)
 	x_axis=orientation_camera["rotation_matrix"][0,:]
 	y_axis=orientation_camera["rotation_matrix"][1,:]
+	z_axis=orientation_camera["rotation_matrix"][1,:]
 	position_camera=np.array([orientation_camera["x_pos"],orientation_camera["y_pos"],orientation_camera["z_pos"]])
 	position_target=np.array([orientation_target["x_pos"],orientation_target["y_pos"],orientation_target["z_pos"]])
 	camera_movement_scale=0.4
@@ -287,6 +290,21 @@ while display.loop_running():
 	position_target+=x_axis*pod_x
 	position_target+=y_axis*pod_y
 	xyz_degrees=euler_angles(position_target-position_camera,u_camera,segment,time_elapsed)
+	#light_vect=np.array([10,-10,-7])
+	light_vect=np.array([0,0,-10])
+	#light_vect=light_vect.dot(xyz_degrees[3])
+	light_vect=light_vect.dot(orientation_camera["rotation_matrix"].T)
+	if(True):#frame_id % 8 <4):
+		pass
+		light.position((light_vect[0],light_vect[1],light_vect[2]))
+		#light.color((1.0,0.0,0.0))
+		#pi3d.Light(lightpos=(light_vect[0],light_vect[1],light_vect[2]),lightcol=(0.75,0.75,0.45), lightamb=(0.1,0.1,0.42),is_point=False)
+		#print("light 1")
+	else:
+		light.position((-10,10,-7))
+		#light.color((10.0,10.0,10.0))
+		#pi3d.Light(lightpos=(-10,10,-7),lightcol=(0.75,0.75,0.45), lightamb=(0.1,0.1,0.42),is_point=False)
+		#print("light 2")
 	if(time_elapsed<2):
 		#print(segment)
 		pass
@@ -300,9 +318,11 @@ while display.loop_running():
 	pod.rotateToX(orientation_target["x_rot"])
 	pod.rotateToY(orientation_target["y_rot"])
 	pod.rotateToZ(orientation_target["z_rot"])
+	pod.set_light(light)
 	pod.draw()
 	
 	for ring in ring_list:
+		ring.set_light(light)
 		ring.draw()
 		
 	#sphere.draw()
