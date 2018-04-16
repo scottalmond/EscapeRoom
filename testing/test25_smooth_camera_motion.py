@@ -311,7 +311,7 @@ while display.loop_running():
 	#light_vect=np.array([0,0,-10])
 	#light_vect=light_vect.dot(xyz_degrees[3])
 	light_vect=(position_target+x_axis*15-y_axis*15)-position_camera #have light point somewhere down-right of target
-	light_vect[2]=-light_vect[2]
+	light_vect[2]=-light_vect[2] #ref pi3d issue 220: https://github.com/tipam/pi3d/issues/220
 	#light_vect=light_vect.dot(orientation_camera["rotation_matrix"].T)
 	if(True):#frame_id % 8 <4):
 		pass
