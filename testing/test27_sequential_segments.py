@@ -1,6 +1,7 @@
 from Segment import Segment
 from AssetLibrary import AssetLibrary
-from RingAssembly import RingAssembly
+from RingAssembly import *#RingAssembly
+#from import DEBRIS_TYPE
 from Curve import Curve
 
 import sys
@@ -59,7 +60,9 @@ segment_3=Segment(asset_library,False,segment_2_out["position"],
 segment_3_out=segment_3.getEndPoints()[0]
 for ring_id in range(ring_counts[2]):
 	u=ring_id/ring_counts[2]
-	segment_3.addRingAssembly(asset_library,u,ring_rotation_rate=RingAssembly.RING_ROTATION_DEGREES_PER_SECOND)
+	this_ring_assembly=segment_3.addRingAssembly(asset_library,u,ring_rotation_rate=RingAssembly.RING_ROTATION_DEGREES_PER_SECOND,debris_rotation_rate=RingAssembly.DEBRIS_ROTATION_DEGREES_PER_SECOND)
+	if(ring_id==2):
+		this_ring_assembly.addDebris(DEBRIS_TYPE.ASTEROID_LARGE,np.array([2,2,0]),np.array([0,0,0]),np.array([-40,50,-5]))
 
 #raise AssertionError("stop")
 

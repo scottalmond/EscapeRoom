@@ -32,7 +32,12 @@ class AssetLibrary:
 		#asteroids
 		asteroid_large_scale=0.55
 		self.asteroid_large=pi3d.Model(file_string=MODEL_PATH+'asteroid_large_1.obj',sx=asteroid_large_scale,sy=asteroid_large_scale,sz=asteroid_large_scale)
+		self.asteroid_large.set_shader(shader)
+		self.__setFog(self.asteroid_large)
+		
 		self.asteroid_medium=None
+		
+		
 		self.asteroid_small=None
 		
 		#rings
@@ -41,6 +46,8 @@ class AssetLibrary:
 		for ring_id in range(2):
 			ring = pi3d.Model(file_string=MODEL_PATH+ring_filename[ring_id])
 			ring.set_shader(shader)
-			ring.set_fog((0.0, 0.0, 0.0, 0.0), 130.8)
+			self.__setFog(ring)
 			self.rings.append(ring)
 
+	def __setFog(self,model):
+		model.set_fog((0.0, 0.0, 0.0, 0.0), 130.8)

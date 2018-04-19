@@ -96,6 +96,7 @@ class Segment:
 			print("curve_id: "+str(curve_id))
 			print("definition_time: "+str(definition_time))
 			print("definition_time: "+str(self.start_time_seconds))
+		return ring_assembly
 		
 	def update(self,life_elapsed_time_seconds,light):
 		for ring_assembly in self.ring_assembly_list:
