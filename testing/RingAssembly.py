@@ -18,7 +18,7 @@ class RingAssembly:
 	POST_RENDER_SECONDS=1
 	
 	RING_ROTATION_DEGREES_PER_SECOND=-40
-	DEBRIS_ROTATION_DEGREES_PER_SECOND=10
+	DEBRIS_ROTATION_DEGREES_PER_SECOND=25
 	
 	#asset_library is an instance of the AssetLibrary with the template 3D models
 	#position is the np.array of x,y,z coords in the global reference frame for hte center of the ring

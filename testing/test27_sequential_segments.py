@@ -116,7 +116,7 @@ while display.loop_running():
 	x_axis=camera_orientation["rotation_matrix"][0,:]
 	y_axis=camera_orientation["rotation_matrix"][1,:]
 	position_camera=camera_orientation["position"]
-	camera_movement_scale=0.4
+	camera_movement_scale=0.5
 	position_camera+=x_axis*pod_x*camera_movement_scale
 	position_camera+=y_axis*pod_y*camera_movement_scale
 	
@@ -148,8 +148,11 @@ while display.loop_running():
 		k = keys.read()
 		buttons.append(k)
 	k=max(buttons)
-	last_key=k
-	k=max(k,last_key)
+	temp=k
+	is_smooth_motion_enabled=True
+	if(is_smooth_motion_enabled): 
+		k=max(k,last_key)
+	last_key=temp
 	
 	#pod position update
 	pod_target=np.array([0,0])
