@@ -83,7 +83,7 @@ class RingAssembly:
 								 "debris_type":debris_type,
 								 "location":location,
 								 "angle":angle,
-								 "angular_velocity":angular_velocity})
+								 "angular_velocity":angular_velocity}) #todo: add radius property
 		self.debris_axis.add_child(model)
 
 	def update(self,life_elapsed_time_seconds,light):

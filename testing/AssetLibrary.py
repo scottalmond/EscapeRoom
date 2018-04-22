@@ -20,6 +20,8 @@ class AssetLibrary:
 		self.invisible=pi3d.Triangle(corners=((0,0),(.001,.001),(-.001,.001)))
 		
 		#pod
+		#self.pod_frame=self.invisible.shallow_clone()
+		#self.pod_frame.children=[]
 		self.pod=pi3d.Model(file_string=MODEL_PATH+'pod_2.obj', z=0.0)		
 		pod_scale=0.33
 		self.pod.scale(pod_scale,pod_scale,pod_scale)
@@ -50,4 +52,4 @@ class AssetLibrary:
 			self.rings.append(ring)
 
 	def __setFog(self,model):
-		model.set_fog((0.0, 0.0, 0.0, 0.0), 130.8)
+		model.set_fog((0.0, 0.0, 0.0, 0.0), 110.8)
