@@ -84,8 +84,8 @@ class ResourceManager:
 		self.was_keyboard_toggle=False #retain previous state of keyboard_toggle key state (2/10/18, why was this needed...?)
 		self.pygame_event=[]
 		self.pygame_keys_pressed=[]
-		self.morse_sequence=[] #list of True, False the represent Morse Code sequence
-		self.morse_cleared_seconds=0 #last time that the morse code sequence was cleared
+		#self.morse_sequence=[] #list of True, False the represent Morse Code sequence
+		#self.morse_cleared_seconds=0 #last time that the morse code sequence was cleared
 		print("ResourceManager.init: set debug: "+str(is_debug))
 		self._is_debug=is_debug
 		
@@ -123,8 +123,8 @@ class ResourceManager:
 		
 	def dispose(self):
 		self.pygame_event=[]
-		self.morse_sequence=[]
-		self.morse_cleared_seconds=0
+		#self.morse_sequence=[]
+		#self.morse_cleared_seconds=0
 		self.__dispose3Dgraphics()
 		self.__dispose2Dgraphics()
 
@@ -380,20 +380,26 @@ class ResourceManager:
 		else:
 			raise ValueError("Light puzzle input not yet implemented: "+str(input_index))
 	
+	# **Aditya Edit** moved Morse sequence handling to MorseCode.py
+	#
 	#a list of morse code key presses are maintained internally
 	#update the list here based on user inputs
-	def updateMorse(self):
-		is_dot=self.isDotPressed()
-		is_dash=self.isDashPressed()
-		if(is_dot and is_dash):
-			self.morse_sequence=[] #if both keys are down, clear entry
-			self.morse_cleared_seconds=time.time()
-		else:
-			pass
-			# -- TO DO --
+	#def updateMorse(self):
+	#	is_dot=self.isDotPressed()
+	#	is_dash=self.isDashPressed()
+	#	if(is_dot and is_dash):
+	#		self.morse_sequence=[] #if both keys are down, clear entry
+	#		self.morse_cleared_seconds=time.time()
+	#	elif(is_dot):
+	#		self.morse_sequence.append(False)
+	#	elif(is_dash):
+	#		self.morse_sequence.append(True)
+	#	else:
+	#		pass
+			
 		
-	def getMorse(self):
-		return self.morse_sequence
+	#def getMorse(self):
+	#	return self.morse_sequence
 		
 	#indicates whether IO_Manager is listening for inputs from the keyboard or from DI/O pins
 	def isKeyboard(self): return self.is_keyboard
