@@ -26,8 +26,8 @@ class SceneManager:
 	MAX_POD_DISPLACEMENT=3.5 #2.8 #maximum distance the pod can be from the center of the playfield
 	# ~4x of Segment.BRANCH_DISPLACEMENT_DISTANCE
 	POD_TRANSLATION_PER_SECOND=10.0 #rate of pod movement per second
-	POD_ROTATION_DEGREES_PER_SECOND=100.0 #rate of rotation animatic when pod is translating
-	POD_MAX_ROTATION=10.0
+	POD_ROTATION_DEGREES_PER_SECOND=70.0 #rate of rotation animatic when pod is translating
+	POD_MAX_ROTATION=[6.0,12.0] #x-translation, y-translation, degrees
 	INTRO_SECONDS=1 #number of seconds to wait on start for cut scene to play
 	OUTRO_SECONDS=1
 	DEATH_SECONDS=1
@@ -42,9 +42,9 @@ class SceneManager:
 		
 		#objects
 		self.asset_library=AssetLibrary()
-		self.pod=self.asset_library.pod.shallow_clone() #note: all children remain intact
-		self.pod_offset=np.array([0,0]) #x,y offset
-		self.pod_offset_rate=np.array([0,0]) #Z,X rotation angles for translation animatic (rotate right to translate right)
+		self.pod=self.asset_library.pod_frame.shallow_clone() #note: all children remain intact
+		self.pod_offset=np.array([0.0,0.0]) #x,y offset
+		self.pod_offset_rate=np.array([0.0,0.0]) #Z,X rotation angles for translation animatic (rotate right to translate right)
 		
 		#variables
 		self.scene={'state':SCENE_STATE.INTRO,'start_seconds':0,'end_seconds':self.INTRO_SECONDS,'ratio':0.0}
@@ -128,10 +128,10 @@ class SceneManager:
 		if(k==ord('d')):
 			pod_target[0]=1
 			is_x=True
-		if(k==ord('w')):
+		if(k==ord('s')):
 			pod_target[1]=1
 			is_y=True
-		if(k==ord('s')):
+		if(k==ord('w')):
 			pod_target[1]=-1
 			is_y=True
 		delta_pod=pod_target*self.POD_TRANSLATION_PER_SECOND*delta_time*(0.707 if (is_x and is_y) else 1.0)
@@ -144,9 +144,9 @@ class SceneManager:
 		#rotation animatic
 		x_rate=self.pod_offset_rate[0] #x-translation, Z-rotation
 		delta_x=self.POD_ROTATION_DEGREES_PER_SECOND*delta_time
-		if(k==ord('a')):#right
+		if(k==ord('d')):#right
 			delta_x=-delta_x
-		elif(k==ord('d')):#left
+		elif(k==ord('a')):#left
 			pass
 		else:#neither, return to center
 			if(x_rate<0): delta_x=min(-x_rate,delta_x)
@@ -156,9 +156,9 @@ class SceneManager:
 		
 		y_rate=self.pod_offset_rate[1] #y-translation, Y-rotation
 		delta_y=self.POD_ROTATION_DEGREES_PER_SECOND*delta_time
-		if(k==ord('w')):#up
+		if(k==ord('s')):#up
 			delta_y=-delta_y
-		elif(k==ord('s')):#down
+		elif(k==ord('w')):#down
 			pass
 		else:#neither, return to center
 			if(y_rate<0): delta_y=min(-y_rate,delta_y)
@@ -167,8 +167,8 @@ class SceneManager:
 		self.pod_offset_rate[1]+=delta_y
 		
 		for itr in range(2): #bound rotation
-			self.pod_offset_rate[itr]=max(self.pod_offset_rate[itr],-self.POD_MAX_ROTATION)
-			self.pod_offset_rate[itr]=min(self.pod_offset_rate[itr],self.POD_MAX_ROTATION)
+			self.pod_offset_rate[itr]=max(self.pod_offset_rate[itr],-self.POD_MAX_ROTATION[itr])
+			self.pod_offset_rate[itr]=min(self.pod_offset_rate[itr],self.POD_MAX_ROTATION[itr])
 			
 	def __updateProps(self,level_elapsed_time_seconds):
 		prop_orientation=self.getPropOrientation(level_elapsed_time_seconds)
@@ -180,11 +180,17 @@ class SceneManager:
 		#pod
 		pod_pos=prop_orientation['pod']['position']
 		pod_rot=prop_orientation['pod']['rotation_euler']
+		self.pod.children[0].rotateToX(self.pod_offset_rate[1])
+		self.pod.children[0].rotateToZ(self.pod_offset_rate[0])
 		self.pod.position(pod_pos[0],pod_pos[1],pod_pos[2])
-		self.pod.rotateToX(pod_rot[0]+self.pod_offset_rate[1])
+		self.pod.rotateToX(pod_rot[0])
 		self.pod.rotateToY(pod_rot[1])
-		self.pod.rotateToZ(pod_rot[2]+self.pod_offset_rate[0])
+		self.pod.rotateToZ(pod_rot[2])
 		self.pod.set_light(self.light)
+		#TO DO make recursive set_light method for pod
+		self.pod.children[0].set_light(self.light)
+		self.pod.children[0].children[0].set_light(self.light)
+		self.pod.children[0].children[0].children[0].set_light(self.light)
 		
 		#camera
 		camera_pos=prop_orientation['camera']['position']
@@ -203,7 +209,7 @@ class SceneManager:
 			if(self.pod_segment.is_branch): #when entering a branch, decide which path to take
 				is_left=self.pod_offset[0]<0
 				self.pod_segment.decideBranch(level_elapsed_time_seconds,is_left)
-				print('is_left: ',self.pod_segment.isLeft())
+				#print('is_left: ',self.pod_segment.isLeft())
 				
 		self.pod_orientation=self.pod_segment.getOrientationAtTime(level_elapsed_time_seconds)
 		

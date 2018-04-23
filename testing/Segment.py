@@ -53,8 +53,8 @@ class Segment:
 		return self.predecessor.hasTraceabilityTo(target)
 		
 	def dispose(self):
-		if(self.is_branch):
-			print('Segment.dispose: branch disposed')
+		#if(self.is_branch):
+		#	print('Segment.dispose: branch disposed')
 		for curve in self.curves:
 			curve.is_valid=False
 	
@@ -84,7 +84,7 @@ class Segment:
 		if(self.is_branch):
 			if(self.isLeft()):
 				return self.successor[1]
-			print('Segment.getSuccessor: '+str(self.isLeft()))
+			#print('Segment.getSuccessor: '+str(self.isLeft()))
 			return self.successor[2]
 		else:
 			return self.successor[0]

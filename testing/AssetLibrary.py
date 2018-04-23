@@ -20,8 +20,9 @@ class AssetLibrary:
 		self.invisible=pi3d.Triangle(corners=((0,0),(.001,.001),(-.001,.001)))
 		
 		#pod
-		#self.pod_frame=self.invisible.shallow_clone()
-		#self.pod_frame.children=[]
+		self.pod_frame=self.invisible.shallow_clone()
+		#the frame is the central location, but the pod may be rotated about the local axes for an animatic rotation effect during translation
+		self.pod_frame.children=[]
 		self.pod=pi3d.Model(file_string=MODEL_PATH+'pod_2.obj', z=0.0)		
 		pod_scale=0.33
 		self.pod.scale(pod_scale,pod_scale,pod_scale)
@@ -29,7 +30,10 @@ class AssetLibrary:
 		self.laser_gun = pi3d.Model(file_string=MODEL_PATH+'laser_gun_2.obj', y=0.4, z=-0.4)
 		self.laser_base.add_child(self.laser_gun)
 		self.pod.add_child(self.laser_base)
+		self.pod_frame.add_child(self.pod)
 		self.pod.set_shader(shader)
+		self.laser_gun.set_shader(shader)
+		self.laser_base.set_shader(shader)
 		
 		#asteroids
 		asteroid_large_scale=0.55
