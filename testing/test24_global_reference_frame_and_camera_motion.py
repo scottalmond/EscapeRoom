@@ -17,7 +17,7 @@ RING_ROTATION_DEGREES_PER_SECOND=30
 ALPHA=2.6 #a lower value alpha means the pod "cuts the corners" when moving through a ring
 # a high alpha means the pod is lined up the next ring long before going through it (or overshoots the alignment)
 MAX_POD_DISPLACEMENT=2.8 #maximum distance the pod can be from the center of the playfield
-POD_DISTANCE_PER_SECOND=7.0 #rate of pod moveemnt per second
+POD_DISTANCE_PER_SECOND=7.0 #rate of pod movement per second
 
 prevX_random=[random.random()]
 prevY_random=[random.random()]
