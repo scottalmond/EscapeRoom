@@ -5,8 +5,9 @@ class Segment:
 	DISTANCE_BETWEEN_RINGS=20.0 #Pi3D units of distance between rings
 	RINGS_PER_SECOND=1.2 #how many rings per second the player passes through
 	BRANCH_DISPLACEMENT_DISTANCE=2 #when selecting a branch path, there is
-	# a physical offset in the paths between the input and the 2 outputs
+	# a lateral offset in the paths between the input and the 2 outputs
 	# this is the distance between the input and one of the outputs in pi3d distance units
+	# TODO: make diagram of branch mechanics for joint connections
 	
 	def __init__(self,asset_library,is_branch,start_position,start_rotation_matrix,
 		start_time_seconds,curvature_degrees,orientation_degrees,ring_count,segment_id=0,

@@ -1,12 +1,12 @@
-from Segment import Segment
-from AssetLibrary import AssetLibrary
-from RingAssembly import *
-from Curve import Curve
+from chapters.wall.hyperspace_helper.Segment import Segment
+from chapters.wall.hyperspace_helper.AssetLibrary import AssetLibrary
+from chapters.wall.hyperspace_helper.RingAssembly import *
+from chapters.wall.hyperspace_helper.Curve import Curve
 
 import sys
 import sys
-sys.path.insert(1,'/home/pi/pi3d') # to use local 'develop' branch version
-import pi3d
+#sys.path.insert(1,'/home/pi/pi3d') # to use local 'develop' branch version
+#import pi3d
 import numpy as np
 import math
 import random
@@ -34,19 +34,9 @@ class SceneManager:
 	CAMERA_LAG_DISTANCE=12 #pi3d distance unit between camera and pod
 
 	def __init__(self):
-		#playfield
-		self.display = pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
-		self.camera = pi3d.Camera()
-		self.light=pi3d.Light(lightpos=(10,-10,-7),lightcol=(0.75,0.75,0.45), lightamb=(0.1,0.1,0.42),is_point=False)
-		self.keys = pi3d.Keyboard()
-		
-		#objects
-		self.asset_library=AssetLibrary()
-		self.pod=self.asset_library.pod_frame.shallow_clone() #note: all children remain intact
+		#variables
 		self.pod_offset=np.array([0.0,0.0]) #x,y offset
 		self.pod_offset_rate=np.array([0.0,0.0]) #Z,X rotation angles for translation animatic (rotate right to translate right)
-		
-		#variables
 		self.scene={'state':SCENE_STATE.INTRO,'start_seconds':0,'end_seconds':self.INTRO_SECONDS,'ratio':0.0}
 		self.life=0
 		self.level_start_time_seconds=0
@@ -55,6 +45,20 @@ class SceneManager:
 		self.camera_segment=None
 		self.is_done=False #remove from final program
 		self.last_key=-1 #delete from final program - used for smoothing pi3d keyboard inputs
+		
+	def clean(self,pi3d,display_3d,camera_3d):
+		#variables
+		self.pi3d=pi3d
+		
+		#playfield
+		self.display = display_3d #self.pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
+		self.camera = camera_3d #self.pi3d.Camera()
+		self.light = self.pi3d.Light(lightpos=(10,-10,-7),lightcol=(0.75,0.75,0.45), lightamb=(0.1,0.1,0.42),is_point=False)
+		#self.keys = self.pi3d.Keyboard() #TODO: remove later...
+		
+		#objects
+		self.asset_library=AssetLibrary(self.pi3d)
+		self.pod=self.asset_library.pod_frame.shallow_clone() #note: all children remain intact
 		
 	def __getRingCount(self):
 		count=0
@@ -197,6 +201,7 @@ class SceneManager:
 		camera_rot=prop_orientation['camera']['rotation_euler']
 		self.camera.reset()
 		self.camera.position(camera_pos)
+#		print("SceneManager.__updateProps: camera_pos:",camera_pos)
 		self.camera.rotate(camera_rot[0],camera_rot[1],camera_rot[2])
 		
 	def __drawSegments(self):
@@ -372,25 +377,26 @@ class SceneManager:
 			self.__updateCameraSegment(level_elapsed_time_seconds)
 			
 			#user input
-			buttons=[]
-			k=0
-			while k>=0:
-				k = sm.keys.read()
-				buttons.append(k)
-			k=max(buttons)
-			temp=k
-			is_smooth_motion_enabled=True
-			if(is_smooth_motion_enabled): 
-				k=max(k,self.last_key)
-			self.last_key=temp
+			#buttons=[]
+			#k=0
+			#while k>=0:
+				#k = sm.keys.read()
+				#buttons.append(k)
+			#k=max(buttons)
+			#temp=k
+			#is_smooth_motion_enabled=True
+			#if(is_smooth_motion_enabled): 
+				#k=max(k,self.last_key)
+			#self.last_key=temp
 			
+			k=-1 #temp disconnect from player controls
 			self.__updatePodPosition(k,delta_time)
 			
 			self.__updateProps(level_elapsed_time_seconds)
 			self.__updateSegments(level_elapsed_time_seconds)
 			
-			if k==27:
-				self.is_done=True
+			#if k==27:
+			#	self.is_done=True
 			
 			#TODO collissions
 			#update pod, camera, light, rings, branches, laser, asteroids...

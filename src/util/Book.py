@@ -160,8 +160,8 @@ class Book:
 					#TODO: connection_manager.pop("Book")
 					#TODO: connection_manager.pop("Chapter") --> pass to update() method
 					peek=None if self.connection_manager.inbound_queue.empty() else self.connection_manager.inbound_queue.queue[0]
-					if(self.getTitle().lower()=="Wall".lower()):
-						print("Book.run: peek: "+str(peek))
+					#if(self.getTitle().lower()=="Wall".lower()):
+					#	print("Book.run: peek: "+str(peek))
 					book_packets=self.getScopePackets("Book")
 					#print("Book.run: number of packets: "+str(len(book_packets)))
 					for book_packet in book_packets:
