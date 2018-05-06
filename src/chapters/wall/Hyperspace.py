@@ -31,6 +31,7 @@ from chapters.wall.hyperspace_helper.SceneManager import *
 import time
 import numpy as np
 import math
+from util.ResourceManager import DIRECTION,DEVICE
 
 class Hyperspace(Chapter):
 	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
@@ -81,7 +82,23 @@ class Hyperspace(Chapter):
 		debug_strings=[]
 		debug_strings.append("DEBUG.HEREXXXXXX")
 		
-		self.scene_manager.update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,None)
+		#navigation_joystick=self.rm.getJoystickDirection(DEVICE.DIRECTION)
+		#camera_joystick=self.rm.getJoystickDirection(DEVICE.CAMERA)
+		#laser_joystick=self.rm.getJoystickDirection(DEVICE.LASER)
+		is_fire_laser=self.rm.isFirePressed(DEVICE.LASER)
+		
+		is_input_active=np.zeros((3,4), dtype=bool)
+		device_list=[DEVICE.DIRECTION,DEVICE.CAMERA,DEVICE.LASER]
+		direction_list=[DIRECTION.NORTH,DIRECTION.WEST,DIRECTION.SOUTH,DIRECTION.EAST]
+		for input_device in range(len(device_list)):
+			joystick_inputs=self.rm.getJoystickDirection(device_list[input_device])
+			for direction_id in range(len(direction_list)):
+				if(direction_list[direction_id] in joystick_inputs):
+					is_input_active[input_device,direction_id]=True
+		
+		self.scene_manager.update(this_frame_number,
+			this_frame_elapsed_seconds,previous_frame_elapsed_seconds,None,
+			is_input_active[0,:],is_input_active[1,:],is_input_active[2,:],is_fire_laser)
 		
 		self.is_first_frame=this_frame_number==0
 		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)

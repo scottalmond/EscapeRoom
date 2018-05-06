@@ -56,10 +56,10 @@ class SnakePlayer:
 		elif(player_index==2):
 			self.tail_list.append([5,10,0,True])
 			self.tail_list.append([5,9,0,True])
-			self.tail_list.append([5,8,0,True])
-			self.tail_list.append([5,7,0,True])
-			self.tail_list.append([5,6,0,True])
-			self.tail_list.append([5,5,0,True])
+			self.tail_list.append([5,8,1,True])
+			self.tail_list.append([5,7,1,True])
+			self.tail_list.append([5,6,1,True])
+			self.tail_list.append([5,5,1,True])
 		else:
 			raise ValueError("Player number "+str(player_index)+" not implemented in SnakePlayer")
 		
@@ -73,7 +73,11 @@ class SnakePlayer:
 			self.__step()
 		
 	#draw the snake
-	def draw(self):
+	#player images is a list of the following images:
+	# head pointed up
+	# body
+	# pellet
+	def draw(self,player_images):
 		#TO DO, draw partial image:
 		# https://stackoverflow.com/questions/6239769/how-can-i-crop-an-image-with-pygame
 		if(self.player_index==0):
@@ -82,6 +86,13 @@ class SnakePlayer:
 			player_color=(0,255,0)
 		elif(self.player_index==2):
 			player_color=(0,0,255)
+		#limit graphic renders to the playable area
+		top_left_playable_area=self.snake_game.RC2XY(0,0)["absolute"]
+		bottom_right_playable_area=self.snake_game.RC2XY(self.snake_game.GRID_ROWS,self.snake_game.GRID_COLS)["absolute"]
+		playable_area=(top_left_playable_area[0],
+					   top_left_playable_area[1],
+					   bottom_right_playable_area[0],
+					   bottom_right_playable_area[1])
 		#draw tail (high index) first then head (index 1) on top
 		#skip index 0 (forehead: where the snake head is partially intersecting)
 		for node_index in reversed(range(len(self.tail_list)-1)):
@@ -102,12 +113,43 @@ class SnakePlayer:
 				for node_loc_index in range(len(node_loc_aliases)):
 					node_loc=node_loc_aliases[node_loc_index]
 					if(render_alias or node_loc_index==0):
-						this_rect=(node_loc[0],node_loc[1],self.snake_game.GRID_CELL_PX,self.snake_game.GRID_CELL_PX)#x,y,width,height
-						self.snake_game.rm.pygame.draw.rect(self.snake_game.rm.screen_2d,player_color,this_rect,0)
-						if(this_node[2]==1): #placeholder for actual graphics by graphic_id
-							self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(255,255,255),this_rect,0)
-						elif(this_node[2]==2):
-							self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(0,0,0),this_rect,0)
+						this_rect=[node_loc[0],node_loc[1],self.snake_game.GRID_CELL_PX,self.snake_game.GRID_CELL_PX]#x,y,width,height
+						if(this_rect[0]+this_rect[2]>playable_area[2]):
+							this_rect[2]=playable_area[2]-this_rect[0] #clip alias going off right side of playable area
+						if(this_rect[1]+this_rect[3]>playable_area[3]):
+							this_rect[3]=playable_area[3]-this_rect[1] #clip alias going off bottom of playable area
+						if(this_rect[0]<playable_area[0]):
+							this_rect[0]=playable_area[0] #clip alias going off left side of playable area
+							this_rect[2]=this_rect[2]-(playable_area[0]-this_rect[0])
+						if(this_rect[1]<playable_area[1]):
+							this_rect[1]=playable_area[1] #clip alias going off top of playable area
+							this_rect[3]=this_rect[3]-(playable_area[1]-this_rect[1])
+						if(False): #simple graphics
+							this_rect=(node_loc[0],node_loc[1],self.snake_game.GRID_CELL_PX,self.snake_game.GRID_CELL_PX)#x,y,width,height
+							self.snake_game.rm.pygame.draw.rect(self.snake_game.rm.screen_2d,player_color,this_rect,0)
+							if(this_node[2]==1): #placeholder for actual graphics by graphic_id
+								self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(255,255,255),this_rect,0)
+							elif(this_node[2]==2):
+								self.snake_game.rm.pygame.draw.ellipse(self.snake_game.rm.screen_2d,(0,0,0),this_rect,0)
+						else:
+							clipped_graphic=(this_rect[0]-node_loc[0],
+											 this_rect[1]-node_loc[1],
+											 this_rect[2],
+											 this_rect[3])
+							graphic_id_range=self.graphicID("head")
+							if(graphic_id_range[0] <= this_node[2] <= graphic_id_range[1]):
+								rotation_index=0
+								head_dir,unused=self.getHeadDirection()
+								if(head_dir==DIRECTION.EAST): rotation_index=1
+								elif(head_dir==DIRECTION.SOUTH): rotation_index=2
+								elif(head_dir==DIRECTION.WEST): rotation_index=3
+								#print("SnakePlayer.draw: rotation_index: ",rotation_index)
+								#print("SnakePlayer.draw: len(player_images[0]): ",len(player_images[0]))
+								self.snake_game.rm.screen_2d.blit(player_images[0][rotation_index],(this_rect[0],this_rect[1]),clipped_graphic)
+							graphic_id_range=self.graphicID("pellet")
+							if(graphic_id_range[0] <= this_node[2] <= graphic_id_range[1]):
+								#player_images [1] for pellet, [0] for rotation
+								self.snake_game.rm.screen_2d.blit(player_images[1][0],(this_rect[0],this_rect[1]),clipped_graphic)
 		
 	#return the current direction the snake head is headed
 	# also return the direction the tail is from the head (opposite of heading direction)
@@ -249,7 +291,11 @@ class SnakePlayer:
 	# each pellet (and corresponding snake component) has a graphic representation
 	# used by the snake_game.draw() method
 	def graphicID(self,graphic_type):
-		return [1,3]
+		if(graphic_type=="head"):
+			return [0,0]
+		if(graphic_type=="pellet"):
+			return [1,3]
+		return None
 
 	#if I am in a position that I can exit, then return True
 	def canExit(self):

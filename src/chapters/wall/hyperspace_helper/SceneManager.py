@@ -34,7 +34,11 @@ class SceneManager:
 	CAMERA_LAG_DISTANCE=12 #pi3d distance unit between camera and pod
 
 	def __init__(self):
+		pass
+		
+	def clean(self,pi3d,display_3d,camera_3d):
 		#variables
+		self.pi3d=pi3d
 		self.pod_offset=np.array([0.0,0.0]) #x,y offset
 		self.pod_offset_rate=np.array([0.0,0.0]) #Z,X rotation angles for translation animatic (rotate right to translate right)
 		self.scene={'state':SCENE_STATE.INTRO,'start_seconds':0,'end_seconds':self.INTRO_SECONDS,'ratio':0.0}
@@ -43,12 +47,7 @@ class SceneManager:
 		self.segment_list=[]
 		self.pod_segment=None
 		self.camera_segment=None
-		self.is_done=False #remove from final program
 		self.last_key=-1 #delete from final program - used for smoothing pi3d keyboard inputs
-		
-	def clean(self,pi3d,display_3d,camera_3d):
-		#variables
-		self.pi3d=pi3d
 		
 		#playfield
 		self.display = display_3d #self.pi3d.Display.create(background=(0.0, 0.0, 0.0, 0.0))
@@ -121,22 +120,43 @@ class SceneManager:
 		for segment in self.segment_list:
 			segment.update(level_elapsed_time_seconds,self.light)
 			
+	#assumes input for 'k' as 4-element bool np.array
+	# in the following order: [NORTH,WEST,SOUTH,EAST], where True is an active user input command
 	def __updatePodPosition(self,k,delta_time):
 		#position
 		pod_target=np.array([0,0])
 		is_x=False
 		is_y=False
-		if(k==ord('a')):
+		IS_AIRPLANE_CONTROLS=True #True is up joystick means down motion
+		#if(k==ord('a')):
+			#pod_target[0]=-1
+			#is_x=True
+		#if(k==ord('d')):
+			#pod_target[0]=1
+			#is_x=True
+		#if(k==ord('s')):
+			#pod_target[1]=1
+			#is_y=True
+		#if(k==ord('w')):
+			#pod_target[1]=-1
+			#is_y=True
+		if(k[1]):
 			pod_target[0]=-1
 			is_x=True
-		if(k==ord('d')):
+		if(k[3]):
 			pod_target[0]=1
 			is_x=True
-		if(k==ord('s')):
-			pod_target[1]=1
+		if(k[2]):
+			if(IS_AIRPLANE_CONTROLS):
+				pod_target[1]=-1
+			else:
+				pod_target[1]=1
 			is_y=True
-		if(k==ord('w')):
-			pod_target[1]=-1
+		if(k[0]):
+			if(IS_AIRPLANE_CONTROLS):
+				pod_target[1]=1
+			else:
+				pod_target[1]=-1
 			is_y=True
 		delta_pod=pod_target*self.POD_TRANSLATION_PER_SECOND*delta_time*(0.707 if (is_x and is_y) else 1.0)
 		pod_pos=self.pod_offset+delta_pod
@@ -148,9 +168,13 @@ class SceneManager:
 		#rotation animatic
 		x_rate=self.pod_offset_rate[0] #x-translation, Z-rotation
 		delta_x=self.POD_ROTATION_DEGREES_PER_SECOND*delta_time
-		if(k==ord('d')):#right
+		#if(k==ord('d')):#right
+			#delta_x=-delta_x
+		#elif(k==ord('a')):#left
+			#pass
+		if(k[3]):#right
 			delta_x=-delta_x
-		elif(k==ord('a')):#left
+		elif(k[1]):#left
 			pass
 		else:#neither, return to center
 			if(x_rate<0): delta_x=min(-x_rate,delta_x)
@@ -160,10 +184,20 @@ class SceneManager:
 		
 		y_rate=self.pod_offset_rate[1] #y-translation, Y-rotation
 		delta_y=self.POD_ROTATION_DEGREES_PER_SECOND*delta_time
-		if(k==ord('s')):#up
-			delta_y=-delta_y
-		elif(k==ord('w')):#down
-			pass
+		#if(k==ord('s')):#up
+			#delta_y=-delta_y
+		#elif(k==ord('w')):#down
+			#pass
+		if(k[0]):#up
+			if(IS_AIRPLANE_CONTROLS):
+				pass
+			else:
+				delta_y=-delta_y
+		elif(k[2]):#down
+			if(IS_AIRPLANE_CONTROLS):
+				delta_y=-delta_y
+			else:
+				pass
 		else:#neither, return to center
 			if(y_rate<0): delta_y=min(-y_rate,delta_y)
 			elif(y_rate>0): delta_y=max(-y_rate,-delta_y)
@@ -343,7 +377,10 @@ class SceneManager:
 		
 		return {'pod':pod_orientation,'camera':camera_orientation,'light':light_orientation}
 
-	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):
+	#assumes inputs for navigation_joystick,camera_joystick,laser_joystick as 4-element bool np.arrays
+	# in the following order: [NORTH,WEST,SOUTH,EAST], where True is an active user input command
+	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets,
+			navigation_joystick,camera_joystick,laser_joystick,is_fire_laser):
 		scene_state=self.scene['state']
 		level_elapsed_time_seconds=this_frame_elapsed_seconds-self.level_start_time_seconds
 		scene_start=self.scene['start_seconds'] #seconds
@@ -390,7 +427,7 @@ class SceneManager:
 			#self.last_key=temp
 			
 			k=-1 #temp disconnect from player controls
-			self.__updatePodPosition(k,delta_time)
+			self.__updatePodPosition(navigation_joystick,delta_time)
 			
 			self.__updateProps(level_elapsed_time_seconds)
 			self.__updateSegments(level_elapsed_time_seconds)
@@ -446,23 +483,3 @@ class SceneManager:
 			self.scene=out_scene
 			return
 		raise NotImplementedError('SceneManager.__setSceneState(): Unable to transition from scene state: '+str(from_scene_state)+', to scene state: '+str(to_scene_state))
-
-if __name__ == "__main__":
-	random.seed(0)
-	sm=SceneManager()
-	start_time=time.time()
-	previous_frame_seconds=0
-	frame_id=0
-	last_key=-1
-	while(sm.display.loop_running()):
-		current_frame_seconds=time.time()-start_time
-		sm.update(frame_id,current_frame_seconds,previous_frame_seconds,None)
-		sm.draw()
-		previous_frame_seconds=current_frame_seconds
-		frame_id+=1
-		
-		
-		if(sm.is_done):
-			sm.keys.close()
-			sm.display.destroy()
-			break

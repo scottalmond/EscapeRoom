@@ -194,4 +194,6 @@ class Tutorial(Chapter):
 		else:
 			raise ValueError("Invalid device state: "+str(input_state))
 		img_size=img.get_size()
-		self.rm.screen_2d.blit(img,(x_px-img_size[0],y_px-img_size[1]))
+		self.rm.screen_2d.blit(img,(x_px-math.floor(img_size[0]/2),
+									y_px-math.floor(img_size[1]/2)))
+		#TODO: floor x_val/2 ?

@@ -48,6 +48,15 @@ class DEVICE(Enum):
 	CAMERA=1
 	LASER=2
 	MORSE=3
+	
+#discrete input pin mapping
+#refer to resources/project_box_pinout.ods
+class DI_PINS(Enum):
+	DIRECTION_JOYSTICK_1=6 #north
+	DIRECTION_JOYSTICK_2=21 #south
+	DIRECTION_JOYSTICK_3=5 #east
+	DIRECTION_JOYSTICK_4=27 #west
+	LASER_FIRE=7
 
 class ResourceManager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only - higher values used to reduce pixelation in 3D graphics
@@ -62,6 +71,11 @@ class ResourceManager:
 			#if need supporting libraries, load them
 			#Physical Interfaces
 			import wiringpi as wp
+			self.wp=wp
+			wp.wiringPiSetup()
+			for pin in DI_PINS:
+				wp.pinMode(pin.value,wp.GPIO.INPUT)
+				wp.pullUpDnControl(pin.value,wp.GPIO.PUD_UP)
 			#2D Graphics
 			import pygame
 			#3D graphics
@@ -294,6 +308,12 @@ class ResourceManager:
 			pass
 		return False
 		
+	#True if depressed (eletrical contact between weak pull-up and GND)
+	#False if button is NOT depressed (eletrical pull-up is the only input)
+	def __readPin(self,pin_enum):
+		out=self.wp.digitalRead(pin_enum.value)
+		return 1-out
+		
 	#returns a list of 0, 1 or 2 elements.  List of two are orthogonal directions.  ex:
 	#[] #no direction selected
 	#[IO_Manager.NORTH] #only north selected
@@ -325,7 +345,10 @@ class ResourceManager:
 				raise ValueError("Invalid joystick enum: "+str(joystick))
 		else:
 			if(joystick==DEVICE.DIRECTION):
-				pass #TODO
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_1)): directions.append(DIRECTION.NORTH)
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_2)): directions.append(DIRECTION.SOUTH)
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_3)): directions.append(DIRECTION.EAST)
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_4)): directions.append(DIRECTION.WEST)
 			elif(joystick==DEVICE.CAMERA):
 				pass #TODO
 			elif(joystick==DEVICE.LASER):
@@ -358,7 +381,7 @@ class ResourceManager:
 			elif(joystick==DEVICE.CAMERA):
 				pass
 			elif(joystick==DEVICE.LASER):
-				pass #TODO
+				if(self.__readPin(DI_PINS.LASER_FIRE)): return True
 			else:
 				raise ValueError("Invalid joystick enum: "+str(joystick))
 		return False

@@ -39,13 +39,15 @@ class Snake(Chapter):
 	WINNING_PLAYER_LENGTH=8 #number of blocks behind snake, including head, needed to have a full-length snake
 	GRID_ROWS=10
 	GRID_COLS=21
-	GRID_CELL_PX=80 #number of pixels on a side of a grid cell
+	GRID_CELL_PX=80 #number of pixels on a side of a grid cell - interdependent with player image and background
 	CELL_COLOR_1=(255,255,255) #white
 	CELL_COLOR_2=(162,152,138) #brown
 	MIN_VISIBLE_PELLETS_PER_PLAYER=2 #number of pellets that must be on screen for players to eat (unless they are already at max length)
 	GOAL_WIDTH_CELLS=3
 	MUSIC_PATH='./chapters/wall/assets/snake/escaperoom01_pre05_2.mp3'
 	MUSIC_ENABLED=True
+	IMAGE_BACKGROUND_PATH='./chapters/wall/assets/snake/snake_background_by_chilly_prins.png'
+	IMAGE_PLAYER_PATH='./chapters/wall/assets/snake/snake_player_by_chilly_prins.png'
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -58,6 +60,25 @@ class Snake(Chapter):
 			
 	def clean(self):
 		super().clean()
+		print("Snake.clean(): load images...")
+		self.image_background=self.rm.pygame.image.load(self.IMAGE_BACKGROUND_PATH).convert()
+		self.image_player=self.rm.pygame.image.load(self.IMAGE_PLAYER_PATH).convert_alpha()
+		print("Snake.clean(): images loaded")
+		self.image_player_portion=[[None for x in range(3)] for x in range(self.NUMBER_OF_PLAYERS+1)] #cols are: head, tail, pellet
+		for player_segment_type in range(3):
+			for player_id in range(1+self.NUMBER_OF_PLAYERS):
+				offset_x=(18+self.GRID_CELL_PX)*player_id+25
+				offset_y=(10+self.GRID_CELL_PX)*player_segment_type+124
+				image_cropped=self.rm.pygame.Surface((self.GRID_CELL_PX,self.GRID_CELL_PX),self.rm.pygame.SRCALPHA,32)
+				image_cropped=image_cropped.convert_alpha()
+				image_cropped.blit(self.image_player,(0,0),
+					(offset_x,offset_y,offset_x+self.GRID_CELL_PX,offset_y+self.GRID_CELL_PX))
+				image_list=[]
+				image_list.append(image_cropped)
+				for direction in range(3):
+					rotated_image=self.rm.pygame.transform.rotate(image_list[-1],-90)
+					image_list.append(rotated_image)
+				self.image_player_portion[player_id][player_segment_type]=image_list
 		self.is_goal_blink=False #goal blinks when it is active for players to exit the playing field through
 		self.is_music_fading_out=False
 		self.pellets=[] #pellets are items that players can run over to lengthen the snake:
@@ -107,13 +128,22 @@ class Snake(Chapter):
 	def draw(self):
 		super().draw()
 		self.__drawBackground()
-		self.__drawGrid()
+		#self.__drawGrid()
 		self.__drawPellets()
 		self.__drawPlayers()
 		self.__drawGoals()
 		self.__drawGUI()
 		self.displayDebugStringList()
 		
+		if(False): #debug test render of player images
+			for x in range(len(self.image_player_portion)):
+				for y in range(len(self.image_player_portion[0])):
+					img=self.image_player_portion[x][y][0]
+					if(not img is None):
+						self.rm.pygame.draw.rect(self.rm.screen_2d,self.CELL_COLOR_2,
+							(100+90*x,100+90*y,80,80))
+						self.rm.screen_2d.blit(img,(100+90*x,100+90*y))
+					
 		self.rm.pygame.display.flip()
 		
 	#initalize new pellets as needed
@@ -184,7 +214,8 @@ class Snake(Chapter):
 		self.is_goal_blink=this_frame_elapsed_seconds%(1/rate_hz)<(0.5/rate_hz)
 		
 	def __drawBackground(self):
-		self.rm.screen_2d.fill(self.background_color)
+		#self.rm.screen_2d.fill(self.background_color)
+		self.rm.screen_2d.blit(self.image_background,(0,0))
 		
 	#draw background grid in the center of the screen
 	#note: drawing several rectangles appears to use a significnat amount of
@@ -208,17 +239,22 @@ class Snake(Chapter):
 		
 	def __drawPellets(self):
 		for pellet in self.pellets:
-			player_color=(255,0,0)
+			player_color=(255,0,0) #red
 			player_index=pellet[3]
-			if(player_index==1): player_color=(0,255,0)
-			if(player_index==2): player_color=(0,0,255)
+			if(player_index==1): player_color=(0,255,0) #green
+			if(player_index==2): player_color=(0,0,255) #blue
 			pellet_xy=self.RC2XY(pellet[0],pellet[1])["absolute"]
-			self.rm.pygame.draw.ellipse(self.rm.screen_2d,player_color,
-				(pellet_xy[0],pellet_xy[1],self.GRID_CELL_PX,self.GRID_CELL_PX),0)
+			#self.rm.pygame.draw.ellipse(self.rm.screen_2d,player_color,
+			#	(pellet_xy[0],pellet_xy[1],self.GRID_CELL_PX,self.GRID_CELL_PX),0)
+			player_image_index=self.__player_index_to_image_index(player_index)
+			pellet_image_index=2 #from image_player_portion definition
+			self.rm.screen_2d.blit(self.image_player_portion[player_image_index][pellet_image_index][0],(pellet_xy[0],pellet_xy[1]))
 		
 	def __drawPlayers(self):
 		for player in self.players:
-			player.draw()
+			player_image_index=self.__player_index_to_image_index(player.player_index)
+			player_images=self.image_player_portion[player_image_index]
+			player.draw(player_images)
 		
 	#goals have several functions
 	# 1) when snake is not long enough, display a progress indicator
@@ -291,6 +327,9 @@ class Snake(Chapter):
 						   edge[0]/2,
 						   edge[1]/2)#x,y,w,h
 				self.rm.pygame.draw.rect(self.rm.screen_2d,direction_color,rect_dims,0)
+		
+	def __player_index_to_image_index(self,player_index):
+		return 3-player_index
 		
 	#if there is a pellet at the specified (row,col)
 	# and it matches the current player color
