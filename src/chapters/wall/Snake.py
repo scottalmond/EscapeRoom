@@ -61,6 +61,7 @@ class Snake(Chapter):
 	def clean(self):
 		super().clean()
 		print("Snake.clean(): load images...")
+		#encoutnered sRGB color error, fix: https://wiki.archlinux.org/index.php/Libpng_errors
 		self.image_background=self.rm.pygame.image.load(self.IMAGE_BACKGROUND_PATH).convert()
 		self.image_player=self.rm.pygame.image.load(self.IMAGE_PLAYER_PATH).convert_alpha()
 		print("Snake.clean(): images loaded")

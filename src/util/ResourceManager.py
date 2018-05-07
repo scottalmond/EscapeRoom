@@ -445,6 +445,9 @@ class ResourceManager:
 		#raise ValueError("Debug mode cannot be set except by the book in response to an external command: either as TCP, within the terminal command, or in response to the F1 key")
 
 if __name__ == "__main__":
-	io=IO_Manager(None)
-	io.clean()
-	print("stopped: "+str(io.isStopped()))
+	#io=IO_Manager(None)
+	#io.clean()
+	#print("stopped: "+str(io.isStopped()))
+	rm=ResourceManager.loadCSV('configuration_map_connections.csv')
+	print(rm)
+	

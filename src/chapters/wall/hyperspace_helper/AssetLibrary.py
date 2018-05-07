@@ -10,7 +10,7 @@ import time
 # allows for cloning to minimize GPU usage
 
 class AssetLibrary:
-	MODEL_PATH = 'chapters/wall/assets/hyperspace/'
+	MODEL_PATH = 'chapters/wall/assets/hyperspace/3D/'
 	
 	def __init__(self,pi3d):
 		#init

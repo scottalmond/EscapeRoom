@@ -269,6 +269,7 @@ class SceneManager:
 	#output:
 	#{'previous_segment':Segment,'next_segment':[Segment,Segment,Segment]}
 	# where previous_segment is the input
+	# and one of the following is True: 'next_segment'[0] is None OR 'next_segment'[1:2] is None
 	def getSegmentAfter(self,segment):
 		if(segment is None):
 			#return first segment
