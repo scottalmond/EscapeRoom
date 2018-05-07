@@ -26,10 +26,8 @@ from util.Chapter import Chapter
 
 class MorseCode(Chapter):
 	
-	MC_FONT_FNAME = 'CourierPrimeCode.ttf'
-	MC_FONT_SIZE = 128
-	PROMPT_X = 100
-	PROMPT_Y = 300
+	MC_FONT_FNAME = 'WHITRABT.TTF' #alternatively 'CourierPrimeCode.ttf'
+	MC_FONT_SIZE = 72
 	PASSWORD = "SPACE"
 	MESSAGE = "Congratulations!" #Reward for solving puzzle - currently a placeholder
 	
@@ -56,6 +54,9 @@ class MorseCode(Chapter):
 		self.blank_space = ""
 		self.display_error = False
 		self.correct_password = False
+		self.width,self.height = self.rm.getScreenDimensions()
+		self.prompt_x = self.width*0.5
+		self.prompt_y = self.height*0.1
 		
 	def dispose(self,is_final_call):
 		super().dispose(is_final_call) 
@@ -106,7 +107,8 @@ class MorseCode(Chapter):
 			self.__drawText()
 		else: #show reward message if correct password has been entered
 			rendered_message = self.mc_font.render(self.MESSAGE,1,(255,255,255))
-			self.rm.screen_2d.blit(rendered_message,(self.PROMPT_X,self.PROMPT_Y))
+			rendered_message = self.rm.pygame.transform.rotate(rendered_message,270)
+			self.rm.screen_2d.blit(rendered_message,(self.prompt_x,self.prompt_y))
 		
 		self.rm.pygame.display.flip()
 
@@ -118,11 +120,13 @@ class MorseCode(Chapter):
 	#display prompt along with blinking cursor
 	def __displayPrompt(self):
 		rendered_prompt = self.mc_font.render("PASSWORD:",1,(255,255,255))
-		self.rm.screen_2d.blit(rendered_prompt,(self.PROMPT_X,self.PROMPT_Y))
+		rendered_prompt = self.rm.pygame.transform.rotate(rendered_prompt,270)
+		self.rm.screen_2d.blit(rendered_prompt,(self.prompt_x,self.prompt_y))
 
 		if(self.cursor_visible):
-			rendered_prompt2 = self.mc_font.render(self.blank_space + "_",0,(255,255,255))
-			self.rm.screen_2d.blit(rendered_prompt2,(self.PROMPT_X,self.PROMPT_Y+self.MC_FONT_SIZE))
+			rendered_cursor = self.mc_font.render(self.blank_space + "_",0,(255,255,255))
+			rendered_cursor = self.rm.pygame.transform.rotate(rendered_cursor,270)
+			self.rm.screen_2d.blit(rendered_cursor,(self.prompt_x-self.MC_FONT_SIZE,self.prompt_y))
 			
 	#updates Morse Code sequence
 	def __updateSequence(self,this_frame_elapsed_seconds):
@@ -166,7 +170,8 @@ class MorseCode(Chapter):
 
 	def __drawSequence(self):
 		rendered_seq = self.mc_font.render(self.blank_space+self.sequence,1,(255,255,255))
-		self.rm.screen_2d.blit(rendered_seq,(self.PROMPT_X,self.PROMPT_Y+self.MC_FONT_SIZE))
+		rendered_seq = self.rm.pygame.transform.rotate(rendered_seq,270)
+		self.rm.screen_2d.blit(rendered_seq,(self.prompt_x-self.MC_FONT_SIZE,self.prompt_y))
 
 	def __decodeSequence(self):
 		if(self.sequence == ".-"):
@@ -282,10 +287,12 @@ class MorseCode(Chapter):
 		
 	def __drawText(self):
 		rendered_text = self.mc_font.render(self.decoded_text,1,self.text_color)
-		self.rm.screen_2d.blit(rendered_text,(self.PROMPT_X,self.PROMPT_Y+self.MC_FONT_SIZE))
+		rendered_text = self.rm.pygame.transform.rotate(rendered_text,270)
+		self.rm.screen_2d.blit(rendered_text,(self.prompt_x-self.MC_FONT_SIZE,self.prompt_y))
 		if(self.display_error): #show error symbol if invalid Morse sequence
 			rendered_error = self.mc_font.render(self.blank_space+"!",1,(255,0,0))
-			self.rm.screen_2d.blit(rendered_error,(self.PROMPT_X,self.PROMPT_Y+self.MC_FONT_SIZE))
+			rendered_error = self.rm.pygame.transform.rotate(rendered_error,270)
+			self.rm.screen_2d.blit(rendered_error,(self.prompt_x-self.MC_FONT_SIZE,self.prompt_y))
 
 	#shows if input password is correct or not (via color)
 	def __updateText(self,this_frame_elapsed_seconds):
