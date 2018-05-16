@@ -35,11 +35,13 @@ from util.ResourceManager import DIRECTION,DEVICE
 
 class Hyperspace(Chapter):
 	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
+	#HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out.mp4'
 	VIDEO_ENABLED=False #if True, play looping video
-	MUSIC_PATH='./chapters/wall/assets/hyperspace/escaperoom01_pre01_0.mp3'
-	MUSIC_ENABLED=False #if True, play looping music
-	
+	LOOP_VIDEO=True
+	MUSIC_PATH='./chapters/wall/assets/hyperspace/escaperoom02_pre06_2.mp3'
+	MUSIC_ENABLED=True #if True, play looping music
 	ASSET_FOLDER='chapters/wall/assets/hyperspace/'
+	BACKGROUND_2D='./chapters/wall/assets/hyperspace/background.png'
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
@@ -50,32 +52,49 @@ class Hyperspace(Chapter):
 		self.scene_manager=SceneManager()
 		self.background_video_player=None #reference to the omxplayer
 		#that plays the background hyperspace video
+		self.is_first_frame=True #if is first frame, draw pygame background
 
 	def clean(self):
 		super().clean()
 		self.scene_manager.clean(self.rm.pi3d,self.rm.display_3d,self.rm.camera_3d)
 		if(not self.background_video_player is None):
-			self.io.disposeVideo(self.background_video_player)
+			self.rm.disposeVideo(self.background_video_player)
 		if(self.VIDEO_ENABLED):
-			self.background_video_player=loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO)
+			self.background_video_player=None#self.rm.loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO)
+			if(self.background_video_player is None):
+				print("Hyperspace.clean: video player is None")
+			else:
+				print("Hyperspace.clean: video player created")
+			print("Hyperspace.clean.sleep...")
+			time.sleep(2)
+			self.rm.pauseVideo(self.background_video_player)
+			print("Hyperspace.clean.sleep done")
+		self.image_background=self.rm.pygame.image.load(self.BACKGROUND_2D).convert() #temp placehold for video
 			
 	def dipose(self,is_final_call):
 		super().dipose(self,is_final_call)
 		if(not self.background_video_player is None):
-			self.io.disposeVideo(self.background_video_player)
+			self.rm.disposeVideo(self.background_video_player)
 		
 	def enterChapter(self,unix_time_seconds):
 		super().enterChapter(unix_time_seconds)
 		if(self.MUSIC_ENABLED):
+			print("Hyperspace.enterChapter.MUSIC: here")
 			self.rm.pygame.mixer.music.load(self.MUSIC_PATH)
+			self.rm.pygame.mixer.music.play(loops=-1) #TODO: move to later in game sequence storyboard
 		if(self.VIDEO_ENABLED):
-			self.io.playVideo(self.background_video_player)
+			self.rm.playVideo(self.background_video_player)
+			self.background_video_player=self.rm.loadVideo(self.HYPERSPACE_BACKGROUND_VIDEO,self.LOOP_VIDEO)
 		self.background_color=(0,100,255)
 		
 	def exitChapter(self):
 		super().exitChapter()
 		if(self.MUSIC_ENABLED):
 			self.rm.pygame.mixer.music.stop()
+		if(self.VIDEO_ENABLED):
+			#self.rm.pauseVideo(self.background_video_player)
+			self.rm.disposeVideo(self.background_video_player)#temp
+			self.background_video_player=None#temp
 	
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets)
@@ -105,11 +124,13 @@ class Hyperspace(Chapter):
 		
 	def draw(self):
 		super().draw()
-		#if(self.is_first_frame):
-		#	self.rm.screen_2d.fill(self.background_color)
 		self.scene_manager.draw()
-		self.displayDebugStringList(is_2d=True)
+		self.displayDebugStringList(is_2d=False)
 		#	self.rm.pygame.display.flip()
 			
 		#self.environment.draw()
+		if(self.is_first_frame):
+		#	self.rm.screen_2d.fill(self.background_color)
+			self.rm.screen_2d.blit(self.image_background,(0,0))
+			self.rm.pygame.display.flip()
 		

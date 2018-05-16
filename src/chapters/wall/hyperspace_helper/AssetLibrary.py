@@ -57,3 +57,4 @@ class AssetLibrary:
 
 	def __setFog(self,model):
 		model.set_fog((0.0, 0.0, 0.0, 0.0), 110.8)
+		#pass

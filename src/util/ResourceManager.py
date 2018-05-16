@@ -91,6 +91,9 @@ class ResourceManager:
 			#Video
 			#from omxplayer.player import OMXPlayer
 			self.pygame=pygame
+			import omxplayer.player
+			#from omxplayer.player import OMXPlayer
+			self.omxplayer=omxplayer.player
 		self.pygame_init=False
 		self.display_3d=None
 		self.is_windowed=is_windowed
@@ -223,18 +226,40 @@ class ResourceManager:
 		if(is_loop):
 			video_args.append('--loop')
 		print("ResourceManager.loadVideo, video args: "+str(video_args))
-		video_player=OMXPlayer(video_path,args=video_args)
+		#video_player=OMXPlayer(video_path,args=video_args)
+		video_player=self.omxplayer.OMXPlayer(video_path,args=video_args)
 		#-100 places the video player visually above the desktop and pygame, but behind pi3d
 		#-o directs any any audio output out the local audio jack rather than hdmi
 		#no-osd turns off on-screen displays like "play" when starting a video
+		video_player.set_alpha(255)
 		video_player.pause()
 		#video_player.set_aspect_mode('stretch')
-		video_player.set_alpha(255)
+		return video_player
 	
 	#unhides the video and plays it
 	def playVideo(self,video_player):
-		video_player.set_alpha(0)
-		video_player.play()
+		if(video_player is None):
+			print("ResourceManager.playVideo: video_player is None")
+		else:
+			try:
+				video_player.set_alpha(0)
+				video_player.play()
+				return True
+			except self.omxplayer.OMXPlayerDeadError:
+				pass
+		return False
+	
+	def pauseVideo(self,video_player):
+		if(video_player is None):
+			print("ResourceManager.pauseVideo: video_player is None")
+		else:
+			try:
+				video_player.pause()
+				video_player.set_alpha(255)
+				return True
+			except self.omxplayer.OMXPlayerDeadError:
+				pass
+		return False
 	
 	#change the location of the video with respect to the screen displayed to players
 	def setVideoLocation(self,video_player,top_left_x,top_left_y,bottom_right_x,bottom_right_y):
@@ -242,10 +267,14 @@ class ResourceManager:
 	
 	#cleanly exits the current video player instance
 	def disposeVideo(self,video_player):
+		if(video_player is None):
+			return False
 		try:
 			video_player.quit()
+			return True
 		except OMXPlayerDeadError:
 			pass #silence errors about player already being closed
+		return False
 		
 	# -- AUDIO --
 	
