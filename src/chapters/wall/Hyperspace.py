@@ -36,7 +36,7 @@ from util.ResourceManager import DIRECTION,DEVICE
 class Hyperspace(Chapter):
 	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'
 	#HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out.mp4'
-	VIDEO_ENABLED=False #if True, play looping video
+	VIDEO_ENABLED=True #if True, play looping video
 	LOOP_VIDEO=True
 	MUSIC_PATH='./chapters/wall/assets/hyperspace/escaperoom02_pre06_2.mp3'
 	MUSIC_ENABLED=True #if True, play looping music
