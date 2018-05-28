@@ -10,8 +10,8 @@ class Segment:
 	# TODO: make diagram of branch mechanics for joint connections
 	
 	def __init__(self,asset_library,is_branch,start_position,start_rotation_matrix,
-		start_time_seconds,curvature_degrees,orientation_degrees,ring_count,segment_id=0,
-		is_forward=True):
+		start_time_seconds,curvature_degrees,orientation_degrees,ring_count,segment_id=0):#,
+		#is_forward=True): #segments are naive to forward/backward notion, is managed by a super class instead
 		self.start_time_seconds=start_time_seconds
 		self.is_branch=is_branch
 		self.curves=[] #math representation
@@ -19,7 +19,7 @@ class Segment:
 		self.successor=[None,None,None] #pointer to next segment: center, left, right
 		self.predecessor=None
 		self.segment_id=segment_id
-		self.is_forward=is_forward
+		#self.is_forward=is_forward
 		if(self.is_branch):
 			#center
 			x_axis=start_rotation_matrix[0,:]
@@ -160,6 +160,8 @@ class Segment:
 				position+=delta_x
 		return output
 	
+	#curve_id is the branch id number - for straight paths the value is 0 (default)
+	#u is between 0 and 1
 	def addRingAssembly(self,asset_library,u,curve_id=0,
 		ring_index=1,ring_rotation_degrees=0,ring_rotation_rate=0,debris_rotation_rate=0):
 		curve=self.curves[curve_id]

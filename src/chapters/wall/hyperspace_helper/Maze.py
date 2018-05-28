@@ -80,7 +80,7 @@ File columns:
 			    would draw a green and blue line next to each other on the subway map
 	branch_definition
 		node_id_prev, node_id_curr, node_id_next, is_two_way, sprite, x_pixels, y_pixels
-			note: sprite is one of the following strings: default, jump2, land3, dead, start, end, corner
+			note: sprite is one of the following strings: start, end, corner, branch, dead, jump2, land3
 				where jump2 and land3 can have any numeric after them
 				where default 
 			note: is_two_way is a boolean: 'TRUE' or 'FALSE'
@@ -92,7 +92,7 @@ File columns:
 		ring_model, ring_angle_degrees, ring_angle_rate_degrees_per_second, 
 		debris_name, debris_angle_degrees, debris_angle_rate_degrees_per_second
 			note: type can be one of the following strings: straight, dead, end
-			note: ring_model is a filename pointing to an obj file in the asset folder
+			note: ring_model is an int index per AssetLibrary.ring_filename
 			note: debris_name can be 'None' string or a string to 'debris_definition'
 			note: ring_angle_rate_degrees_per_second and debris_... can be the 
 				string 'DEFAULT' to use the built-in default constant
@@ -126,6 +126,7 @@ File columns:
 """
 
 from enum import Enum
+import copy #deepcopy
 
 class MAZE_CONFIG(Enum):
 	LINEAR_DEFINITION={"filename":"linear_definition.csv"}
@@ -148,6 +149,9 @@ class Maze:
 		self.branch_definition=self.__load(MAZE_CONFIG.BRANCH_DEFINITION)
 		self.segment_definition=self.__load(MAZE_CONFIG.SEGMENT_DEFINITION)
 		self.debris_definition=self.__load(MAZE_CONFIG.DEBRIS_DEFINITION)
+		#TODO: sanity check to make sure no definitions are missing...
+		#  ex: nodes used in linear_definition/brach_definition, but not used elsewhere, same with segments
+		#  TODO: update segment_definition to directly reference debris_definition row contents... "ring_list" --> debris_list=[debris_name[], debris_name[] ... ]
 		
 	#returns a list of dictionaries
 	# except for DEBRIS_DEFINITION which is a dictionary (by ring_assembly name)
@@ -170,7 +174,6 @@ class Maze:
 				segment_list=file_row["segments"].split()
 				file_row["segments"]=[]
 				for segment in segment_list: file_row["segments"].append(int(segment))
-				output.append(file_row)
 				color_list=file_row["colors"].split()
 				file_row["colors"]=[]
 				for color_str in color_list:
@@ -180,6 +183,7 @@ class Maze:
 					for idx in range(3):
 						this_color[idx]=int(this_color[idx])
 					file_row["colors"].append(this_color)
+				output.append(file_row)
 			elif(maze_config==MAZE_CONFIG.BRANCH_DEFINITION):
 				file_row["node_id_prev"]=int(file_row["node_id_prev"])
 				file_row["node_id_curr"]=int(file_row["node_id_curr"])
@@ -191,11 +195,11 @@ class Maze:
 				file_row["is_two_way"]=is_two_way
 			elif(maze_config==MAZE_CONFIG.SEGMENT_DEFINITION):
 				file_row["segment_id"]=int(file_row["segment_id"])
-				if(not file_row["type"] in ["straight","dead","end"]):
-					raise NotImplementedError('Maze.__load: unknown segment type in SEGMENT_DEFINITION: ',file_row["type"])
+				if(not file_row["sprite"] in ["corner","branch","start","dead","end"]): #TODO, handle jump/land case
+					raise NotImplementedError('Maze.__load: unknown segment sprite in SEGMENT_DEFINITION: ',file_row["sprite"])
 				for deg in ["curvature","orientation","ring_angle","debris_angle"]:
 					file_row[deg+"_degrees"]=file_row[deg+"_degrees"].trim()
-					if(len(file_row[deg+"_degrees"])<=0):
+					if(len(file_row[deg+"_degrees"])<=0): #if no string present, then populate default
 						file_row[deg+"_degrees"]=0.0
 					else:
 						file_row[deg+"_degrees"]=float(file_row[deg+"_degrees"])
@@ -207,6 +211,25 @@ class Maze:
 					file_row["debris_angle_degrees_per_second"]=RingAssembly.DEBRIS_ROTATION_DEGREES_PER_SECOND
 				else:
 					file_row["debris_angle_degrees_per_second"]=float(file_row["debris_angle_degrees_per_second"])
+				segment_row={"segment_id":file_row["segment_id"],"sprite":file_row["sprite"],
+				    "curvature_degrees":file_row["curvature_degrees"],
+				    "orientation_degrees":file_row["orientation_degrees"],"ring_list":[]}
+				is_new_segment=True
+				for out_row in output:#find first row in output where this segment_id has laready been defined
+					if(row["segment_id"]==file_row["segment_id"]):
+						segment_row=out_row
+						break
+				ring_row={}
+				ring_parameters=["ring_model","ring_angle_degrees","ring_angle_degrees_per_second",
+								 "debris_angle_degrees","debris_angle_degrees_per_second"]
+				for parameter in ring_parameters:
+					if(parameter=="ring_model"):
+						ring_row[parameter]=int(file_row[parameter])
+					else:
+						ring_row[parameter]=float(file_row[parameter])
+				segment_row.append(ring_row)
+				if(is_new_segment):
+					output.append(segment_row)
 			elif(maze_config==MAZE_CONFIG.DEBRIS_DEFINITION):
 				file_row["debris_name"]=file_row["debris_name"].strip()
 				if(len(file_row["debris_name"])<=0):
@@ -233,6 +256,41 @@ class Maze:
 			else:
 				raise NotImplementedError('Maze.__load: Unable to load config file type: ',maze_config)
 		return output
+			
+	#return the populated Segment with RingAssemblies
+	#return None if not found
+	#  TODO: only use/load RingAssemblies if in Hyperspace.py ...
+	#can't remember, is padding (space between rings) put BEFORE ring CAD model, or after ...? TODO
+	#  It's after:  u=idx/len - so u goes from [0,1)
+	def getSegment(self,segment_id,is_forward,is_branch,asset_library,start_position,start_rotation_matrix,start_time_seconds):
+		segment_definition=self.__getSegmentDefinition(segment_id)
+		if(segment_definition is None):
+			raise IndexError("Maze.getSegment: cannot find segment_definition for segment_id: ",segment_id)
+		is_branch=segment_definition["sprite"]=="branch"
+		curvature_degrees=segment_definition["curvature_degrees"]
+		orientation_degrees=segment_definition["orientation_degrees"]
+		ring_count=len(segment_definition["ring_list"])
+		segment=Segment(asset_library,is_branch,start_position,start_rotation_matrix,
+			start_time_seconds,curvature_degrees,orientation_degrees,ring_count,segment_id)
+		ring_list=segment_definition["ring_list"]
+		if(not is_forward): ring_list=list(reversed(ring_list))
+		for ring_index in range(len(ring_list)):
+			ring_definition=ring_list[ring_index]
+			u=ring_index/len(ring_list)
+			ring_index=ring_definition["ring_model"]
+			ring_assembly=segment.addRingAssembly(self,asset_library,u,
+				ring_index=ring_index,ring_rotation_degrees=0,ring_rotation_rate=0,debris_rotation_rate=0):
+			debris_definition=ring_definition["debris_list"]
+			
+		
+		return segment
+		
+	#search through file for definition
+	def __getSegmentDefinition(self,segment_id):
+		for row in self.segment_definition:
+			if(row["segment_id"]==segment_id):#match
+				return copy.deepcopy(row)
+		return None
 		
 	#TODO
 	#curr_segment_id
@@ -288,11 +346,6 @@ class Maze:
 			if(hit):
 				return {"is_forward":is_forward,"node_id_prev":this_prev,"node_id_next":this_next,"segments":this_segments}
 		return None
-			
-	#return the populated Segment with RingAssemblies
-	#  TODO: only use/load RingAssemblies if in Hyperspace.py ...
-	def getSegment(self,segment_id,is_forward):
-		pass
 
 	#TODO: deletable...
 	#get the node-node relationship, and the segment_list index, for a given segment_id

@@ -32,13 +32,14 @@ class RingAssembly:
 	#ring_rotation_rate is degrees per second rotation about the Z axis for the ring
 	#debris_rotation_rate is degrees per second rotation of the cumulative debris about the Z axis
 	def __init__(self,asset_library,position,rotation_euler,rotation_matrix,definition_time,
-		ring_index,ring_rotation_degrees,ring_rotation_rate,debris_rotation_rate):
+		ring_index,ring_rotation_degrees,ring_rotation_rate,debris_rotation_degrees,debris_rotation_rate):
 		#variables
 		self.rotation_euler=rotation_euler
 		self.rotation_matrix=rotation_matrix
 		self.definition_time=definition_time
 		self.ring_rotation_degrees=ring_rotation_degrees
 		self.ring_rotation_rate=ring_rotation_rate
+		self.debris_rotation_degrees=debris_rotation_degrees
 		self.debris_rotation_rate=debris_rotation_rate
 		self.is_visible=False
 		self.asset_library=asset_library
