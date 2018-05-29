@@ -163,14 +163,15 @@ class Segment:
 	#curve_id is the branch id number - for straight paths the value is 0 (default)
 	#u is between 0 and 1
 	def addRingAssembly(self,asset_library,u,curve_id=0,
-		ring_index=1,ring_rotation_degrees=0,ring_rotation_rate=0,debris_rotation_rate=0):
+		ring_model_index=1,ring_rotation_degrees=0,ring_rotation_rate=0,debris_rotation_degrees=0,debris_rotation_rate=0):
 		curve=self.curves[curve_id]
 		definition_time=self.start_time_seconds+u*curve.distance/(self.DISTANCE_BETWEEN_RINGS*self.RINGS_PER_SECOND)
 		ring_orientation=curve.getOrientationAlongCurve(u)
 		ring_assembly=RingAssembly(asset_library,ring_orientation["position"],
 			ring_orientation["rotation_euler"],ring_orientation["rotation_matrix"],
-			definition_time,ring_index,ring_rotation_degrees,
-			ring_rotation_rate,debris_rotation_rate)
+			definition_time,ring_model_index,
+			ring_rotation_degrees,ring_rotation_rate,
+			debris_rotation_degrees,debris_rotation_rate)
 		self.ring_assembly_list.append(ring_assembly)
 		#if(ring_index==0):
 		#	print("curve_id: "+str(curve_id))

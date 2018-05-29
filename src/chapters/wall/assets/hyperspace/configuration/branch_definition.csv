@@ -1,0 +1,4 @@
+node_id_prev,node_id_curr,node_id_next,is_two_way,sprite,x_pixels,y_pixels
+-1,100,91,FALSE,start,100,500
+100,91,80,FALSE,branch,100,450
+100,91,92,FALSE,branch,150,500

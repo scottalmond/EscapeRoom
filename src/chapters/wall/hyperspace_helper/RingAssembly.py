@@ -8,10 +8,11 @@
 #    art asteroid <-- any debris outside the playing field for aesthetics
 
 from enum import Enum
+import math
 
-class DEBRIS_TYPE(Enum):
-	ASTEROID_LARGE=0
-	ASTEROID_MEDIUM=1
+#class DEBRIS_TYPE(Enum):
+#	ASTEROID_LARGE=0
+#	ASTEROID_MEDIUM=1
 
 class RingAssembly:
 	PRE_RENDER_SECONDS=5 #render objects that are defined between now and X seconds into the future
@@ -67,25 +68,32 @@ class RingAssembly:
 	#location is an [x,y,z] numpy.array of the debris at definition_time
 	#angle is the numpy.array [x,y,z] rotation at definition_time measures in degrees
 	#angular_velocity is degrees per second
-	def addDebris(self,debris_type,location,angle,angular_velocity):
+	#def addDebris(self,debris_type,location,angle,angular_velocity):
+	def addDebris(self,debris_model_index,location,angle,angular_velocity,scale,radius):
 		if(self.debris_axis is None):
-			#debris axis, declare only on first usage
+			#debris axis does not exist, declare only on first usage (ie, don't declare if not used)
 			self.debris_axis=self.asset_library.invisible.shallow_clone()
 			self.debris_axis.children=[]
 			self.global_axis.add_child(self.debris_axis)
-		model=None
-		if(debris_type==DEBRIS_TYPE.ASTEROID_LARGE):
-			model=self.asset_library.asteroid_large.shallow_clone()
-		elif(debris_type==DEBRIS_TYPE.ASTEROID_MEDIUM):
-			model=self.asset_library.asteroid_medium.shallow_clone()
+		#model=None
+		#if(debris_type==DEBRIS_TYPE.ASTEROID_LARGE):
+		#	model=self.asset_library.asteroid_large.shallow_clone()
+		#elif(debris_type==DEBRIS_TYPE.ASTEROID_MEDIUM):
+		#	model=self.asset_library.asteroid_medium.shallow_clone()
+		model=self.asset_library.asteroids[debris_model_index].shallow_clone()
 		model.children=[]
 		model.position(location[0],location[1],location[2])
-		self.debris_list.append({"model":model,
-								 "debris_type":debris_type,
-								 "location":location,
-								 "angle":angle,
-								 "angular_velocity":angular_velocity}) #todo: add radius property
+		model.scale(scale[0],scale[1],scale[2])
+		radius=radius*math.sqrt(scale[0]*scale[0]+scale[1]*scale[1]+scale[2]*scale[2])
+		out={"model":model,
+			 "debris_model_index":debris_model_index,
+			 "location":location,
+			 "angle":angle,
+			 "angular_velocity":angular_velocity,
+			 "radius":radius}
+		self.debris_list.append(out)
 		self.debris_axis.add_child(model)
+		return out
 
 	def update(self,life_elapsed_time_seconds,light):
 		min_time=self.definition_time - self.PRE_RENDER_SECONDS

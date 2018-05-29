@@ -36,20 +36,22 @@ class AssetLibrary:
 		self.laser_base.set_shader(shader)
 		
 		#asteroids
-		asteroid_large_scale=0.55
-		self.asteroid_large=self.pi3d.Model(file_string=MODEL_PATH+'asteroid_large_1.obj',sx=asteroid_large_scale,sy=asteroid_large_scale,sz=asteroid_large_scale)
-		self.asteroid_large.set_shader(shader)
-		self.__setFog(self.asteroid_large)
-		
-		self.asteroid_medium=None
-		
-		
-		self.asteroid_small=None
+		self.asteroids=[]
+		asteroid_filename=['asteroid_large_1.obj']
+		for asteroid_id in range(len(asteroid_filename)):
+			asteroid=self.pi3d.Model(file_string=MODEL_PATH+'asteroid_large_1.obj',sx=asteroid_large_scale,sy=asteroid_large_scale,sz=asteroid_large_scale)
+			asteroid.set_shader(shader)
+			self.__setFog(asteroid)
+			self.asteroids.append(asteroid)
+		#asteroid_large_scale=0.55
+		#self.asteroid_large=self.pi3d.Model(file_string=MODEL_PATH+'asteroid_large_1.obj',sx=asteroid_large_scale,sy=asteroid_large_scale,sz=asteroid_large_scale)
+		#self.asteroid_large.set_shader(shader)
+		#self.__setFog(self.asteroid_large)
 		
 		#rings
 		self.rings=[]
 		ring_filename=['branched_ring_1.obj','straight_ring_1.obj']
-		for ring_id in range(2):
+		for ring_id in range(len(ring_filename)):
 			ring = self.pi3d.Model(file_string=MODEL_PATH+ring_filename[ring_id])
 			ring.set_shader(shader)
 			self.__setFog(ring)
