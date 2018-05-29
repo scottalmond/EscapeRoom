@@ -39,6 +39,8 @@ class AssetLibrary:
 		self.asteroids=[]
 		asteroid_filename=['asteroid_large_1.obj']
 		for asteroid_id in range(len(asteroid_filename)):
+			asteroid_large_scale=0.55
+			print("AssetLibrary.__init__: temporary asteroid scale: ",asteroid_large_scale)
 			asteroid=self.pi3d.Model(file_string=MODEL_PATH+'asteroid_large_1.obj',sx=asteroid_large_scale,sy=asteroid_large_scale,sz=asteroid_large_scale)
 			asteroid.set_shader(shader)
 			self.__setFog(asteroid)

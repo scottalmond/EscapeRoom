@@ -215,7 +215,7 @@ class Maze:
 			return None
 		return self.debris_definition[debris_name]
 		
-	#linear_definition = [ [prev,next], [prev,next], ... ] 
+	#linear_definition = [ [prev,next], [prev,next], ... ]
 	#branch_definition = [ [prev,curr,next], [prev,curr,next], ... ]
 	#segment_definition = [ [id,[ring_assy, ring_assy, ...], [id,[ring_assy, ring_assy, ...], ...]
 	#debris_definition = { name:[debris, debris, ...], name:[debris, debris, ...], ... }
