@@ -263,6 +263,7 @@ class SceneManager:
 		camera_time=level_elapsed_time_seconds-camera_lag_time
 		return camera_time
 		
+	#TODO: is currently a placeholder
 	#given a segment ID, return the parameters needed for the next segment
 	#input:
 	#Segment
@@ -330,6 +331,7 @@ class SceneManager:
 		
 	#return the start node, end node, progress and current segment_id
 	#return a pointer to the segment where the pod is currently located
+	#return: {"node_from":X,"node_to":Y,"ratio":Z} #ratio between nodes
 	def getPodStatus(self):
 		pass
 		
