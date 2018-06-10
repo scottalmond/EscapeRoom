@@ -116,6 +116,9 @@ TODO: 10-20 second demo video
 - Sound
 	- Command: _amixer cset numid=3 1_
 		- Change the audio to come out over the headphone jack [source](https://www.raspberrypi.org/documentation/configuration/audio-config.md)
+- [OMX Video Player](http://python-omxplayer-wrapper.readthedocs.io/en/latest/)
+	- Command: _pip3 install omxplayer_wrapper_
+		- Install Python library for controlling video player
 - Sockets
 	- Command: _sudo apt-get install socket_
 		- allow communication ebtween raspberry pi's

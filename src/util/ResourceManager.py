@@ -50,13 +50,27 @@ class DEVICE(Enum):
 	MORSE=3
 	
 #discrete input pin mapping
-#refer to resources/project_box_pinout.ods
+#refer to "wPi" column in resources/project_box_pinout.ods
 class DI_PINS(Enum):
-	DIRECTION_JOYSTICK_1=6 #north
-	DIRECTION_JOYSTICK_2=21 #south
-	DIRECTION_JOYSTICK_3=5 #east
-	DIRECTION_JOYSTICK_4=27 #west
-	LASER_FIRE=7
+	BUTTON_DOT=8
+	BUTTON_DASH=9
+	DIRECTION_JOYSTICK_0=7
+	DIRECTION_JOYSTICK_1=0
+	DIRECTION_JOYSTICK_2=2
+	DIRECTION_JOYSTICK_3=3
+	CAMERA_JOYSTICK_0=12
+	CAMERA_JOYSTICK_1=13
+	CAMERA_JOYSTICK_2=14
+	CAMERA_JOYSTICK_3=30
+	LASER_JOYSTICK_0=21
+	LASER_JOYSTICK_1=22
+	LASER_JOYSTICK_2=23
+	LASER_JOYSTICK_3=24
+	LASER_JOYSTICK_FIRE=25
+	LIGHT_0=15
+	LIGHT_1=16
+	LIGHT_2=1
+	LIGHT_3=4
 
 class ResourceManager:
 	OVERSAMPLE_RATIO_3D=4 #min is 1, integer values only - higher values used to reduce pixelation in 3D graphics
@@ -326,7 +340,7 @@ class ResourceManager:
 		if(is_keyboard):
 			if(self.pygame_keys_pressed[self.pygame.K_PERIOD]): return True
 		else:
-			pass
+			if(self.__readPin(DI_PINS.BUTTON_DOT)): return True
 		return False
 			
 	def isDashPressed(self,is_keyboard=None):
@@ -334,7 +348,7 @@ class ResourceManager:
 		if(is_keyboard):
 			if(self.pygame_keys_pressed[self.pygame.K_MINUS]): return True
 		else:
-			pass
+			if(self.__readPin(DI_PINS.BUTTON_DASH)): return True
 		return False
 		
 	#True if depressed (eletrical contact between weak pull-up and GND)
@@ -374,14 +388,20 @@ class ResourceManager:
 				raise ValueError("Invalid joystick enum: "+str(joystick))
 		else:
 			if(joystick==DEVICE.DIRECTION):
-				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_1)): directions.append(DIRECTION.NORTH)
-				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_2)): directions.append(DIRECTION.SOUTH)
-				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_3)): directions.append(DIRECTION.EAST)
-				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_4)): directions.append(DIRECTION.WEST)
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_0)): directions.append(DIRECTION.NORTH)
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_1)): directions.append(DIRECTION.SOUTH)
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_2)): directions.append(DIRECTION.EAST)
+				if(self.__readPin(DI_PINS.DIRECTION_JOYSTICK_3)): directions.append(DIRECTION.WEST)
 			elif(joystick==DEVICE.CAMERA):
-				pass #TODO
+				if(self.__readPin(DI_PINS.CAMERA_JOYSTICK_0)): directions.append(DIRECTION.NORTH)
+				if(self.__readPin(DI_PINS.CAMERA_JOYSTICK_1)): directions.append(DIRECTION.SOUTH)
+				if(self.__readPin(DI_PINS.CAMERA_JOYSTICK_2)): directions.append(DIRECTION.EAST)
+				if(self.__readPin(DI_PINS.CAMERA_JOYSTICK_3)): directions.append(DIRECTION.WEST)
 			elif(joystick==DEVICE.LASER):
-				pass #TODO
+				if(self.__readPin(DI_PINS.LASER_JOYSTICK_0)): directions.append(DIRECTION.NORTH)
+				if(self.__readPin(DI_PINS.LASER_JOYSTICK_1)): directions.append(DIRECTION.SOUTH)
+				if(self.__readPin(DI_PINS.LASER_JOYSTICK_2)): directions.append(DIRECTION.EAST)
+				if(self.__readPin(DI_PINS.LASER_JOYSTICK_3)): directions.append(DIRECTION.WEST)
 			else:
 				raise ValueError("Invalid joystick enum: "+str(joystick))
 		if(DIRECTION.NORTH in directions and DIRECTION.SOUTH in directions):
@@ -410,7 +430,7 @@ class ResourceManager:
 			elif(joystick==DEVICE.CAMERA):
 				pass
 			elif(joystick==DEVICE.LASER):
-				if(self.__readPin(DI_PINS.LASER_FIRE)): return True
+				if(self.__readPin(DI_PINS.LASER_JOYSTICK_FIRE)): return True
 			else:
 				raise ValueError("Invalid joystick enum: "+str(joystick))
 		return False
@@ -420,17 +440,27 @@ class ResourceManager:
 		if(is_keyboard is None): is_keyboard=self.is_keyboard
 		if(is_keyboard):
 			if(input_index==0):
-				return self.pygame_keys_pressed[self.pygame.K_1]
+				return self.pygame_keys_pressed[self.pygame.K_1]>0
 			elif(input_index==1):
-				return self.pygame_keys_pressed[self.pygame.K_2]
+				return self.pygame_keys_pressed[self.pygame.K_2]>0
 			elif(input_index==2):
-				return self.pygame_keys_pressed[self.pygame.K_3]
+				return self.pygame_keys_pressed[self.pygame.K_3]>0
 			elif(input_index==3):
-				return self.pygame_keys_pressed[self.pygame.K_4]
+				return self.pygame_keys_pressed[self.pygame.K_4]>0
 			else:
 				raise ValueError("Invalid input queried, light puzzle index: "+str(input_index))
 		else:
-			raise ValueError("Light puzzle input not yet implemented: "+str(input_index))
+			if(input_index==0):
+				if(self.__readPin(DI_PINS.LIGHT_0)): return True
+			elif(input_index==1):
+				if(self.__readPin(DI_PINS.LIGHT_1)): return True
+			elif(input_index==2):
+				if(self.__readPin(DI_PINS.LIGHT_2)): return True
+			elif(input_index==3):
+				if(self.__readPin(DI_PINS.LIGHT_3)): return True
+			else:
+				raise ValueError("Light puzzle input not yet implemented: "+str(input_index))
+		return False
 	
 	# **Aditya Edit** moved Morse sequence handling to MorseCode.py
 	#

@@ -184,7 +184,7 @@ class Maze:
 	def __verify_segment_definition(self):
 		#check that all segments in linear_definition are defined
 		for linear_row in self.linear_definition:
-			for linear_segment_id in linear_row["segments"]:
+			for linear_segment_id in linear_row["segment_list"]:
 				is_found=False
 				for segment_definition in self.segment_definition:
 					if(segment_definition["segment_id"]==linear_segment_id):
@@ -215,6 +215,7 @@ class Maze:
 			return None
 		return self.debris_definition[debris_name]
 		
+	#load csv file
 	#linear_definition = [ [prev,next], [prev,next], ... ]
 	#branch_definition = [ [prev,curr,next], [prev,curr,next], ... ]
 	#segment_definition = [ [id,[ring_assy, ring_assy, ...], [id,[ring_assy, ring_assy, ...], ...]
@@ -233,9 +234,9 @@ class Maze:
 			if(maze_config==MAZE_CONFIG.LINEAR_DEFINITION):
 				file_row["node_id_prev"]=int(file_row["node_id_prev"])
 				file_row["node_id_next"]=int(file_row["node_id_next"])
-				segment_list=file_row["segments"].split()
-				file_row["segments"]=[]
-				for segment in segment_list: file_row["segments"].append(int(segment))
+				segment_list=file_row["segment_list"].split()
+				file_row["segment_list"]=[]
+				for segment in segment_list: file_row["segment_list"].append(int(segment))
 				color_list=file_row["colors"].split()
 				file_row["colors"]=[]
 				for color_str in color_list:
@@ -258,6 +259,7 @@ class Maze:
 				
 				#TODO, handle jump/land sprite case
 				
+				output.append(file_row)
 			elif(maze_config==MAZE_CONFIG.SEGMENT_DEFINITION):
 				file_row["segment_id"]=int(file_row["segment_id"])
 				for prev_row in output: #ease-of-use imeplementation: copy-paste first row contents into subsequent rows with same id number
@@ -334,8 +336,7 @@ class Maze:
 				raise NotImplementedError('Maze.__load: Unable to load config file type: ',maze_config)
 		return output
 			
-	#return the populated Segment with RingAssemblies
-	#return None if not found
+	#return Segment with RingAssemblies assembled/installed/added
 	#  TODO: only use/load RingAssemblies if in Hyperspace.py ...
 	#can't remember, is padding (space between rings) put BEFORE ring
 	#  CAD model, or after ...? TODO
@@ -377,7 +378,7 @@ class Maze:
 				this_debris=ring_assembly.addDebris(debris_model_index,location,angle,angular_velocity,scale,radius)
 		return segment
 		
-	#search through file for definition
+	#search through file for definition (curvature, orientation, etc)
 	def __getSegmentDefinition(self,segment_id):
 		for row in self.segment_definition:
 			if(row["segment_id"]==segment_id):#match
@@ -389,7 +390,7 @@ class Maze:
 	#prev_segment_id
 	#return list of dictionaries:
 	#[{"segment_id":X,"is_forward":True},{"segment_id":Y,"is_forward":False}]
-	def getSegmentIdAfter(self,curr_segment_id,prev_segment_id):
+	def getSegmentIdAfter_legacy(self,curr_segment_id,prev_segment_id):
 		#sudo-code:
 		#if segment_id<0 (ie, get starting segment)
 		#  get the first segment from linear_definition amd return that
@@ -404,7 +405,7 @@ class Maze:
 		if(curr_segment_id<0):
 			#first segment
 			node_node_relationship=self.linear_definition[0]
-			return [{"segment_id":node_node_relationship["segments"][0],"is_forward":True}]
+			return [{"segment_id":node_node_relationship["segment_list"][0],"is_forward":True}]
 		else:
 			#first find the node-node relationship where this segment came from
 			#then determine either 1) the neighboring segment from the segment_list
@@ -414,19 +415,131 @@ class Maze:
 			if(curr_node is None):
 				ValueError("Maze.getSegmentIdAfter: Unable to fetch the node-node relationship for segment: ",curr_segment_id)
 			if(prev_node is None): #should only occur if prev_segment_id is invalid, ie when traversing from the first to the second segment in the maze
-				return [{"segment_id":self.linear_definition[0]["segments"][1],"is_forward":True}]
+				return [{"segment_id":self.linear_definition[0]["segment_list"][1],"is_forward":True}]
 			#now get segment(s) after prev and curr node
 			
+	#returns list of segment_id that come after the curr_segment, prev_segment sequence
+	#returns {"segment_id":X,"is_forward":bool}
+	def getSegmentIdAfter(self,prev_segment_id,curr_segment_id):
+		#consider five cases:
+		#  prev_nodes==curr_nodes
+		#    is between two nodes
+		#    then next segment lies either 1) between these nodes, 2) at the start/end of the next nodes
+		#  else prev_nodes!=curr_nodes
+		#    if curr_nodes is branch, 3) return two followers coming from prev_nodes direction
+		#    
+		lin_def_pair=self.getOrderedLinearDefinition(curr_segment_id,prev_segment_id)
+		prev_lin_def=lin_def_pair["prev"]
+		curr_lin_def=lin_def_pair["curr"]
+		#print("Maze.next_node_list: prev_lin_def[node_id_prev]: ",prev_lin_def["node_id_prev"])
+		#print("Maze.next_node_list: curr_lin_def[node_id_prev]: ",curr_lin_def["node_id_prev"])
+		#print("Maze.next_node_list: curr_lin_def[node_id_next]: ",curr_lin_def["node_id_next"])
+		next_node_list=self.getNodeIdAfter(prev_lin_def["node_id_prev"],curr_lin_def["node_id_prev"],curr_lin_def["node_id_next"])
+		out_list=[]
+		#print("Maze.next_node_list: next_node_list: ",next_node_list)
+		#if(prev_lin_def["node_id_prev"]==curr_lin_def["node_id_prev"] and
+		#   prev_lin_def["node_id_next"]==curr_lin_def["node_id_next"]): #then operating in the same node-node region
+		if(curr_lin_def["segment_id_index"]==(curr_lin_def["segment_list_len"]-1)):#then at end of this node-node region
+			for next_node_id in next_node_list: #get the first segment_id from the next node-node region
+				segment_list=self.getSegmentsBetweenNodes(curr_lin_def["node_id_next"],next_node_id)
+				#print("Maze.getSegmentIdAfter: segment_list: ",segment_list)
+				out_list.append({"is_forward":segment_list["is_forward"],"segment_id":segment_list["segment_list"][0]}) #precon: len(segment_list)>0
+		else:#fetch next from current node-node region
+			segment_list=curr_lin_def["segment_list"]
+			curr_segment_index=curr_lin_def["segment_id_index"]
+			#print("Maze.getSegmentIdAfter: curr_segment_index",curr_segment_index)
+			#print("Maze.getSegmentIdAfter: curr_segment_index",curr_segment_index)
+			out_list.append({"is_forward":curr_lin_def["is_forward"],"segment_id":segment_list[curr_segment_index+1]}) #get segment_id after curr_segment_id in this node-node region
+		#else:#prev_ and curr_segment_id straddle a node-node relationship
+		#	if(curr_lin_def["segment_id_index"]==(curr_lin_def["segment_list_len"]-1)):
+		return out_list
+	
+	#reutrn a list of next_node_id (may include branches)
+	#curr_node_id_from aka prev_node_id_to
+	def getNodeIdAfter(self,prev_node_id_from,curr_node_id_from,curr_node_id_to):
+		prev_node_id=curr_node_id_from
+		if(curr_node_id_from==curr_node_id_to):#if in branch, use previous node as anchor point to determine next node
+			prev_node_id=prev_node_id_from
+		curr_node_id=curr_node_id_to
+		out_list=[]
+		for row in self.branch_definition:
+			#print("Maze.getNodeIdAfter: row: ",row)
+			if(row["node_id_curr"]==curr_node_id):
+				if(row["node_id_prev"]==prev_node_id): #forward relationship
+					out_list.append(row["node_id_next"])
+				elif(row["node_id_next"]==prev_node_id and row["is_two_way"]): #reverse relationship
+					out_list.append(row["node_id_prev"])
+		#make sure not get stuck in a loop - remove [curr_node_id_from,curr_node_id_to] relationship, if present
+		#if(curr_node_id_from==curr_node_id_to):
+		#	out_list=[row for row in out_list if not row==curr_node_id_to]
+		if(len(out_list)>1): #if looking to branch out
+			if(not curr_node_id_from==curr_node_id_to): #and not already in a branch
+				out_list=[curr_node_id_to] #then specifically go to this upcoming branch
+		return out_list
 		
+	#get the linear_definition for curr_ and prev_segment_id, but ordered (is_forward) for the partiular input sequence
+	#returns {"prev":{"prev_id_node":X,"next_id_node":Y,"is_forward":bool,"segment_id":Z},
+	#		  "curr":{"prev_id_node":X,"next_id_node":Y,"is_forward":bool,"segment_id":Z}}
+	#put from_ and to_ nodes in order, and include the index of the segment in the segment_list
+	def getOrderedLinearDefinition(self,curr_segment_id,prev_segment_id):
+		prev_lin_def=self.getLinearDefinitionOfSegment(prev_segment_id)
+		curr_lin_def=self.getLinearDefinitionOfSegment(curr_segment_id)
+		if(curr_lin_def["node_id_prev"]==prev_lin_def["node_id_prev"] and
+		   curr_lin_def["node_id_next"]==prev_lin_def["node_id_next"]): #then both segments within same node-node range
+			if(prev_node_id["segment_id_index"]>curr_node_id["segment_id_index"]): #need to flip because headed backwards
+				prev_lin_def=self.__reverseLinearDefinition(prev_lin_def)
+				curr_lin_def=self.__reverseLinearDefinition(curr_lin_def)
+		else:
+			#else, stradelling some form of node-node boundary, and may need to reverse one or both segment linear_definition rows
+			is_reverse_prev=True
+			is_reverse_curr=True
+			if(prev_lin_def["node_id_prev"]==prev_lin_def["node_id_next"]):
+				is_reverse_prev=False #prev is branch
+			if(curr_lin_def["node_id_prev"]==curr_lin_def["node_id_next"]):
+				is_reverse_curr=False #curr is branch
+			if(prev_lin_def["node_id_next"] in [curr_lin_def["node_id_prev"],curr_lin_def["node_id_next"]]):
+				is_reverse_prev=False #prev in correct order
+			if(curr_lin_def["node_id_prev"] in [prev_lin_def["node_id_prev"],prev_lin_def["node_id_next"]]):
+				is_reverse_curr=False #curr in correct order
+			if(is_reverse_prev): prev_lin_def=self.__reverseLinearDefinition(prev_lin_def)
+			if(is_reverse_curr): curr_lin_def=self.__reverseLinearDefinition(curr_lin_def)
+		#assert prev_lin_def["node_id_next"]==curr_lin_def["node_id_prev"]
+		return {"prev":prev_lin_def,"curr":curr_lin_def}
+		
+	def __reverseLinearDefinition(self,row):
+		row["is_forward"]=False
+		was_node_id_prev=row["node_id_prev"]
+		was_node_id_next=row["node_id_next"]
+		row["node_id_next"]=was_node_id_prev#flip order of nodes so that _from_ is always first, before _to_
+		row["node_id_prev"]=was_node_id_next
+		row["segment_id_index"]=row["segment_list_len"]-row["segment_id_index"]-1 #flip orientation of list_index
+		row["segment_list"]=list(reversed(row["segment_list"]))
+		return row
+		
+	#given a segment_id, find the two nodes around it
+	#always returns is_forward=True order
+	def getLinearDefinitionOfSegment(self,segment_id):
+		for row in self.linear_definition:
+			if(segment_id in row["segment_list"]):
+				return {
+				"node_id_prev":row["node_id_prev"],
+				"node_id_next":row["node_id_next"],
+				"is_forward":True,
+				"segment_id_index":row["segment_list"].index(segment_id),
+				"segment_id":segment_id,
+				"segment_list":row["segment_list"],
+				"segment_list_len":len(row["segment_list"])}
+		return None
+
 	#given two (precon: sequential) nodes (OR same node to find branch segment(s)), find the segment list
 	#segment list will always be in order from prev_node to curr_node
-	#returns {"is_forward":True/False,"segments":[segment_id,segment_id,segment_id]}
+	#returns {"is_forward":True/False,"segment_list":[segment_id,segment_id,segment_id]}
 	#note: method will blindly return segments even if they are not accessible in the stated order (ex. branch_definition is_two_way=False)
 	def getSegmentsBetweenNodes(self,prev_node,next_node):
 		for row in self.linear_definition:
 			this_prev=row["node_id_prev"]
 			this_next=row["node_id_next"]
-			this_segments=row["segments"]
+			this_segments=row["segment_list"]
 			hit=False
 			is_forward=True
 			if(this_prev==prev_node and this_next == next_node):
@@ -436,7 +549,7 @@ class Maze:
 				is_forward=False
 				this_segments=list(reversed(this_segments))
 			if(hit):
-				return {"is_forward":is_forward,"node_id_prev":this_prev,"node_id_next":this_next,"segments":this_segments}
+				return {"is_forward":is_forward,"node_id_prev":this_prev,"node_id_next":this_next,"segment_list":this_segments}
 		return None
 
 	#TODO: deletable...
@@ -466,4 +579,4 @@ if __name__ == "__main__":
 	#print(maze.branch_definition)
 	#print(maze.segment_definition)
 	#print(maze.debris_definition)
-	print(maze.getSegmentIdAfter(1,-1))
+	print(maze.getSegmentIdAfter(2,3))

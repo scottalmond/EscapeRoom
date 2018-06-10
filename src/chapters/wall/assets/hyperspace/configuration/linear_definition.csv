@@ -1,4 +1,4 @@
-node_id_prev,node_id_next,segments,colors
+node_id_prev,node_id_next,segment_list,colors
 100,91,1 2,0_255_0 0_0_255
 91,91,3,255_0_0
 91,80,4,255_0_0
