@@ -297,7 +297,7 @@ class Book:
 				chapters.helm.MorseCode.MorseCode(self),
 				#chapters.helm.BlackScreen.BlackScreen(self,"Tutorial"),
 				#chapters.helm.BlackScreen.BlackScreen(self, "Snake"),
-				#chapters.helm.Map.Map(self),
+				chapters.helm.Map.Map(self),
 				#chapters.helm.BlackScreen.BlackScreen(self, "Credits")
 			]
 		elif(this_book_type==BOOK_TYPE.PROCTOR):

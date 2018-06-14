@@ -141,8 +141,12 @@ class Maze:
 	CONFIG_FILE_PATH='/home/pi/Documents/EscapeRoom/src/chapters/wall/assets/hyperspace/configuration/'
 	
 	def __init__(self):
-		from RingAssembly import RingAssembly #to fetch constants for ring/debris rotation rate
-		from ResourceManager import ResourceManager
+		try:
+			from chapters.wall.hyperspace_helper.RingAssembly import RingAssembly
+			from util.ResourceManager import ResourceManager
+		except ImportError:
+			from RingAssembly import RingAssembly #to fetch constants for ring/debris rotation rate
+			from ResourceManager import ResourceManager
 		self.rm=ResourceManager
 		self.ra=RingAssembly
 		

@@ -11,6 +11,12 @@
 Slide
 Image (0,0) [-1] placeholder_space.jpg
 
+Image (960,0) [W,2] tunnel_v2.png
+
+Slide
+Head1 (200,0) Placeholder
+
+Slide
 Image (960,0) [W,2] placeholder_planet.jpg
 Image (1700,100,1000,600) [W,2] placeholder_pod.png
 #Image (960,0) [L,1] snake_construction
@@ -29,12 +35,6 @@ Head2 (200,20) Code & Design
 
 Slide
 Image (960,0) [W,2] placeholder_pod_landed.jpg
-Head1 (200,0) Placeholder
-
-Slide
-Head1 (200,0) Placeholder
-
-Slide
 Head1 (200,0) Placeholder
 
 Slide

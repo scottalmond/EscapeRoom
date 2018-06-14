@@ -24,16 +24,16 @@ Usage:
 """
 
 from util.Chapter import Chapter
-#from chapters.wall.hyperspace_helper import Maze
+from chapters.wall.hyperspace_helper.Maze import Maze
 
 class Map(Chapter):
 	def __init__(self,this_book):
 		super().__init__(this_book)
-		self.state=HyperspaceState()
+		self.maze=Maze()
 		
 	def clean(self):
-		super().clean(self)
-		self.dispose(False)
+		super().clean()
+		self.maze.clean()
 		
 	def dipose(self,is_final_call):
 		super().dipose(self,is_final_call)
@@ -46,6 +46,34 @@ class Map(Chapter):
 	
 	def update(self,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets):
 		super().update(this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds,packets)
+		debug_strings=[]
+		debug_strings.append("DEBUG.HEREXXXXXX")
+		self.setDebugStringList(debug_strings,this_frame_number,this_frame_elapsed_seconds,previous_frame_elapsed_seconds)
 		
 	def draw(self):
-		super().draw()
+		self.__drawBackground()
+		self.__drawPaths()
+		self.__drawNodes()
+		self.__drawPod()
+		self.displayDebugStringList()
+		self.rm.pygame.display.flip()
+		
+	def __drawBackground(self):
+		self.rm.screen_2d.fill((0,0,255))
+		
+	def __drawPaths(self):
+		pass
+		
+	def __drawNodes(self):
+		pass
+		
+	def __drawPod(self):
+		pass
+
+	#given center of sprite location, draw the given shape
+	#0 is circle
+	#1 is square
+	#2 is triangle pointing up 
+	def __drawSprite(self,x,y,shape):
+		pass
+	
