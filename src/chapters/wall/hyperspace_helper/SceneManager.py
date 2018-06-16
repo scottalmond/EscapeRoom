@@ -1,16 +1,18 @@
-from chapters.wall.hyperspace_helper.Segment import Segment
-from chapters.wall.hyperspace_helper.AssetLibrary import AssetLibrary
-from chapters.wall.hyperspace_helper.RingAssembly import *
-from chapters.wall.hyperspace_helper.Curve import Curve
+
+# class does ...
 
 import sys
-import sys
-#sys.path.insert(1,'/home/pi/pi3d') # to use local 'develop' branch version
-#import pi3d
 import numpy as np
 import math
 import random
 import time
+from enum import Enum
+
+from chapters.wall.hyperspace_helper.Segment import Segment
+from chapters.wall.hyperspace_helper.AssetLibrary import AssetLibrary
+from chapters.wall.hyperspace_helper.RingAssembly import RingAssembly
+from chapters.wall.hyperspace_helper.Curve import Curve
+from chapters.wall.hyperspace_helper.Maze import Maze
 
 class SCENE_STATE(Enum):
 	INTRO=0 #pod exiting space ship
@@ -34,13 +36,14 @@ class SceneManager:
 	CAMERA_LAG_DISTANCE=12 #pi3d distance unit between camera and pod
 
 	def __init__(self):
-		pass
+		self.np=np #for some reason, Python forgets that np was imported...???? so it needs to be stored here for later use... idk/idc
 		
 	def clean(self,pi3d,display_3d,camera_3d):
 		#variables
 		self.pi3d=pi3d
-		self.pod_offset=np.array([0.0,0.0]) #x,y offset
-		self.pod_offset_rate=np.array([0.0,0.0]) #Z,X rotation angles for translation animatic (rotate right to translate right)
+		#why is np appaear as a UnboundedLocalError?  I imported it up above...
+		self.pod_offset=self.np.array([0.0,0.0]) #x,y offset
+		self.pod_offset_rate=self.np.array([0.0,0.0]) #Z,X rotation angles for translation animatic (rotate right to translate right)
 		self.scene={'state':SCENE_STATE.INTRO,'start_seconds':0,'end_seconds':self.INTRO_SECONDS,'ratio':0.0}
 		self.life=0
 		self.level_start_time_seconds=0
@@ -58,6 +61,23 @@ class SceneManager:
 		#objects
 		self.asset_library=AssetLibrary(self.pi3d)
 		self.pod=self.asset_library.pod_frame.shallow_clone() #note: all children remain intact
+		self.maze=Maze()
+		
+		#debug
+		self.maze.clean()
+		print(self.maze.getSegmentsBetweenNodes(100,91))
+		print(self.maze.getSegmentsBetweenNodes(91,100))
+		print(self.maze.getSegmentsBetweenNodes(91,91))
+		#print(maze.linear_definition)
+		#print(maze.branch_definition)
+		#print(maze.segment_definition)
+		#print(maze.debris_definition)
+		segments=self.maze.getSegmentIdAfter(2,3)
+		print("SceneManager.clean: Next segment: ",segments)
+		segments=segments[0]
+		temp2=self.maze.getPopulatedSegment(segments["segment_id"],segments["is_forward"],segments["is_branch"],self.asset_library,self.np.array([0,0,0]),self.np.eye(3),0)
+		print("SceneManager.clean: populated: ",temp2)
+		
 		
 	def __getRingCount(self):
 		count=0
@@ -263,7 +283,7 @@ class SceneManager:
 		camera_time=level_elapsed_time_seconds-camera_lag_time
 		return camera_time
 		
-	#TODO: is currently a placeholder
+	#TODO: is currently a placeholder for Maze...
 	#given a segment ID, return the parameters needed for the next segment
 	#input:
 	#Segment

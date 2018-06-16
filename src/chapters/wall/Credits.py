@@ -46,9 +46,9 @@ such as special thanks
 #sys.path.insert(0,"/home/pi/Documents/EscapeRoom/src/")
 #from util.ResourceManager import ResourceManager
 
-from util.Chapter import Chapter
-
 import os
+
+from util.Chapter import Chapter
 
 class Credits(Chapter):
 	PRIMARY_DIRECTORY='/home/pi/Documents/corporate_credits/'

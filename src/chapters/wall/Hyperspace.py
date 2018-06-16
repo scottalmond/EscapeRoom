@@ -26,12 +26,13 @@ Usage:
 #responsible for Maze (map definition), Environment (3D object definitions, video, music)
 #ConnectionManager (relay object state between PCs)
 
-from util.Chapter import Chapter
-from chapters.wall.hyperspace_helper.SceneManager import *
 import time
 import numpy as np
 import math
+
+from util.Chapter import Chapter
 from util.ResourceManager import DIRECTION,DEVICE
+from chapters.wall.hyperspace_helper.SceneManager import SceneManager
 
 class Hyperspace(Chapter):
 	HYPERSPACE_BACKGROUND_VIDEO='/home/pi/Documents/aux/out_M170_b50_FPS20_SEC10.mp4'

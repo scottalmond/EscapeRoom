@@ -141,14 +141,17 @@ class Maze:
 	CONFIG_FILE_PATH='/home/pi/Documents/EscapeRoom/src/chapters/wall/assets/hyperspace/configuration/'
 	
 	def __init__(self):
-		try:
+		try: #resource paths depend on whether Maze is running headless for testing, or as part of application
 			from chapters.wall.hyperspace_helper.RingAssembly import RingAssembly
 			from util.ResourceManager import ResourceManager
+			from chapters.wall.hyperspace_helper.Segment import Segment
 		except ImportError:
 			from RingAssembly import RingAssembly #to fetch constants for ring/debris rotation rate
 			from ResourceManager import ResourceManager
-		self.rm=ResourceManager
-		self.ra=RingAssembly
+			from Segment import Segment
+		self.rm_library=ResourceManager
+		self.ra_library=RingAssembly
+		self.Segment=Segment
 		
 	def clean(self):
 		self.linear_definition=self.__load(MAZE_CONFIG.LINEAR_DEFINITION)
@@ -226,7 +229,7 @@ class Maze:
 	#debris_definition = { name:[debris, debris, ...], name:[debris, debris, ...], ... }
 	def __load(self,maze_config):
 		filename=maze_config.value["filename"]
-		file_contents=self.rm.loadCSV(self.CONFIG_FILE_PATH+filename)
+		file_contents=self.rm_library.loadCSV(self.CONFIG_FILE_PATH+filename)
 		if(maze_config==MAZE_CONFIG.DEBRIS_DEFINITION):
 			output={}
 		else:
@@ -261,7 +264,9 @@ class Maze:
 					is_two_way=True
 				file_row["is_two_way"]=is_two_way
 				
+				
 				#TODO, handle jump/land sprite case
+				
 				
 				output.append(file_row)
 			elif(maze_config==MAZE_CONFIG.SEGMENT_DEFINITION):
@@ -341,7 +346,7 @@ class Maze:
 		return output
 			
 	#return Segment with RingAssemblies assembled/installed/added
-	#  TODO: only use/load RingAssemblies if in Hyperspace.py ...
+	#  TODO: only use/load RingAssemblies if in Hyperspace.py, not Map.py ...
 	#can't remember, is padding (space between rings) put BEFORE ring
 	#  CAD model, or after ...? TODO
 	#  It's after:  u=idx/len - so u goes from [0,1)
@@ -350,23 +355,24 @@ class Maze:
 		segment_definition=self.__getSegmentDefinition(segment_id)
 		if(segment_definition is None):
 			raise IndexError("Maze.getSegment: cannot find segment_definition for segment_id: ",segment_id)
-		is_branch=segment_definition["sprite"]=="branch"
+		#is_branch=segment_definition["sprite"]=="branch" #provided by method call...
 		curvature_degrees=segment_definition["curvature_degrees"]
 		orientation_degrees=segment_definition["orientation_degrees"]
 		ring_count=len(segment_definition["ring_list"])
-		segment=Segment(asset_library,is_branch,start_position,start_rotation_matrix,
+		segment=self.Segment(asset_library,is_branch,start_position,start_rotation_matrix,
 			start_time_seconds,curvature_degrees,orientation_degrees,ring_count,segment_id)
 		ring_list=segment_definition["ring_list"]
 		if(not is_forward): ring_list=list(reversed(ring_list))
 		for ring_index in range(len(ring_list)):
 			ring_definition=ring_list[ring_index]
 			u=ring_index/len(ring_list)
+			curve_id=0 #always add custom RingAssemblies to first curve
 			ring_index=ring_definition["ring_model"]
 			ring_rotation_degrees=ring_definition["ring_angle_degrees"]
 			ring_rotation_rate=ring_definition["ring_angle_degrees_per_second"]
 			debris_rotation_degrees=ring_definition["debris_angle_degrees"]
 			debris_rotation_rate=ring_definition["debris_angle_degrees_per_second"]
-			ring_assembly=segment.addRingAssembly(self,asset_library,u,ring_index,
+			ring_assembly=segment.addRingAssembly(asset_library,u,curve_id,ring_index,
 				ring_rotation_degrees,ring_rotation_rate,
 				debris_rotation_degrees,debris_rotation_rate)
 			debris_list=ring_definition["debris_list"]
@@ -423,8 +429,9 @@ class Maze:
 			#now get segment(s) after prev and curr node
 			
 	#returns list of segment_id that come after the curr_segment, prev_segment sequence
-	#returns {"segment_id":X,"is_forward":bool}
-	def getSegmentIdAfter(self,prev_segment_id,curr_segment_id):
+	#returns {"segment_id":X,"is_forward":bool,"is_branch":bool}
+	#note: uses recursion to evaluate if segment is a branch (if next segment has mulitple segments after it)
+	def getSegmentIdAfter(self,prev_segment_id,curr_segment_id,evaluate_is_branch=True):
 		#consider five cases:
 		#  prev_nodes==curr_nodes
 		#    is between two nodes
@@ -447,13 +454,24 @@ class Maze:
 			for next_node_id in next_node_list: #get the first segment_id from the next node-node region
 				segment_list=self.getSegmentsBetweenNodes(curr_lin_def["node_id_next"],next_node_id)
 				#print("Maze.getSegmentIdAfter: segment_list: ",segment_list)
-				out_list.append({"is_forward":segment_list["is_forward"],"segment_id":segment_list["segment_list"][0]}) #precon: len(segment_list)>0
+				is_branch=False
+				branch_list=[]#list of segment id's following this branch
+				if(curr_segment_id>=0 and evaluate_is_branch): #only evaluate if is_branch if the current node has something potentially after it
+					try:
+						next_list=self.getSegmentIdAfter(curr_segment_id,segment_list["segment_list"][0],evaluate_is_branch=False)
+					except TypeError:#attempt to get next segment and failed due to there not being any declared segments at end of queue
+						is_branch=False
+					if(len(next_list)>1):
+						is_branch=True #next segment is a branch only if there are two segments that come after it
+						for inner_row in next_list:
+							branch_list.append(inner_row["segment_id"])
+				out_list.append({"is_forward":segment_list["is_forward"],"segment_id":segment_list["segment_list"][0],"is_branch":is_branch,"branch_list":branch_list}) #precon: len(segment_list)>0
 		else:#fetch next from current node-node region
 			segment_list=curr_lin_def["segment_list"]
 			curr_segment_index=curr_lin_def["segment_id_index"]
 			#print("Maze.getSegmentIdAfter: curr_segment_index",curr_segment_index)
 			#print("Maze.getSegmentIdAfter: curr_segment_index",curr_segment_index)
-			out_list.append({"is_forward":curr_lin_def["is_forward"],"segment_id":segment_list[curr_segment_index+1]}) #get segment_id after curr_segment_id in this node-node region
+			out_list.append({"is_forward":curr_lin_def["is_forward"],"segment_id":segment_list[curr_segment_index+1],"is_branch":False,"branch_list":[]}) #get segment_id after curr_segment_id in this node-node region
 		#else:#prev_ and curr_segment_id straddle a node-node relationship
 		#	if(curr_lin_def["segment_id_index"]==(curr_lin_def["segment_list_len"]-1)):
 		return out_list
@@ -583,4 +601,12 @@ if __name__ == "__main__":
 	#print(maze.branch_definition)
 	#print(maze.segment_definition)
 	#print(maze.debris_definition)
-	print(maze.getSegmentIdAfter(2,3))
+	segments=maze.getSegmentIdAfter(2,3)
+	print("Next segment: ",segments)
+	
+	#too involved to de-couple from embedded library imports in helper classes, so can only test on live system
+	#segments=segments[0]
+	#import numpy as np
+	#is_branch=False
+	#temp2=maze.getPopulatedSegment(segments["segment_id"],segments["is_forward"],is_branch,None,np.array([0,0,0]),np.eye(3),0)
+	
