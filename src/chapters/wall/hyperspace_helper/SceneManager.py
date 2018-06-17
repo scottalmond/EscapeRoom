@@ -63,7 +63,7 @@ class SceneManager:
 		self.pod=self.asset_library.pod_frame.shallow_clone() #note: all children remain intact
 		self.maze=Maze()
 		
-		#debug
+		#debug testing
 		self.maze.clean()
 		print(self.maze.getSegmentsBetweenNodes(100,91))
 		print(self.maze.getSegmentsBetweenNodes(91,100))
@@ -292,6 +292,7 @@ class SceneManager:
 		
 	#note: is is assumed super method will populate the retuend segment's predecessor
 	def getSegmentAfter_config(self,prev_segment):
+		print("SceneManager.getSegmentAfter_config: prev_segment: ",prev_segment)
 		if(prev_segment is None):
 			next_segment=self.maze.getFirstPopulatedSegment(self.asset_library,0)#if no segment provided, return the first one
 			#precon: time is measured in seconds from the start of the current life
@@ -301,6 +302,7 @@ class SceneManager:
 			prev_id=prev_segment.segment_id
 			prev2_id=-100 if prev_segment.predecessor is None else prev_segment.predecessor.segment_id #precon: the id of the segment before the first segment needs to be -100
 			next_segment_ids=self.maze.getSegmentIdAfter(prev2_id,prev_id)
+			print("SceneManager.getSegmentAfter_config: next_segment_ids: ",next_segment_ids)
 			was_branch=len(next_segment_ids)>1
 			out_segment=[None] if was_branch else [] #goal is to make either [None,Segment,Segment] for a branch, or [Segment,None,None] for straight
 			for itr in range(2 if was_branch else 1):#precon: only two paths come out of any one branch node

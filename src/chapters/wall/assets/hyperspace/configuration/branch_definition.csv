@@ -20,3 +20,4 @@ node_id_prev,node_id_curr,node_id_next,is_two_way,sprite,x_pixels,y_pixels
 13,35,36,FALSE,branch,50,10
 35,36,15,FALSE,branch,60,10
 36,15,-2,FALSE,end,60,0
+91,80,-3,FALSE,end,0,80

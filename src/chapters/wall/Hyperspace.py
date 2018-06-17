@@ -107,7 +107,7 @@ class Hyperspace(Chapter):
 		#laser_joystick=self.rm.getJoystickDirection(DEVICE.LASER)
 		is_fire_laser=self.rm.isFirePressed(DEVICE.LASER)
 		
-		is_input_active=np.zeros((3,4), dtype=bool)
+		is_input_active=np.zeros((3,4), dtype=bool) #list of user input states (bool)
 		device_list=[DEVICE.DIRECTION,DEVICE.CAMERA,DEVICE.LASER]
 		direction_list=[DIRECTION.NORTH,DIRECTION.WEST,DIRECTION.SOUTH,DIRECTION.EAST]
 		for input_device in range(len(device_list)):

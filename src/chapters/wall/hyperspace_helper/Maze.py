@@ -150,13 +150,13 @@ class Maze:
 			from chapters.wall.hyperspace_helper.RingAssembly import RingAssembly
 			from util.ResourceManager import ResourceManager
 			from chapters.wall.hyperspace_helper.Segment import Segment
+			self.Segment=Segment
 		except ImportError:
 			from RingAssembly import RingAssembly #to fetch constants for ring/debris rotation rate
 			from ResourceManager import ResourceManager
-			from Segment import Segment
+			#from Segment import Segment
 		self.rm_library=ResourceManager
 		self.ra_library=RingAssembly
-		self.Segment=Segment
 		
 	def clean(self):
 		self.linear_definition=self.__load(MAZE_CONFIG.LINEAR_DEFINITION)
@@ -378,30 +378,32 @@ class Maze:
 			start_time_seconds,curvature_degrees,orientation_degrees,ring_count,segment_id)
 		ring_list=segment_definition["ring_list"]
 		if(not is_forward): ring_list=list(reversed(ring_list))
-		for ring_index in range(len(ring_list)):
-			ring_definition=ring_list[ring_index]
-			u=ring_index/len(ring_list)
-			curve_id=0 #always add custom RingAssemblies to first curve
-			ring_index=ring_definition["ring_model"]
-			ring_rotation_degrees=ring_definition["ring_angle_degrees"]
-			ring_rotation_rate=ring_definition["ring_angle_degrees_per_second"]
-			debris_rotation_degrees=ring_definition["debris_angle_degrees"]
-			debris_rotation_rate=ring_definition["debris_angle_degrees_per_second"]
-			ring_assembly=segment.addRingAssembly(asset_library,u,curve_id,ring_index,
-				ring_rotation_degrees,ring_rotation_rate,
-				debris_rotation_degrees,debris_rotation_rate)
-			debris_list=ring_definition["debris_list"]
-			for debris_definition in debris_list:
-				debris_model_index=debris_definition["debris_model"]
-				location=[debris_definition["x"],debris_definition["y"],debris_definition["z"]]
-				angle=[debris_definition["x_degrees"],debris_definition["y_degrees"],debris_definition["z_degrees"]]
-				angular_velocity=[debris_definition["x_degrees_per_second"],
-								  debris_definition["y_degrees_per_second"],
-								  debris_definition["z_degrees_per_second"]]
-				scale=[debris_definition["x_scale"],debris_definition["y_scale"],debris_definition["z_scale"]]
-				radius=debris_definition["radius"]
-				#print("Maze.getPopulatedSegment: debris_model_index: ",debris_model_index)
-				this_debris=ring_assembly.addDebris(debris_model_index,location,angle,angular_velocity,scale,radius)
+		#if(not is_branch):
+		if(True):
+			for ring_index in range(len(ring_list)):
+				ring_definition=ring_list[ring_index]
+				u=ring_index/len(ring_list)
+				curve_id=0 #always add custom RingAssemblies to first curve (assumes non-branch)
+				ring_index=ring_definition["ring_model"]
+				ring_rotation_degrees=ring_definition["ring_angle_degrees"]
+				ring_rotation_rate=ring_definition["ring_angle_degrees_per_second"]
+				debris_rotation_degrees=ring_definition["debris_angle_degrees"]
+				debris_rotation_rate=ring_definition["debris_angle_degrees_per_second"]
+				ring_assembly=segment.addRingAssembly(asset_library,u,curve_id,ring_index,
+					ring_rotation_degrees,ring_rotation_rate,
+					debris_rotation_degrees,debris_rotation_rate)
+				debris_list=ring_definition["debris_list"]
+				for debris_definition in debris_list:
+					debris_model_index=debris_definition["debris_model"]
+					location=[debris_definition["x"],debris_definition["y"],debris_definition["z"]]
+					angle=[debris_definition["x_degrees"],debris_definition["y_degrees"],debris_definition["z_degrees"]]
+					angular_velocity=[debris_definition["x_degrees_per_second"],
+									  debris_definition["y_degrees_per_second"],
+									  debris_definition["z_degrees_per_second"]]
+					scale=[debris_definition["x_scale"],debris_definition["y_scale"],debris_definition["z_scale"]]
+					radius=debris_definition["radius"]
+					#print("Maze.getPopulatedSegment: debris_model_index: ",debris_model_index)
+					this_debris=ring_assembly.addDebris(debris_model_index,location,angle,angular_velocity,scale,radius)
 		return segment
 		
 	#search through file for definition (curvature, orientation, etc)
@@ -476,12 +478,12 @@ class Maze:
 				if(curr_segment_id>=0 and evaluate_is_branch): #only evaluate if is_branch if the current node has something potentially after it
 					try:
 						next_list=self.getSegmentIdAfter(curr_segment_id,segment_list["segment_list"][0],evaluate_is_branch=False)
+						if(len(next_list)>1):
+							is_branch=True #next segment is a branch only if there are two segments that come after it
+							for inner_row in next_list:
+								branch_list.append(inner_row["segment_id"])
 					except TypeError:#attempt to get next segment and failed due to there not being any declared segments at end of queue
 						is_branch=False
-					if(len(next_list)>1):
-						is_branch=True #next segment is a branch only if there are two segments that come after it
-						for inner_row in next_list:
-							branch_list.append(inner_row["segment_id"])
 				out_list.append({"is_forward":segment_list["is_forward"],"segment_id":segment_list["segment_list"][0],"is_branch":is_branch,"branch_list":branch_list}) #precon: len(segment_list)>0
 		else:#fetch next from current node-node region
 			segment_list=curr_lin_def["segment_list"]
@@ -619,7 +621,8 @@ if __name__ == "__main__":
 	#print(maze.branch_definition)
 	#print(maze.segment_definition)
 	#print(maze.debris_definition)
-	segments=maze.getSegmentIdAfter(2,3)
+	segments=maze.getSegmentIdAfter(3,4)
+	#segments=maze.getSegmentIdAfter(2,3)
 	print("Next segment: ",segments)
 	
 	#too involved to de-couple from embedded library imports in helper classes, so can only test on live system

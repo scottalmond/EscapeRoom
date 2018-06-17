@@ -26,7 +26,7 @@ class Segment:
 			#center
 			x_axis=start_rotation_matrix[0,:]
 			self.curves.append(Curve(start_position,start_rotation_matrix,
-				1.4*self.DISTANCE_BETWEEN_RINGS,0,0)) #ring branch (non-transversable)
+				1.4*2*self.DISTANCE_BETWEEN_RINGS,0,0)) #ring branch (non-transversable)
 				
 			branch_dist=2.2
 			branch_curvature=25
@@ -39,9 +39,8 @@ class Segment:
 			start_right_pos=start_position+x_axis*self.BRANCH_DISPLACEMENT_DISTANCE
 			self.curves.append(Curve(start_right_pos,start_rotation_matrix,
 				branch_dist*self.DISTANCE_BETWEEN_RINGS,branch_curvature,0))
-			self.addRingAssembly(asset_library,u=0.0,curve_id=0,ring_model_index=1)
-			#self.addRingAssembly(asset_library,u=0.33,curve_id=0,ring_index=1)
-			self.addRingAssembly(asset_library,u=1.0,curve_id=0,ring_model_index=0)
+			#self.addRingAssembly(asset_library,u=0.0,curve_id=0,ring_model_index=1)
+			#self.addRingAssembly(asset_library,u=1.0,curve_id=0,ring_model_index=0)
 			self.curves[0].is_valid=False
 		else:
 			self.curves.append(Curve(start_position,start_rotation_matrix,
