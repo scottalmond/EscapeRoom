@@ -77,7 +77,8 @@ class SceneManager:
 		segments=segments[0]
 		temp2=self.maze.getPopulatedSegment(segments["segment_id"],segments["is_forward"],segments["is_branch"],self.asset_library,self.np.array([0,0,0]),self.np.eye(3),0)
 		print("SceneManager.clean: populated: ",temp2)
-		
+		temp3=self.maze.getFirstPopulatedSegment(self.asset_library,0)
+		print("SceneManager.clean: first segment: ",temp3)
 		
 	def __getRingCount(self):
 		count=0
@@ -283,6 +284,37 @@ class SceneManager:
 		camera_time=level_elapsed_time_seconds-camera_lag_time
 		return camera_time
 		
+	def getSegmentAfter(self,prev_segment):
+		if(True): #create per config file
+			return self.getSegmentAfter_config(prev_segment)
+		else: #create randomly
+			return self.getSegmentAfter_random(prev_segment)
+		
+	#note: is is assumed super method will populate the retuend segment's predecessor
+	def getSegmentAfter_config(self,prev_segment):
+		if(prev_segment is None):
+			next_segment=self.maze.getFirstPopulatedSegment(self.asset_library,0)#if no segment provided, return the first one
+			#precon: time is measured in seconds from the start of the current life
+			out_segment=[next_segment,None,None]
+		else:
+			end_point=prev_segment.getEndPoints()
+			prev_id=prev_segment.segment_id
+			prev2_id=-100 if prev_segment.predecessor is None else prev_segment.predecessor.segment_id #precon: the id of the segment before the first segment needs to be -100
+			next_segment_ids=self.maze.getSegmentIdAfter(prev2_id,prev_id)
+			was_branch=len(next_segment_ids)>1
+			out_segment=[None] if was_branch else [] #goal is to make either [None,Segment,Segment] for a branch, or [Segment,None,None] for straight
+			for itr in range(2 if was_branch else 1):#precon: only two paths come out of any one branch node
+				next_segment_def=next_segment_ids[itr]
+				next_segment=self.maze.getPopulatedSegment(next_segment_def["segment_id"],
+					next_segment_def["is_forward"],next_segment_def["is_branch"],
+					self.asset_library,end_point[itr]["position"],
+					end_point[itr]["rotation_matrix"],end_point[itr]["timestamp_seconds"])
+				out_segment.append(next_segment)
+			if(not was_branch):
+				out_segment.append(None)
+				out_segment.append(None)
+		return {'prev_segment':prev_segment,'next_segment':out_segment}
+		
 	#TODO: is currently a placeholder for Maze...
 	#given a segment ID, return the parameters needed for the next segment
 	#input:
@@ -291,7 +323,7 @@ class SceneManager:
 	#{'previous_segment':Segment,'next_segment':[Segment,Segment,Segment]}
 	# where previous_segment is the input
 	# and one of the following is True: 'next_segment'[0] is None OR 'next_segment'[1:2] is None
-	def getSegmentAfter(self,segment):
+	def getSegmentAfter_random(self,segment):
 		if(segment is None):
 			#return first segment
 			#TODO load from file
@@ -347,7 +379,7 @@ class SceneManager:
 							ring_rotation_rate=RingAssembly.RING_ROTATION_DEGREES_PER_SECOND,
 							debris_rotation_rate=RingAssembly.DEBRIS_ROTATION_DEGREES_PER_SECOND)
 			#return next segment
-		return {'previous_segment':previous_segment,'next_segment':next_segment}
+		return {'prev_segment':previous_segment,'next_segment':next_segment}
 		
 	#return the start node, end node, progress and current segment_id
 	#return a pointer to the segment where the pod is currently located

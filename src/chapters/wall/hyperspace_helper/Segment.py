@@ -19,7 +19,7 @@ class Segment:
 		self.curves=[] #math representation
 		self.ring_assembly_list=[] #CAD models
 		self.successor=[None,None,None] #pointer to next segment: center, left, right
-		self.predecessor=None
+		self.predecessor=None #queried externally by super methods
 		self.segment_id=segment_id
 		#self.is_forward=is_forward
 		if(self.is_branch):
@@ -50,8 +50,10 @@ class Segment:
 	#need a way to determine if a given segment should be extended
 	# so recursively look for a predecessor segment that matches the current pod segment (target)
 	# if the target pod segment is not in the tree, then the pod followed a different path
+	#can input either an int or a Segment
 	def hasTraceabilityTo(self,target):
-		if(self==target): return True
+		if(self==target): return True #if passed a Segment object
+		if(self.segment_id==target): return True #if passed an int segment_id
 		if(self.__branches_alive()<=0 or self.predecessor is None): return False
 		return self.predecessor.hasTraceabilityTo(target)
 		

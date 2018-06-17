@@ -1,4 +1,4 @@
 debris_name,debris_model,radius,x,y,z,x_degrees,y_degrees,z_degrees,x_degrees_per_second,y_degrees_per_second,z_degrees_per_second,x_scale,y_scale,z_scale
-one_asteroid,1,1,1,0,0,0,0,0,0,10,10,1,1,1
-two_asteroids,1,1,1,0,0,0,0,0,0,10,10,1,1,1
-,1,1,0,1,0,0,0,0,0,-10,10,1,1,1
+one_asteroid,0,1,1,0,0,0,0,0,0,10,10,1,1,1
+two_asteroids,0,1,1,0,0,0,0,0,0,10,10,1,1,1
+,0,1,0,1,0,0,0,0,0,-10,10,1,1,1

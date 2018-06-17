@@ -124,11 +124,16 @@ File columns:
 				when the pod passes through them.  Forward/backward propagation is
 				used to compute the state before/after an encounter with the player
 			precon: first row must have a name in the 'debris_name' field
-
+			
+Note: idea to separate node/segments was a poor choice since it results
+  in duplicate tracking and indexing in many places which gets confusing/verbose
+  A better architecture would have been to have only atomic segments
+  and then define "node" markers in the map as the juncture between segments
 """
 
 from enum import Enum
 import copy #deepcopy
+import numpy as np
 
 class MAZE_CONFIG(Enum):
 	LINEAR_DEFINITION={"filename":"linear_definition.csv"}
@@ -323,6 +328,7 @@ class Maze:
 				if(len(file_row["debris_name"])<=0):
 					this_row_name=previous_row_name
 				file_row["radius"]=int(file_row["radius"])
+				file_row["debris_model"]=int(file_row["debris_model"])
 				for var in ["","_scale","_degrees","_degrees_per_second"]:
 					for dim in ["x","y","z"]:
 						file_row[dim+var]=file_row[dim+var].strip()
@@ -344,6 +350,15 @@ class Maze:
 			else:
 				raise NotImplementedError('Maze.__load: Unable to load config file type: ',maze_config)
 		return output
+			
+	def getFirstPopulatedSegment(self,asset_library,start_time_seconds):
+		segment_id=1 #hard coded/precon that the first segment is 1
+		is_forward=True
+		is_branch=False
+		start_position=np.array([0.0,0.0,0.0])
+		start_rotation_matrix=np.eye(3)
+		return self.getPopulatedSegment(segment_id,is_forward,is_branch,asset_library,
+			start_position,start_rotation_matrix,start_time_seconds)
 			
 	#return Segment with RingAssemblies assembled/installed/added
 	#  TODO: only use/load RingAssemblies if in Hyperspace.py, not Map.py ...
@@ -385,6 +400,7 @@ class Maze:
 								  debris_definition["z_degrees_per_second"]]
 				scale=[debris_definition["x_scale"],debris_definition["y_scale"],debris_definition["z_scale"]]
 				radius=debris_definition["radius"]
+				#print("Maze.getPopulatedSegment: debris_model_index: ",debris_model_index)
 				this_debris=ring_assembly.addDebris(debris_model_index,location,angle,angular_velocity,scale,radius)
 		return segment
 		
@@ -439,6 +455,7 @@ class Maze:
 		#  else prev_nodes!=curr_nodes
 		#    if curr_nodes is branch, 3) return two followers coming from prev_nodes direction
 		#    
+		print("Maze.getSegmentIdAfter: prev_segment_id: "+str(prev_segment_id)+", curr_segment_id: "+str(curr_segment_id)+", evaluate_is_branch: "+str(evaluate_is_branch))
 		lin_def_pair=self.getOrderedLinearDefinition(curr_segment_id,prev_segment_id)
 		prev_lin_def=lin_def_pair["prev"]
 		curr_lin_def=lin_def_pair["curr"]
@@ -508,7 +525,8 @@ class Maze:
 		curr_lin_def=self.getLinearDefinitionOfSegment(curr_segment_id)
 		if(curr_lin_def["node_id_prev"]==prev_lin_def["node_id_prev"] and
 		   curr_lin_def["node_id_next"]==prev_lin_def["node_id_next"]): #then both segments within same node-node range
-			if(prev_node_id["segment_id_index"]>curr_node_id["segment_id_index"]): #need to flip because headed backwards
+			#if(prev_node_id["segment_id_index"]>curr_node_id["segment_id_index"]): #need to flip because headed backwards #varaible not defined error
+			if(prev_lin_def["segment_id_index"]>curr_lin_def["segment_id_index"]): #need to flip because headed backwards
 				prev_lin_def=self.__reverseLinearDefinition(prev_lin_def)
 				curr_lin_def=self.__reverseLinearDefinition(curr_lin_def)
 		else:
