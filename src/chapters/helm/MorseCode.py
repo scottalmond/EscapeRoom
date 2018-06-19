@@ -29,7 +29,7 @@ class MorseCode(Chapter):
 	MC_FONT_FNAME = 'WHITRABT.TTF' #alternatively 'CourierPrimeCode.ttf'
 	MC_FONT_SIZE = 72
 	PASSWORD = "SPACE"
-	MESSAGE = "Congratulations!" #Reward for solving puzzle - currently a placeholder
+	MESSAGE = "OHMS"
 	
 	def __init__(self,this_book):
 		super().__init__(this_book)
