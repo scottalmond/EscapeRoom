@@ -230,7 +230,7 @@ class Maze:
 	#load csv file
 	#linear_definition = [ [prev,next], [prev,next], ... ]
 	#branch_definition = [ [prev,curr,next], [prev,curr,next], ... ]
-	#segment_definition = [ [id,[ring_assy, ring_assy, ...], [id,[ring_assy, ring_assy, ...], ...]
+	#segment_definition = [ {"segment_id":id,"ring_list":[ring_assy, ring_assy, ...}, {"segment_id":id,"ring_list":[ring_assy, ring_assy, ...}, ...]
 	#debris_definition = { name:[debris, debris, ...], name:[debris, debris, ...], ... }
 	def __load(self,maze_config):
 		filename=maze_config.value["filename"]
@@ -276,7 +276,7 @@ class Maze:
 				output.append(file_row)
 			elif(maze_config==MAZE_CONFIG.SEGMENT_DEFINITION):
 				file_row["segment_id"]=int(file_row["segment_id"])
-				for prev_row in output: #ease-of-use imeplementation: copy-paste first row contents into subsequent rows with same id number
+				for prev_row in output: #ease-of-use implementation: copy-paste first row contents into subsequent rows with same id number
 					if(prev_row["segment_id"]==file_row["segment_id"]):
 						file_row["type"]=prev_row["type"]
 						file_row["curvature_degrees"]=str(prev_row["curvature_degrees"])
@@ -413,39 +413,6 @@ class Maze:
 				return copy.deepcopy(row) #should no longer need deepcopy since debris is now copied into segment_definition at start ratehr than after this method call
 		return None
 
-	#TODO
-	#curr_segment_id
-	#prev_segment_id
-	#return list of dictionaries:
-	#[{"segment_id":X,"is_forward":True},{"segment_id":Y,"is_forward":False}]
-	def getSegmentIdAfter_legacy(self,curr_segment_id,prev_segment_id):
-		#sudo-code:
-		#if segment_id<0 (ie, get starting segment)
-		#  get the first segment from linear_definition amd return that
-		#look through linear_definition for current segment_id
-		#if is_forward, find the segment_id after the current segment_id
-		#  in this node-node relationship segment_list
-		#if NOT is_forward, find the segment_id BEFORE the current segment_id
-		#if segment_list from this node-node relationship has been exhausted
-		#then fetch the next/previous node-node relationship and
-		#return the first/last segment from there
-		#if node_type is end/dead --> return [] since there is no follower
-		if(curr_segment_id<0):
-			#first segment
-			node_node_relationship=self.linear_definition[0]
-			return [{"segment_id":node_node_relationship["segment_list"][0],"is_forward":True}]
-		else:
-			#first find the node-node relationship where this segment came from
-			#then determine either 1) the neighboring segment from the segment_list
-			#or the neighboring node-node relationship and the segment from *that* segment_list
-			curr_node=self.getSegment2Node(curr_segment_id)
-			prev_node=self.getSegment2Node(prev_segment_id)
-			if(curr_node is None):
-				ValueError("Maze.getSegmentIdAfter: Unable to fetch the node-node relationship for segment: ",curr_segment_id)
-			if(prev_node is None): #should only occur if prev_segment_id is invalid, ie when traversing from the first to the second segment in the maze
-				return [{"segment_id":self.linear_definition[0]["segment_list"][1],"is_forward":True}]
-			#now get segment(s) after prev and curr node
-			
 	#returns list of segment_id that come after the curr_segment, prev_segment sequence
 	#returns {"segment_id":X,"is_forward":bool,"is_branch":bool}
 	#note: uses recursion to evaluate if segment is a branch (if next segment has mulitple segments after it)
@@ -519,8 +486,8 @@ class Maze:
 		return out_list
 		
 	#get the linear_definition for curr_ and prev_segment_id, but ordered (is_forward) for the partiular input sequence
-	#returns {"prev":{"prev_id_node":X,"next_id_node":Y,"is_forward":bool,"segment_id":Z},
-	#		  "curr":{"prev_id_node":X,"next_id_node":Y,"is_forward":bool,"segment_id":Z}}
+	#returns {"prev":{"prev_id_node":X,"next_id_node":Y,"is_forward":bool,"segment_id":Z,"segment_list":prev_curr_sorted_segment_list},
+	#		  "curr":{"prev_id_node":X,"next_id_node":Y,"is_forward":bool,"segment_id":Z,"segment_list":prev_curr_sorted_segment_list}}
 	#put from_ and to_ nodes in order, and include the index of the segment in the segment_list
 	def getOrderedLinearDefinition(self,curr_segment_id,prev_segment_id):
 		prev_lin_def=self.getLinearDefinitionOfSegment(prev_segment_id)
@@ -593,18 +560,43 @@ class Maze:
 			if(hit):
 				return {"is_forward":is_forward,"node_id_prev":this_prev,"node_id_next":this_next,"segment_list":this_segments}
 		return None
-
-	#TODO: deletable...
-	#get the node-node relationship, and the segment_list index, for a given segment_id
-	#return dictionary {"node":linear_definition[X],"segment_list_index":Y}
-	#return None if not found
-	def getSegment2Node(self,segment_id):
-		for node_node_iter in self.linear_definition:
-			segment_list=node_node_iter["segments"]
-			if(segment_id in segment_list):
-				segment_index=segment_list.index(seg_id)
-				return {"node":node_node_iter,"segment_list_index":segment_index}
-		return None
+		
+	#given the previous and current segment id's, determine how far along the pod is between two nodes
+	#precon: segment_ratio is between 0 and 1
+	#precon: prev_segment_id and curr_segment_id are defined sequentially in self.linear_definition
+	#returns dictionary with node id's and ratio of completion between endpoints
+	# weighted for each Segment's total length (to ensure ratio increments linearly
+	# with time as pod traverses between nodes)
+	def getNodeStatus(self,prev_segment_id,curr_segment_id,segment_ratio):
+		ordered_definition=getOrderedLinearDefinition(self,curr_segment_id,prev_segment_id)
+		curr_node_definition=ordered_definition["curr"]
+		curr_node_segment_list=curr_node_definition["segment_list"] #already ordered from prev to curr nodes
+		progress_duration=0
+		total_duration=0
+		found_current_segment=False
+		for this_segment_id in curr_node_segment_list:
+			if(not found_current_segment):
+				if(curr_segment_id==this_segment_id):
+					found_current_segment=True
+					progress_duration+=segment_ratio*self.__getSegmentDuration(this_segment_id)
+				else:
+					progress_duration+=self.__getSegmentDuration(this_segment_id)
+			total_duration+=self.__getSegmentDuration(this_segment_id)
+		node_progress=progress_duration/total_duration
+		return {"prev_id_node":curr_node_definition["prev_id_node"],
+				"curr_id_node":curr_node_definition["curr_id_node"],
+				"node_progress":node_progress}
+	
+	#determine the number of ring assemblies in the given segment
+	# used as a proxy to estimate time elapsed when traversing the given segment
+	# info is combined in super-methods with other segment durations to
+	# gauge progresss between nodes
+	#note: currently "duration" is defined as a ring count, not a explict duration
+	# though they are related through a constant rate of speed along all Segment curves
+	def __getSegmentDuration(self,segment_id):
+		for file_row in self.segment_definition:
+			if(file_row["segment_id"]==segment_id):
+				return len(file_row["ring_list"])
 		
 if __name__ == "__main__":
 	import sys
